@@ -89,6 +89,30 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
           {/* Clean Light Tab Navigation */}
           <div className="flex overflow-x-auto space-x-1 py-2 border-t border-slate-100 no-scrollbar">
             <button
+              onClick={() => setActiveTab('syllabus')}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer ${
+                activeTab === 'syllabus'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <FileUp className="w-4 h-4" />
+              <span>Upload Syllabus / Notes</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('revision')}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer ${
+                activeTab === 'revision'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <Calendar className="w-4 h-4" />
+              <span>Revision & Study Plans</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('eli10')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer ${
                 activeTab === 'eli10'
@@ -98,18 +122,6 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
             >
               <Lightbulb className="w-4 h-4" />
               <span>“Explain Like I’m 10”</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('kahoot')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer ${
-                activeTab === 'kahoot'
-                  ? 'bg-purple-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <Trophy className="w-4 h-4" />
-              <span>Kahoot Practice Tests</span>
             </button>
 
             <button
@@ -125,29 +137,18 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
             </button>
 
             <button
-              onClick={() => setActiveTab('revision')}
+              onClick={() => setActiveTab('kahoot')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer ${
-                activeTab === 'revision'
-                  ? 'bg-emerald-600 text-white shadow-xs'
+                activeTab === 'kahoot'
+                  ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <Calendar className="w-4 h-4" />
-              <span>Revision & Study Plans</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('syllabus')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer ${
-                activeTab === 'syllabus'
-                  ? 'bg-cyan-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <FileUp className="w-4 h-4" />
-              <span>Upload Syllabus / Notes</span>
+              <Trophy className="w-4 h-4" />
+              <span>Kahoot Practice Tests</span>
             </button>
           </div>
+
 
         </div>
       </header>
