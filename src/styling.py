@@ -10,7 +10,7 @@ CUSTOM_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 /* ==========================================================================
-   GLOBAL APP & DREAMY PASTEL CANVAS (ENHANCED TYPOGRAPHY)
+   GLOBAL APP & LUMINOUS SOOTHING CANVAS
    ========================================================================== */
 html {
     font-size: 16.5px !important;
@@ -21,8 +21,12 @@ div[data-testid="stAppViewContainer"],
 div[data-testid="stHeader"],
 div[data-testid="stToolbar"],
 div[data-testid="stBottom"] {
-    background-color: #faf7f2 !important;
-    background: linear-gradient(135deg, #fdfbf7 0%, #f4f6fb 35%, #f2f8f5 70%, #fbf5f8 100%) !important;
+    background-color: #f8fafd !important;
+    background: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.06) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.05) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.04) 0px, transparent 50%),
+        linear-gradient(135deg, #f8fafc 0%, #f1f5f9 30%, #f3f6fc 60%, #f0fdf9 100%) !important;
     background-attachment: fixed !important;
     color: #1e293b !important;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
@@ -31,7 +35,7 @@ div[data-testid="stBottom"] {
 
 /* Breathable Block Container */
 .main .block-container {
-    max-width: 1250px !important;
+    max-width: 1260px !important;
     padding-top: 1.25rem !important;
     padding-bottom: 3.5rem !important;
     padding-left: 2rem !important;
@@ -69,11 +73,11 @@ button[data-testid="stSidebarCollapsedControl"],
 
 .sidebar-stat-box {
     background: #ffffff;
-    border: 1px solid #ede8e3;
+    border: 1px solid #e2e8f0;
     border-radius: 12px;
     padding: 0.75rem 0.85rem;
     text-align: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
 }
 
 .sidebar-stat-number {
@@ -170,32 +174,34 @@ button[kind="secondary"] {
    LANDING PAGE STYLING
    ========================================================================== */
 .hero-container {
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid #ede8e3;
-    border-radius: 20px;
-    padding: 2.5rem 2.25rem;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(20px);
+    border: 1.5px solid rgba(226, 232, 240, 0.9);
+    border-radius: 24px;
+    padding: 2.75rem 2.25rem;
     text-align: center;
     margin-bottom: 2rem;
-    box-shadow: 0 8px 28px -4px rgba(220, 215, 205, 0.38);
+    box-shadow: 0 20px 40px -15px rgba(30, 41, 59, 0.05), 0 4px 12px -2px rgba(30, 41, 59, 0.02);
 }
 
 .hero-pill-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #f5f3ff;
+    background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
     color: #4f46e5;
-    border: 1px solid #ddd6fe;
-    padding: 0.4rem 1rem;
+    border: 1px solid #c7d2fe;
+    padding: 0.4rem 1.1rem;
     border-radius: 999px;
     font-size: 0.88rem;
     font-weight: 700;
     margin-bottom: 1.15rem;
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.08);
 }
 
 .hero-h1 {
     font-family: 'Outfit', sans-serif !important;
-    font-size: 2.65rem;
+    font-size: 2.75rem;
     font-weight: 800;
     color: #0f172a;
     letter-spacing: -0.035em;
@@ -204,7 +210,7 @@ button[kind="secondary"] {
 }
 
 .hero-h1-gradient {
-    background: linear-gradient(135deg, #4f46e5 0%, #0284c7 100%);
+    background: linear-gradient(135deg, #4338ca 0%, #3b82f6 50%, #06b6d4 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -218,86 +224,88 @@ button[kind="secondary"] {
 }
 
 .feature-card {
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid #ede8e3;
-    border-radius: 16px;
-    padding: 1.45rem;
-    box-shadow: 0 4px 16px rgba(220, 215, 205, 0.25);
-    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(16px);
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px -4px rgba(30, 41, 59, 0.04);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     height: 100%;
 }
 
 .feature-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(220, 215, 205, 0.4);
-    border-color: #ddd6fe;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px -6px rgba(79, 70, 229, 0.12);
+    border-color: #c7d2fe;
 }
 
 .feature-icon-wrapper {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.45rem;
-    margin-bottom: 0.9rem;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .feature-title {
     font-family: 'Outfit', sans-serif !important;
-    font-size: 1.12rem;
+    font-size: 1.15rem;
     font-weight: 700;
     color: #0f172a;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.45rem;
 }
 
 .feature-desc {
     font-size: 0.92rem;
     color: #64748b;
-    line-height: 1.58;
+    line-height: 1.6;
 }
 
 .step-card {
     background: #ffffff;
-    border: 1px solid #ede8e3;
-    border-radius: 14px;
-    padding: 1.35rem 1.25rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.45rem 1.25rem;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
     height: 100%;
 }
 
 .step-num {
     display: inline-block;
-    width: 32px;
-    height: 32px;
-    line-height: 32px;
+    width: 34px;
+    height: 34px;
+    line-height: 34px;
     border-radius: 50%;
-    background: #4f46e5;
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
     color: #ffffff;
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     font-weight: 700;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.65rem;
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
 }
 
 /* ==========================================================================
-   UNIFIED TOP NAV BAR (PASTEL GLASSMORPHISM)
+   UNIFIED TOP NAV BAR (FROSTED GLASSMORPHISM)
    ========================================================================== */
 .top-nav-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(16px);
-    border: 1px solid #ede8e3;
-    border-radius: 14px;
-    padding: 0.65rem 1.25rem;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 16px;
+    padding: 0.7rem 1.35rem;
     margin-bottom: 1.25rem;
-    box-shadow: 0 4px 16px -2px rgba(220, 215, 205, 0.35);
+    box-shadow: 0 4px 20px -4px rgba(30, 41, 59, 0.05);
     flex-wrap: wrap;
     gap: 0.75rem;
-    min-height: 52px;
+    min-height: 54px;
 }
 
 .nav-back-link {
@@ -457,11 +465,11 @@ button[kind="secondary"] {
    CARD CONTAINERS & GLASSMORPHIC BLOCKS
    ========================================================================== */
 div[data-testid="stVerticalBlockBorderWrapper"] {
-    background: rgba(255, 255, 255, 0.9) !important;
-    backdrop-filter: blur(12px) !important;
-    border: 1px solid #ede8e3 !important;
-    border-radius: 16px !important;
-    box-shadow: 0 4px 20px -2px rgba(220, 215, 205, 0.35) !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(226, 232, 240, 0.88) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02) !important;
     padding: 1.5rem !important;
     margin-bottom: 1.25rem !important;
 }
@@ -470,21 +478,24 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
 .chip-btn {
     display: inline-flex;
     align-items: center;
-    padding: 0.4rem 0.85rem;
-    background: #fdfbf7;
+    padding: 0.45rem 0.95rem;
+    background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 20px;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     font-weight: 600;
     color: #334155;
     cursor: pointer;
-    transition: all 0.15s ease;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .chip-btn:hover {
-    background: #f1f5f9;
-    color: #0f172a;
-    border-color: #94a3b8;
+    background: #f0f4ff;
+    color: #4338ca;
+    border-color: #c7d2fe;
+    transform: translateY(-1.5px);
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.12);
 }
 
 /* Buttons */
@@ -494,17 +505,19 @@ button[data-testid="baseButton-secondary"] {
     background: #ffffff !important;
     color: #1e293b !important;
     font-weight: 600 !important;
-    border: 1px solid #cbd5e1 !important;
+    border: 1.5px solid #cbd5e1 !important;
     border-radius: 10px !important;
     padding: 0.55rem 1.25rem !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
-    transition: all 0.15s ease !important;
+    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.03) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .stButton > button:hover {
-    background: #fdfbf7 !important;
+    background: #f8fafc !important;
     border-color: #94a3b8 !important;
     color: #0f172a !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06) !important;
 }
 
 /* Primary and Form Submit Buttons */
@@ -512,13 +525,14 @@ button[data-testid="baseButton-secondary"] {
 div[data-testid="stFormSubmitButton"] > button,
 div[data-testid="stFormSubmitButton"] > button[kind="primary"],
 button[data-testid="baseButton-primary"] {
-    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
-    border: 1px solid #3730a3 !important;
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%) !important;
+    border: 1px solid #4338ca !important;
     color: #ffffff !important;
     font-weight: 700 !important;
     font-size: 1rem !important;
-    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.28) !important;
+    box-shadow: 0 4px 16px rgba(79, 70, 229, 0.35) !important;
     cursor: pointer !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .stButton > button[kind="primary"] *,
@@ -532,11 +546,11 @@ button[data-testid="baseButton-primary"] * {
 
 .stButton > button[kind="primary"]:hover,
 div[data-testid="stFormSubmitButton"] > button:hover {
-    background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%) !important;
-    border-color: #312e81 !important;
+    background: linear-gradient(135deg, #4338ca 0%, #2563eb 100%) !important;
+    border-color: #3730a3 !important;
     color: #ffffff !important;
-    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35) !important;
-    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.45) !important;
+    transform: translateY(-2px) !important;
 }
 
 /* Text Inputs & Select Boxes */
@@ -544,16 +558,17 @@ div[data-baseweb="input"],
 div[data-baseweb="select"] > div,
 div[data-baseweb="textarea"] {
     background-color: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 10px !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 11px !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03) !important;
+    transition: all 0.2s ease !important;
 }
 
 div[data-baseweb="input"]:focus-within,
 div[data-baseweb="select"] > div:focus-within,
 div[data-baseweb="textarea"]:focus-within {
-    border-color: #4f46e5 !important;
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3.5px rgba(99, 102, 241, 0.18) !important;
 }
 
 /* Completely Hide Streamlit "Press Ctrl+Enter to apply" helper text */
@@ -576,16 +591,16 @@ span[data-testid="stWidgetInstructions"],
 /* Chat Messages */
 div[data-testid="stChatMessage"] {
     background: #ffffff !important;
-    border: 1px solid #ede8e3 !important;
-    border-radius: 14px !important;
-    padding: 1.15rem !important;
-    margin-bottom: 0.85rem !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    padding: 1.25rem !important;
+    margin-bottom: 0.95rem !important;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03) !important;
 }
 
 div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarUser"]) {
-    background: #fdfbf7 !important;
-    border-color: #e2e8f0 !important;
+    background: linear-gradient(135deg, #f0f4ff 0%, #f5f3ff 100%) !important;
+    border-color: #c7d2fe !important;
 }
 
 /* Direct Click-to-Edit User Chat Bubble */
@@ -604,10 +619,10 @@ div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarUser"])
 }
 
 div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarUser"]) div[data-baseweb="input"]:focus-within {
-    border: 1px solid #6366f1 !important;
+    border: 1.5px solid #6366f1 !important;
     background: #ffffff !important;
     border-radius: 8px !important;
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
 }
 
 div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarUser"]) input {
