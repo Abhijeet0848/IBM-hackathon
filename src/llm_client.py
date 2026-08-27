@@ -409,9 +409,11 @@ Why was this developed? Across academic history, pioneering researchers and educ
 ### 3. 🚀 Future Research & Modern Real-World Applications
 Today, these concepts directly power modern educational technologies, cognitive science models, adaptive learning platforms, and professional workforce development."""
 
-        # Mode: 10-QUESTION CONTEXT-GROUNDED QUIZ GENERATOR
+        # Mode: DYNAMIC CONTEXT-GROUNDED QUIZ GENERATOR
         elif system_mode == "quiz":
-            return self._build_10_question_context_quiz(topic, context)
+            count_match = re.search(r'(\d+)\s*(?:multiple choice questions|questions|high-yield)', prompt, re.IGNORECASE)
+            q_count = int(count_match.group(1)) if count_match else 10
+            return self._build_dynamic_context_quiz(topic, context, count=q_count)
 
         return f"Syllabus insights on {display_topic}."
 
@@ -456,10 +458,11 @@ Today, these concepts directly power modern educational technologies, cognitive 
             ]
         return "\n".join(selected)
 
-    def _build_10_question_context_quiz(self, topic: str, context: str) -> str:
+    def _build_dynamic_context_quiz(self, topic: str, context: str, count: int = 10) -> str:
         """
-        Synthesizes authentic, professional multiple-choice questions grounded in uploaded syllabus concepts.
+        Synthesizes authentic, professional multiple-choice questions grounded in uploaded syllabus concepts
+        matching the exact question count requested by the user.
         """
         from src.quiz_evaluator import QuizEvaluator
-        quiz_data = QuizEvaluator.build_topic_quiz_from_context(topic=topic, context=context, count=10)
+        quiz_data = QuizEvaluator.build_topic_quiz_from_context(topic=topic, context=context, count=count)
         return json.dumps(quiz_data, indent=2)
