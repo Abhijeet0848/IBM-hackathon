@@ -761,7 +761,7 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
             num_questions = st.number_input(
                 "🔢 Question Count:",
                 min_value=3,
-                max_value=30,
+                max_value=100,
                 value=8,
                 step=1,
                 key="quiz_num_questions"
