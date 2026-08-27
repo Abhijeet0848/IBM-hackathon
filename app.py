@@ -563,10 +563,10 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                                 f'<div class="popover-header"><span>🎯</span><span><strong>Focus:</strong> {res_data["primary_topic"]}</span></div>'
                                 f'<div class="resource-tile-list">'
                                 f'<a href="{res_data["primary_wiki"]}" target="_blank" class="resource-tile resource-tile-blue"><span>🌐 Wikipedia Article</span><span>↗</span></a>'
-                                f'<a href="{res_data["gfg_url"]}" target="_blank" class="resource-tile resource-tile-green"><span>💻 GeeksforGeeks Tutorial</span><span>↗</span></a>'
-                                f'<a href="{res_data["youtube_url"]}" target="_blank" class="resource-tile resource-tile-red"><span>▶️ Video Masterclass</span><span>↗</span></a>'
-                                f'<a href="{res_data["google_books_url"]}" target="_blank" class="resource-tile resource-tile-amber"><span>📖 Textbooks & Notes</span><span>↗</span></a>'
-                                f'<a href="{res_data["mit_ocw_url"]}" target="_blank" class="resource-tile resource-tile-purple"><span>🎓 MIT OpenCourseWare</span><span>↗</span></a>'
+                                f'<a href="{res_data["scholar_url"]}" target="_blank" class="resource-tile resource-tile-green"><span>🔬 Google Scholar & Papers</span><span>↗</span></a>'
+                                f'<a href="{res_data["youtube_url"]}" target="_blank" class="resource-tile resource-tile-red"><span>▶️ Educational Video Lectures</span><span>↗</span></a>'
+                                f'<a href="{res_data["google_books_url"]}" target="_blank" class="resource-tile resource-tile-amber"><span>📖 Textbooks & Academic Notes</span><span>↗</span></a>'
+                                f'<a href="{res_data["mit_ocw_url"]}" target="_blank" class="resource-tile resource-tile-purple"><span>🎓 Courseware & Tutorials</span><span>↗</span></a>'
                                 f'</div>'
                             )
                             st.markdown(popover_html, unsafe_allow_html=True)

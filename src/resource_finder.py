@@ -107,10 +107,11 @@ class ResourceFinder:
         # 4. Strip leading structural labels like 'Topic:', 'Module 1:', 'Study concept:'
         cleaned = re.sub(r'^\s*(Topic|Module\s*\d+|Unit\s*\d+|Chapter\s*\d+|Day\s*\d+|Week\s*\d+|Section\s*\d+|Lecture\s*\d+|Study concept)\s*:\s*', '', cleaned, flags=re.IGNORECASE)
         
-        # 5. Remove boilerplate activity descriptions
+        # 5. Remove comprehensive boilerplate activity descriptions and task prefixes
         boilerplate_patterns = [
-            r'Work through practical examples\s*(?:&|and)?\s*(?:formula sheet)?\s*(?:for)?',
-            r'Test conceptual mastery with\s*(?:ELI10)?\s*(?:mode)?\s*(?:on)?',
+            r'Core definitions and foundations of',
+            r'Practical exercises and problems on',
+            r'Active recall check on',
             r'Extract key testable definitions and theorems for',
             r'Solve high-probability exam questions on',
             r'Complete active recall test in',
@@ -119,7 +120,15 @@ class ResourceFinder:
             r'Teach concept in ELI10 mode to verify 100% intuition',
             r'Quick recall review\s*(?:on)?',
             r'Study core mechanisms\s*(?:&|and)?\s*properties of',
+            r'Solve targeted practical exercises on',
             r'Solve \d+ targeted exercises on',
+            r'Work through practical examples\s*(?:&|and)?\s*(?:formula sheet)?\s*(?:for)?',
+            r'Rapid review of summary notes and core formulas across',
+            r'Work through high-yield edge case problems and',
+            r'Launch \d+ full-length active recall drills in',
+            r'Active recall flashcard session reviewing',
+            r'Re-attempt any difficult practice problems from',
+            r'Clarify any conceptual doubts using',
             r'Study concept\s*:',
             r'Study concept',
             r'Study',
@@ -185,18 +194,32 @@ class ResourceFinder:
         if not primary_topic or primary_topic.lower() in ["topic", "module", "unit", "day"]:
             primary_topic = "Syllabus Core Concepts"
 
-        # Extract meaningful subtopics from tasks
+        # Extract meaningful distinct subtopics from primary topic clauses or tasks
         subtopics = []
         seen_names = {primary_topic.lower()}
         
+        # Extract subtopics from clauses inside primary topic (e.g. "national and international current events")
+        sub_clauses = re.split(r'[,;]|\band\b', primary_topic)
+        if len(sub_clauses) > 1:
+            for sc in sub_clauses:
+                clean_sc = sc.strip().rstrip(" ,;:.-")
+                if len(clean_sc) > 3 and clean_sc.lower() not in seen_names:
+                    seen_names.add(clean_sc.lower())
+                    subtopics.append({
+                        "name": clean_sc[:50],
+                        "wikipedia_url": ResourceFinder.resolve_wikipedia_link(clean_sc)
+                    })
+
         for t in tasks:
             clean_t = ResourceFinder.clean_topic_query(t)
             if clean_t and clean_t.lower() not in seen_names and len(clean_t) > 3 and clean_t.lower() not in ["topic", "module", "unit", "day"]:
-                seen_names.add(clean_t.lower())
-                subtopics.append({
-                    "name": clean_t[:35],
-                    "wikipedia_url": ResourceFinder.resolve_wikipedia_link(clean_t)
-                })
+                # Ensure it's not a generic task fragment
+                if not any(clean_t.lower().startswith(p) for p in ["core definitions", "practical exercises", "active recall", "final comprehensive"]):
+                    seen_names.add(clean_t.lower())
+                    subtopics.append({
+                        "name": clean_t[:50],
+                        "wikipedia_url": ResourceFinder.resolve_wikipedia_link(clean_t)
+                    })
         
         encoded_primary = urllib.parse.quote_plus(primary_topic)
         primary_wiki = ResourceFinder.resolve_wikipedia_link(primary_topic)
@@ -205,10 +228,11 @@ class ResourceFinder:
             "primary_topic": primary_topic,
             "primary_wiki": primary_wiki,
             "subtopics": subtopics[:3],
-            "gfg_url": f"https://www.google.com/search?q=site%3Ageeksforgeeks.org+{encoded_primary}",
-            "youtube_url": f"https://www.youtube.com/results?search_query={encoded_primary}+tutorial+lecture",
+            "scholar_url": f"https://scholar.google.com/scholar?q={encoded_primary}",
+            "youtube_url": f"https://www.youtube.com/results?search_query={encoded_primary}+educational+lecture",
             "google_books_url": f"https://www.google.com/search?tbm=bks&q={encoded_primary}+textbook",
-            "mit_ocw_url": f"https://www.google.com/search?q=site%3Aocw.mit.edu+{encoded_primary}"
+            "mit_ocw_url": f"https://www.google.com/search?q={encoded_primary}+open+courseware+tutorial",
+            "gfg_url": f"https://www.google.com/search?q=site%3Ageeksforgeeks.org+{encoded_primary}"
         }
 
     @staticmethod
@@ -218,7 +242,7 @@ class ResourceFinder:
         return {
             "topic": res["primary_topic"],
             "wikipedia_url": res["primary_wiki"],
-            "gfg_url": res["gfg_url"],
+            "scholar_url": res["scholar_url"],
             "youtube_url": res["youtube_url"],
             "google_books_url": res["google_books_url"],
             "mit_ocw_url": res["mit_ocw_url"]
