@@ -183,7 +183,7 @@ class ResourceFinder:
             primary_topic = ResourceFinder.clean_topic_query(tasks[0])
             
         if not primary_topic or primary_topic.lower() in ["topic", "module", "unit", "day"]:
-            primary_topic = "Computer Science Concepts"
+            primary_topic = "Syllabus Core Concepts"
 
         # Extract meaningful subtopics from tasks
         subtopics = []
