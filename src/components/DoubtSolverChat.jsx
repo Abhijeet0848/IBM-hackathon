@@ -51,17 +51,36 @@ const DoubtSolverChat = ({ onAddXP }) => {
 
       const qLower = query.toLowerCase();
       if (qLower.includes('dom') || qLower.includes('react')) {
-        reply = `**Virtual DOM & Reconciliation Explained:**\n\n1. **Virtual DOM Tree:** React maintains an in-memory lightweight representation of the UI.\n2. **Diffing Algorithm:** When state updates occur, React generates a new Virtual DOM tree and diffs it with the previous one (O(n) heuristic).\n3. **Batch Patching:** Only the changed nodes are updated in the actual browser DOM, saving massive layout recalculation costs.\n\n*Bob's Tip: Use \`React.memo\` and \`useCallback\` to avoid re-rendering heavy child components unnecessarily!*`;
+        reply = `### 📖 Core Concept (Virtual DOM & Reconciliation)
+React maintains an in-memory lightweight representation of the UI. When state changes, a diffing algorithm (O(n) heuristic) calculates the minimal batch of changes needed and patches only the changed real DOM nodes.
+
+### 🏛️ Historical Origin
+Prior to 2013, JavaScript frameworks manipulated the Browser DOM directly on every event, leading to severe layout recalculation bottlenecks and jank. Jordan Walke at Facebook engineered the Virtual DOM paradigm in 2013 to abstract expensive reflow calculations.
+
+### 🚀 Future Research & Industry Application
+Modern frameworks are evolving with React 19 Server Components, Asset Loading optimization, and fine-grained reactivity (Signals / Solid.js) to achieve near-instant client hydration.`;
         citations = ["ChromaDB Chunk #12: React_Advanced_Patterns.pdf", "IBM SkillsBuild: Frontend Performance"];
-      } else if (qLower.includes('tcp') || qLower.includes('udp')) {
-        reply = `**TCP vs UDP Comparison:**\n\n- **TCP (Transmission Control Protocol):** Connection-oriented, guarantees packet delivery via 3-way handshake and retransmission. Best for web browsing (HTTP/HTTPS) and file transfers.\n- **UDP (User Datagram Protocol):** Connectionless, lightweight, no delivery guarantee, minimal latency. Best for live gaming, video streaming, and VoIP.`;
-        citations = ["ChromaDB Chunk #4: Networking_Protocols.pdf"];
-      } else if (qLower.includes('vector') || qLower.includes('chroma')) {
-        reply = `**Vector Embeddings & ChromaDB:**\n\nText chunks are transformed into multi-dimensional floating-point vectors by embedding models. When you ask a doubt, your query is embedded and matched against stored document vectors using Cosine Similarity to extract the most relevant syllabus context!`;
+      } else if (qLower.includes('vector') || qLower.includes('chroma') || qLower.includes('rag')) {
+        reply = `### 📖 Core Concept (Vector Embeddings & RAG)
+Text passages are converted into multi-dimensional numeric vectors capturing deep semantic meaning. RAG matches user queries to syllabus embeddings using Cosine Similarity to provide grounded answers with citations.
+
+### 🏛️ Historical Origin
+Vector space models date back to Gerard Salton's SMART system in the 1960s. Modern transformer-based embeddings (Word2Vec -> BERT -> IBM Granite Embeddings) revolutionized natural language retrieval in 2018-2023.
+
+### 🚀 Future Research & Industry Application
+State-of-the-art developments include Agentic RAG with Self-Correction, GraphRAG for complex relational knowledge graphs, and on-device quantized vector search in edge devices.`;
         citations = ["ChromaDB Chunk #2: RAG_Vector_Search.pdf", "IBM Granite AI Spec"];
       } else {
-        reply = `Based on your course materials for **${query}**:\n\nThe fundamental principle is to break the problem into modular, testable components. Always verify edge cases and establish clear input/output contracts before writing code.`;
+        reply = `### 📖 Core Concept (${query})
+Fundamental principle grounded in your syllabus: Breaking complex topics into modular, testable components with verifiable input/output invariants.
+
+### 🏛️ Historical Origin
+Developed as computational and scientific demands expanded from imperative workflows to modular, declarative abstractions.
+
+### 🚀 Future Research & Industry Application
+Active research explores AI-assisted synthesis, automated formal verification, and distributed scale.`;
       }
+
 
       setMessages(prev => [
         ...prev,

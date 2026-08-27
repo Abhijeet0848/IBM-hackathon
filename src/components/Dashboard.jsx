@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import { 
   Lightbulb, Trophy, Bot, Calendar, FileUp, 
-  Flame, Award, ArrowLeft 
+  Flame, Award, ArrowLeft, Layers 
 } from 'lucide-react';
 import ELI10Explainer from './ELI10Explainer';
 import KahootQuiz from './KahootQuiz';
 import DoubtSolverChat from './DoubtSolverChat';
 import RevisionPlanner from './RevisionPlanner';
 import SyllabusUploader from './SyllabusUploader';
+import ArchitectureModal from './ArchitectureModal';
 
 const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
+  const [showArchitecture, setShowArchitecture] = useState(false);
 
-  // Gamification Global State
+  // Gamification Global State (Architecture Layer 3)
   const [studentXP, setStudentXP] = useState(0);
   const [studyStreak] = useState(1);
 
@@ -58,8 +60,17 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
               </div>
             </div>
 
-            {/* Right: Gamification Stats */}
+            {/* Right: Architecture & Gamification Stats */}
             <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                onClick={() => setShowArchitecture(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-semibold transition-all cursor-pointer shadow-xs"
+                title="View AI Study Buddy Pipeline Architecture"
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>Architecture</span>
+              </button>
+
               <div className="flex items-center gap-2 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700">
                 <span className="flex items-center gap-1 text-orange-600">
                   <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-500" />
@@ -149,6 +160,11 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
         {activeTab === 'revision' && <RevisionPlanner onAddXP={handleAddXP} />}
         {activeTab === 'syllabus' && <SyllabusUploader onAddXP={handleAddXP} />}
       </main>
+
+      {/* Architecture Modal */}
+      {showArchitecture && (
+        <ArchitectureModal onClose={() => setShowArchitecture(false)} />
+      )}
 
     </div>
   );
