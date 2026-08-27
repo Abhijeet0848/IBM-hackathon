@@ -1,38 +1,48 @@
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+/**
+ * Lazy PDF parser loader to keep initial page load instantaneous
+ */
+let pdfjsPromise = null;
 
-// Configure pdfjs worker for Vite browser runtime
-if (typeof window !== 'undefined') {
-  try {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
-  } catch {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version || '4.10.38'}/build/pdf.worker.min.mjs`;
+async function getPdfJs() {
+  if (!pdfjsPromise) {
+    pdfjsPromise = (async () => {
+      const pdfjsLib = await import('pdfjs-dist');
+      try {
+        const workerModule = await import('pdfjs-dist/build/pdf.worker.min.mjs?url');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = workerModule.default || workerModule;
+      } catch {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version || '4.10.38'}/build/pdf.worker.min.mjs`;
+      }
+      return pdfjsLib;
+    })();
   }
+  return pdfjsPromise;
 }
 
 /**
- * Extracts raw text from a PDF file using pdfjs-dist with secondary stream fallback
+ * Extracts raw text from a PDF file lazily using pdfjs-dist with secondary stream fallback
  */
 export async function extractTextFromPDF(file) {
   try {
     const arrayBuffer = await file.arrayBuffer();
+    const pdfjsLib = await getPdfJs();
+
     const loadingTask = pdfjsLib.getDocument({
       data: new Uint8Array(arrayBuffer),
       useSystemFonts: true,
       disableFontFace: true,
+      isEvalSupported: false,
     });
 
     const pdfDocument = await loadingTask.promise;
-    const numPages = pdfDocument.numPages;
+    const numPages = Math.min(pdfDocument.numPages, 30); // Cap at 30 pages for lightning speed
     let fullText = '';
-    const pageTexts = [];
 
     for (let pageNum = 1; pageNum <= numPages; pageNum++) {
       try {
         const page = await pdfDocument.getPage(pageNum);
         const textContent = await page.getTextContent();
         
-        // Group items with line breaks when appropriate
         let lastY = null;
         let pageStr = '';
         
@@ -50,7 +60,6 @@ export async function extractTextFromPDF(file) {
 
         const cleanPageStr = pageStr.trim();
         if (cleanPageStr) {
-          pageTexts.push(`--- Page ${pageNum} ---\n` + cleanPageStr);
           fullText += cleanPageStr + '\n\n';
         }
       } catch (pageErr) {
@@ -58,14 +67,14 @@ export async function extractTextFromPDF(file) {
       }
     }
 
-    if (fullText.trim().length > 30) {
+    if (fullText.trim().length > 20) {
       return fullText.trim();
     }
   } catch (pdfErr) {
     console.warn("Primary pdfjs extraction encountered error, attempting fallback:", pdfErr);
   }
 
-  // Fallback: parse raw buffer if pdfjs had issues
+  // Fast Fallback: parse printable text segments if pdfjs had issues
   try {
     const text = await file.text();
     const printable = text.replace(/[^\x20-\x7E\n\r\t]/g, ' ');
@@ -127,7 +136,7 @@ export function structureSyllabusContent(fileName, rawText) {
   // Extract explicit Unit / Module / Chapter headings
   const modulePatterns = [
     /^(?:unit|module|chapter|week|phase|section|part)\s*[-:]?\s*([0-9ivxlcdm]+|[a-z])\s*[-:]?\s*(.*)$/i,
-    /^(?:[0-9ivxlcdm]+|[a-z])[\.\)]\s+([a-zA-Z].*)$/i,
+    /^(?:[0-9ivxlcdm]+|[a-z])[.)]\s+([a-zA-Z].*)$/i,
     /^#+\s+(.*)$/
   ];
 
@@ -298,7 +307,7 @@ export function structureSyllabusContent(fileName, rawText) {
     : `Parsed syllabus for ${baseTitle}.`;
 
   // Dynamically generate Quiz questions grounded in the extracted topics
-  const generatedQuizQuestions = generateDynamicQuiz(baseTitle, extractedTopics, rawText);
+  const generatedQuizQuestions = generateDynamicQuiz(baseTitle, extractedTopics);
 
   return {
     fileName,
@@ -315,7 +324,7 @@ export function structureSyllabusContent(fileName, rawText) {
 /**
  * Generates dynamic 4-choice Kahoot-style quiz questions grounded in the extracted syllabus
  */
-function generateDynamicQuiz(title, topics, rawText) {
+function generateDynamicQuiz(title, topics) {
   const t0 = topics[0] || `${title} Fundamentals`;
   const t1 = topics[1] || `${title} Dynamics`;
   const t2 = topics[2] || `${title} Advanced Analysis`;
