@@ -36,12 +36,32 @@ st.set_page_config(
 # Inject CSS
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
+# Persistent Chat Storage Helpers
+CHAT_HISTORY_FILE = "./chroma_db/chat_history.json"
+
+def load_stored_chat_history():
+    if os.path.exists(CHAT_HISTORY_FILE):
+        try:
+            with open(CHAT_HISTORY_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return []
+
+def save_stored_chat_history(history):
+    try:
+        os.makedirs("./chroma_db", exist_ok=True)
+        with open(CHAT_HISTORY_FILE, "w", encoding="utf-8") as f:
+            json.dump(history, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
 # Initialize Session States
 if "ingestion_pipeline" not in st.session_state or not hasattr(st.session_state.ingestion_pipeline, "get_all_chunks"):
     st.session_state.ingestion_pipeline = DocumentIngestionPipeline(persist_directory="./chroma_db")
 
 if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
+    st.session_state.chat_history = load_stored_chat_history()
 
 if "student_xp" not in st.session_state:
     st.session_state.student_xp = 0
@@ -567,17 +587,26 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
     # TAB 2: KNOWLEDGE RETRIEVAL & ENRICHED CONTENT
     # ----------------------------------------------------------------------
     with tab_chat:
-        col_chat_h, col_chat_clr = st.columns([4.2, 1.1])
+        col_chat_h, col_chat_clr = st.columns([3.8, 1.4])
         with col_chat_h:
             st.markdown("### 💬 Interactive AI Study Tutor & Enriched Deep Dives")
             st.caption("Ask questions about your uploaded syllabus or select specialized cognitive delivery personas.")
         with col_chat_clr:
             if st.session_state.chat_history:
-                st.write("")
-                if st.button("🗑️ Clear Chat", key="btn_clear_chat", use_container_width=True):
-                    st.session_state.chat_history = []
-                    st.session_state.editing_msg_idx = None
-                    st.rerun()
+                md_notes = "# AI Study Buddy — Study Q&A Notes\n\n"
+                for m in st.session_state.chat_history:
+                    if m["role"] == "user":
+                        md_notes += f"### 🧑‍🎓 Question: {m['content']}\n\n"
+                    else:
+                        md_notes += f"#### 🤖 Answer ({m.get('mode', 'tutor').title()} Mode):\n{m['content']}\n\n---\n\n"
+                c_btn1, c_btn2 = st.columns(2)
+                with c_btn1:
+                    st.download_button("💾 Save", data=md_notes, file_name="study_chat_notes.md", mime="text/markdown", use_container_width=True)
+                with c_btn2:
+                    if st.button("🗑️ Clear", key="btn_clear_chat", use_container_width=True):
+                        st.session_state.chat_history = []
+                        save_stored_chat_history([])
+                        st.rerun()
 
         col_m, col_i = st.columns([1.8, 3.2])
         with col_m:
@@ -635,6 +664,7 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                     "mode": selected_mode_key,
                     "citations": citations
                 })
+                save_stored_chat_history(st.session_state.chat_history)
 
                 reward = GamificationEngine.award_xp(
                     st.session_state.student_xp,
@@ -671,6 +701,7 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                                 "mode": selected_mode_key,
                                 "citations": response_obj["context_chunks"]
                             })
+                            save_stored_chat_history(st.session_state.chat_history)
                         st.rerun()
             else:
                 with st.chat_message("assistant", avatar="💡" if msg.get("mode") == "enriched" else ("🎓" if msg.get("mode") == "strict" else "🧒")):
