@@ -4,6 +4,7 @@ Streamlit Main Application - Complete Multi-Tab Working Edition
 """
 
 import os
+import re
 import time
 import importlib
 import streamlit as st
