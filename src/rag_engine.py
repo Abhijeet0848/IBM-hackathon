@@ -104,7 +104,8 @@ class RAGEngine:
         # Step 3: LLM Inference
         raw_response = self.llm.generate(
             prompt=prompt,
-            system_mode=mode
+            system_mode=mode,
+            question_count=question_count
         )
 
         latency = round(time.time() - start_time, 2)
@@ -113,7 +114,10 @@ class RAGEngine:
         quiz_data = None
         if mode == "quiz":
             quiz_data = QuizEvaluator.parse_quiz_json(raw_response)
-            if not quiz_data:
+            if quiz_data and "questions" in quiz_data and len(quiz_data["questions"]) > 0:
+                # Enforce exact question count requested by student
+                quiz_data["questions"] = quiz_data["questions"][:question_count]
+            else:
                 # Clean topic name from query
                 clean_topic = re.sub(
                     r'^(?:generate|create|make)\s+(?:at least\s+)?(?:\d+\s+)?(?:multiple choice\s+)?(?:questions|quiz)\s+(?:on|about|for)?\s*',

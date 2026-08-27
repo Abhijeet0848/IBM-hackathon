@@ -118,7 +118,7 @@ class LLMClient:
             return res.json()["choices"][0]["message"]["content"].strip()
         raise ValueError(f"Groq error: {res.text}")
 
-    def _generate_fallback(self, prompt: str, system_mode: str = "tutor") -> str:
+    def _generate_fallback(self, prompt: str, system_mode: str = "tutor", question_count: Optional[int] = None) -> str:
         """
         High-fidelity cognitive fallback that parses the REAL uploaded document context
         and builds 100% grounded, syllabus-specific answers and quizzes.
@@ -195,7 +195,8 @@ class LLMClient:
         prompt: str,
         max_tokens: int = 2500,
         temperature: float = 0.3,
-        system_mode: str = "tutor"
+        system_mode: str = "tutor",
+        question_count: Optional[int] = None
     ) -> str:
         """Dispatches generation to selected LLM provider with smart cognitive fallback."""
         try:
@@ -217,9 +218,9 @@ class LLMClient:
                     return resp.strip()
 
         except Exception as e:
-            return self._generate_fallback(prompt, system_mode=system_mode)
+            return self._generate_fallback(prompt, system_mode=system_mode, question_count=question_count)
 
-        return self._generate_fallback(prompt, system_mode=system_mode)
+        return self._generate_fallback(prompt, system_mode=system_mode, question_count=question_count)
 
     def _call_gemini(self, prompt: str, max_tokens: int, temperature: float) -> str:
         """Invokes Google Gemini REST API across available free endpoints."""
@@ -260,7 +261,7 @@ class LLMClient:
             return res.json()["choices"][0]["message"]["content"].strip()
         raise ValueError(f"Groq error: {res.text}")
 
-    def _generate_fallback(self, prompt: str, system_mode: str = "tutor") -> str:
+    def _generate_fallback(self, prompt: str, system_mode: str = "tutor", question_count: Optional[int] = None) -> str:
         """
         High-fidelity cognitive fallback that parses the REAL uploaded document context
         and builds 100% grounded, syllabus-specific answers and quizzes.
@@ -411,8 +412,11 @@ Today, these concepts directly power modern educational technologies, cognitive 
 
         # Mode: DYNAMIC CONTEXT-GROUNDED QUIZ GENERATOR
         elif system_mode == "quiz":
-            count_match = re.search(r'(\d+)\s*(?:multiple choice questions|questions|high-yield)', prompt, re.IGNORECASE)
-            q_count = int(count_match.group(1)) if count_match else 10
+            if question_count:
+                q_count = question_count
+            else:
+                count_match = re.search(r'(\d+)\s*(?:comprehensive\s+)?(?:multiple\s+choice\s+)?(?:questions|quiz|high-yield)', prompt, re.IGNORECASE)
+                q_count = int(count_match.group(1)) if count_match else 10
             return self._build_dynamic_context_quiz(topic, context, count=q_count)
 
         return f"Syllabus insights on {display_topic}."
