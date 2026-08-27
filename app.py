@@ -899,7 +899,16 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                 st.warning("No matching vector chunks found.")
         
         st.markdown("---")
-        st.markdown(f"### 📂 All Ingested Document Chunks ({len(all_stored_chunks)} total)")
+        col_hdr_l, col_hdr_r = st.columns([3.5, 1.5])
+        with col_hdr_l:
+            st.markdown(f"### 📂 All Ingested Document Chunks ({len(all_stored_chunks)} total)")
+        with col_hdr_r:
+            if st.button("🗑️ Clear Vector Database", key="tab4_clear_db_btn", use_container_width=True):
+                st.session_state.ingestion_pipeline.reset_database()
+                st.session_state.chat_history = []
+                st.session_state.current_quiz = None
+                st.success("Vector database cleared! Please re-index your syllabus.")
+                st.rerun()
         
         if all_stored_chunks:
             for idx, ch in enumerate(all_stored_chunks):
