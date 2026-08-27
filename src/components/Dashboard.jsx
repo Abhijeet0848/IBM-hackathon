@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Lightbulb, Trophy, Bot, Calendar, FileUp, 
-  Flame, Award, Home 
+  Flame, Award, ArrowLeft 
 } from 'lucide-react';
 import ELI10Explainer from './ELI10Explainer';
 import KahootQuiz from './KahootQuiz';
@@ -28,33 +28,38 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           
           <div className="flex items-center justify-between h-16">
-            {/* Brand / Home Toggle */}
-            <div 
-              onClick={onHomeClick}
-              className="flex items-center gap-3 cursor-pointer group"
-              title="Return to Home Overview"
-            >
-              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs">
-                <Bot className="w-5 h-5" />
-              </div>
-              <div>
-                <div className="font-bold text-slate-900 tracking-tight text-base flex items-center gap-1.5">
-                  <span className="text-blue-600 font-extrabold text-xs bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded">IBM</span>
-                  Bob <span className="text-slate-500 font-normal text-sm">| Study Buddy</span>
+            
+            {/* Left: Back to Homepage + Brand */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={onHomeClick}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-xs"
+                title="Go back to Homepage"
+              >
+                <ArrowLeft className="w-4 h-4 text-slate-600" />
+                <span>Back to Homepage</span>
+              </button>
+
+              <div className="h-6 w-px bg-slate-200 hidden sm:block"></div>
+
+              {/* Brand Logo */}
+              <div 
+                onClick={onHomeClick}
+                className="hidden sm:flex items-center gap-2.5 cursor-pointer group"
+                title="Return to Home Overview"
+              >
+                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-xs">
+                  <Bot className="w-4 h-4" />
+                </div>
+                <div className="font-bold text-slate-900 tracking-tight text-sm flex items-center gap-1">
+                  <span className="text-blue-600 font-extrabold text-[11px] bg-blue-50 border border-blue-200 px-1 py-0.5 rounded">IBM</span>
+                  Bob
                 </div>
               </div>
             </div>
 
-            {/* Quick Actions & Stats */}
+            {/* Right: Gamification Stats */}
             <div className="flex items-center gap-2 sm:gap-3">
-              <button
-                onClick={onHomeClick}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all cursor-pointer"
-              >
-                <Home className="w-3.5 h-3.5" />
-                <span>Home</span>
-              </button>
-
               <div className="flex items-center gap-2 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700">
                 <span className="flex items-center gap-1 text-orange-600">
                   <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-500" />
@@ -67,6 +72,7 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
                 </span>
               </div>
             </div>
+
           </div>
 
           {/* Clean Light Tab Navigation */}
