@@ -15,7 +15,7 @@ class FastTextSplitter:
     def __init__(self, chunk_size=800, chunk_overlap=100, separators=None):
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
-        self.separators = separators or ["\n\n", "\n", ". ", " ", ""]
+        self.separators = separators or ["\n\n", "\n", ". ", "; ", ", ", " "]
 
     def split_text(self, text: str) -> List[str]:
         if not text:
@@ -31,15 +31,15 @@ class FastTextSplitter:
         while start < text_len:
             if text_len - start <= self.chunk_size:
                 last_chunk = text[start:].strip()
-                if last_chunk and len(last_chunk) >= 15 and (not chunks or last_chunk != chunks[-1]):
+                if last_chunk and len(last_chunk) >= 15:
                     chunks.append(last_chunk)
                 break
                 
-            end = start + self.chunk_size
+            end = min(text_len, start + self.chunk_size)
             # Find best separator to break naturally
             split_pos = -1
             for sep in self.separators:
-                pos = text.rfind(sep, start, end)
+                pos = text.rfind(sep, start + int(self.chunk_size * 0.4), end)
                 if pos > start:
                     split_pos = pos + len(sep)
                     break
@@ -49,17 +49,25 @@ class FastTextSplitter:
 
             chunk = text[start:split_pos].strip()
             if chunk and len(chunk) >= 15:
-                if not chunks or chunk != chunks[-1]:
-                    chunks.append(chunk)
-            
+                chunks.append(chunk)
+
+            next_start = max(start + 1, split_pos - self.chunk_overlap)
+            if next_start <= start:
+                next_start = split_pos
+            start = next_start
+
         cleaned_chunks = []
+        seen = set()
         for c in (chunks if chunks else [text]):
             c = c.strip()
-            # Strip severed leading sub-words (e.g. "f teaching" -> "Teaching", "eristics" -> skip)
+            # Strip severed leading sub-words
             c = re.sub(r'^(?:[a-zA-Z]\s+|tion\s+|ing\s+|ers\s+|eristics\b[\s\.\,]*)', '', c, flags=re.IGNORECASE).strip()
-            if len(c) >= 20 and (not cleaned_chunks or c.lower() != cleaned_chunks[-1].lower()):
+            if len(c) >= 15:
                 c = c[0].upper() + c[1:]
-                cleaned_chunks.append(c)
+                norm_c = c.lower()[:60]
+                if norm_c not in seen:
+                    seen.add(norm_c)
+                    cleaned_chunks.append(c)
 
         return cleaned_chunks if cleaned_chunks else [text]
 
