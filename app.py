@@ -738,7 +738,7 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
         with q_col1:
             quiz_topic = st.text_input(
                 "🎯 Focus Topic / Concept (Optional):",
-                placeholder="e.g. Pointers, Malloc, or leave blank for full syllabus",
+                placeholder="Leave blank to get quiz of entire syllabus or topics",
                 key="quiz_topic_field"
             )
         with q_col2:
