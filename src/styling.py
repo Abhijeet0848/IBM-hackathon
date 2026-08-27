@@ -971,20 +971,66 @@ def render_top_nav(lvl_info, student_xp, streak, daily_quote=None, show_back=Fal
         '</div>'
     )
 
-def render_motivation_banner(quote_obj):
-    """Renders a prominent, sleek top motivation card with dynamic non-repeating learning wisdom."""
-    quote_text = quote_obj.get("quote", "Mastery is the daily accumulation of focused understanding.")
-    author_text = quote_obj.get("author", "Academic Focus")
+def render_motivation_banner(quotes_data):
+    """
+    Renders a luxury top motivation card that smoothly auto-cycles to a new
+    inspirational learning mantra every 10 seconds via client-side timer.
+    """
+    if isinstance(quotes_data, list) and len(quotes_data) > 0:
+        quotes = quotes_data
+    elif isinstance(quotes_data, dict):
+        quotes = [quotes_data]
+    else:
+        quotes = [{"quote": "Mastery is the daily accumulation of focused understanding.", "author": "Academic Focus"}]
+
+    first_quote = quotes[0].get("quote", "")
+    first_author = quotes[0].get("author", "")
+    quotes_json = json.dumps(quotes)
+
     return (
-        f'<div style="background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border: 1.5px solid #bbf7d0; border-radius: 12px; padding: 0.75rem 1.25rem; margin-bottom: 1.15rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(34, 197, 94, 0.05); gap: 12px; flex-wrap: wrap;">'
-        f'<div style="display: flex; align-items: center; gap: 10px; font-size: 0.94rem; color: #1e293b;">'
+        f'<div class="daily-mindset-banner" style="background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border: 1.5px solid #bbf7d0; border-radius: 12px; padding: 0.75rem 1.25rem; margin-bottom: 1.15rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(34, 197, 94, 0.05); gap: 12px; flex-wrap: wrap; position: relative; overflow: hidden;">'
+        f'<div id="mindset-content-box" style="display: flex; align-items: center; gap: 10px; font-size: 0.94rem; color: #1e293b; transition: opacity 0.35s ease, transform 0.35s ease;">'
         f'<span style="font-size: 1.3rem;">💡</span>'
-        f'<span><strong>Daily Study Mindset:</strong> <em>"{quote_text}"</em></span>'
+        f'<span><strong>Daily Study Mindset:</strong> <em id="mindset-quote-text">"{first_quote}"</em></span>'
         f'</div>'
-        f'<div style="font-size: 0.76rem; font-weight: 700; color: #15803d; background: #dcfce7; padding: 0.25rem 0.65rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em;">'
-        f'{author_text}'
+        f'<div id="mindset-author-badge" style="font-size: 0.76rem; font-weight: 700; color: #15803d; background: #dcfce7; padding: 0.25rem 0.65rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em; transition: opacity 0.35s ease;">'
+        f'{first_author}'
         f'</div>'
+        f'<div style="position: absolute; bottom: 0; left: 0; height: 2.5px; background: linear-gradient(90deg, #22c55e, #16a34a); width: 100%; animation: mindsetProgress 10s linear infinite;"></div>'
         f'</div>'
+        f'<style>'
+        f'@keyframes mindsetProgress {{'
+        f'  0% {{ width: 0%; opacity: 0.8; }}'
+        f'  95% {{ width: 100%; opacity: 1; }}'
+        f'  100% {{ width: 100%; opacity: 0; }}'
+        f'}}'
+        f'</style>'
+        f'<script>'
+        f'(function() {{'
+        f'  var quotes = {quotes_json};'
+        f'  if (!quotes || quotes.length <= 1) return;'
+        f'  var curIdx = 0;'
+        f'  if (window._study_mindset_timer) {{ clearInterval(window._study_mindset_timer); }}'
+        f'  window._study_mindset_timer = setInterval(function() {{'
+        f'    curIdx = (curIdx + 1) % quotes.length;'
+        f'    var box = document.getElementById("mindset-content-box");'
+        f'    var badge = document.getElementById("mindset-author-badge");'
+        f'    var txt = document.getElementById("mindset-quote-text");'
+        f'    if (box && badge && txt) {{'
+        f'      box.style.opacity = "0";'
+        f'      box.style.transform = "translateY(-3px)";'
+        f'      badge.style.opacity = "0";'
+        f'      setTimeout(function() {{'
+        f'        txt.textContent = "\\"" + quotes[curIdx].quote + "\\"";'
+        f'        badge.textContent = quotes[curIdx].author;'
+        f'        box.style.opacity = "1";'
+        f'        box.style.transform = "translateY(0)";'
+        f'        badge.style.opacity = "1";'
+        f'      }}, 350);'
+        f'    }}'
+        f'  }}, 10000);'
+        f'}})();'
+        f'</script>'
     )
 
 def render_quiz_results_dashboard(res):

@@ -132,6 +132,35 @@ class GamificationEngine:
         }
 
     @staticmethod
+    def get_all_mindset_mantras(course_topic: str = "") -> List[Dict[str, str]]:
+        """Returns the full randomized list of mindset mantras for auto-cycling every 10 seconds."""
+        mindset_templates = [
+            {"quote": "Mastery is not an accident; it is the daily accumulation of focused understanding.", "author": "Academic Excellence"},
+            {"quote": "Small, consistent daily checkpoints create unstoppable momentum for exam day.", "author": "Study Habit Principle"},
+            {"quote": "Active recall and self-explanation are the fastest pathways to permanent cognitive retention.", "author": "Cognitive Science"},
+            {"quote": "Every complex formula or concept becomes simple once broken down into first principles.", "author": "First Principles Thinking"},
+            {"quote": "Do not just memorize the answers; master the underlying principles that make the answers inevitable.", "author": "Conceptual Mastery"},
+            {"quote": "Curiosity transforms difficult study sessions into exciting explorations.", "author": "Lifelong Learning"},
+            {"quote": "When you test what you know before you feel ready, you accelerate retention by 300%.", "author": "Active Recall Rule"},
+            {"quote": "Mistakes during practice are not failures; they are the exact data points that build mastery.", "author": "Growth Mindset"},
+            {"quote": "Discipline is choosing what you want most over what you want right now.", "author": "Focus Mantra"},
+            {"quote": "The expert in anything was once a beginner who refused to quit.", "author": "Perseverance Principle"},
+            {"quote": "Deep focus for 45 minutes beats 4 hours of distracted multi-tasking every single time.", "author": "Deep Work Rule"},
+            {"quote": "Your future self will thank you for the extra 20 minutes of review you put in today.", "author": "Study Motivation"}
+        ]
+        if course_topic and len(course_topic.strip()) > 3:
+            topic_clean = course_topic.strip().title()
+            context_mantras = [
+                {"quote": f"Every core principle in {topic_clean} is a building block for your subject mastery.", "author": f"{topic_clean} Focus"},
+                {"quote": f"Deepen your foundational understanding in {topic_clean} one milestone at a time.", "author": f"{topic_clean} Roadmap"},
+                {"quote": f"Connect theory to application as you master the nuances of {topic_clean}.", "author": f"{topic_clean} Practice"}
+            ]
+            mindset_templates = context_mantras + mindset_templates
+
+        random.shuffle(mindset_templates)
+        return mindset_templates
+
+    @staticmethod
     def get_daily_smart_reminder(course_topic: str = "", seen_indices: List[int] = None) -> Dict[str, str]:
         """Backward compatible helper."""
         res = GamificationEngine.get_dynamic_motivation(course_topic=course_topic, seen_indices=seen_indices)

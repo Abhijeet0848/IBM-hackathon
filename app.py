@@ -223,9 +223,6 @@ def render_homepage(study_planner):
 # VIEW 2: STUDY WORKSPACE
 # ======================================================================
 def render_study_workspace(study_planner, rag_engine, llm_client, stats):
-    if "seen_quote_indices" not in st.session_state:
-        st.session_state.seen_quote_indices = []
-
     # Dynamic non-repeating motivation tailored to uploaded course
     active_topic = ""
     if st.session_state.personalized_plan:
@@ -233,16 +230,12 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
     elif stats["total_chunks"] > 0:
         active_topic = "Course Syllabus"
 
-    quote_data = GamificationEngine.get_dynamic_motivation(
-        course_topic=active_topic,
-        seen_indices=st.session_state.seen_quote_indices
-    )
-    st.session_state.seen_quote_indices = quote_data.get("seen_indices", [])
+    all_mantras = GamificationEngine.get_all_mindset_mantras(course_topic=active_topic)
 
     # Unified Top Sleek Navigation Bar with Level XP & Streak
     lvl_info = GamificationEngine.get_level_info(st.session_state.student_xp)
     st.markdown(render_top_nav(lvl_info, st.session_state.student_xp, st.session_state.study_streak, show_back=True), unsafe_allow_html=True)
-    st.markdown(render_motivation_banner(quote_data), unsafe_allow_html=True)
+    st.markdown(render_motivation_banner(all_mantras), unsafe_allow_html=True)
 
     # Main Navigation Tabs (Spacious & Immediately Accessible)
     tab_dashboard, tab_chat, tab_quiz, tab_explorer = st.tabs([
