@@ -796,23 +796,7 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
         # Render Kahoot-Style Quiz Form
         if st.session_state.current_quiz:
             quiz = st.session_state.current_quiz
-            col_q_title, col_q_regen = st.columns([3.8, 1.2])
-            with col_q_title:
-                st.markdown(f"#### 🏆 {quiz.get('title', 'Syllabus Quiz')}")
-            with col_q_regen:
-                if st.button("🔄 New Quiz", key="btn_regen_inline", use_container_width=True):
-                    with st.spinner(f"Generating {num_questions} fresh questions..."):
-                        query = f"Generate {num_questions} multiple choice questions on {quiz_topic}" if quiz_topic else f"Generate {num_questions} comprehensive multiple choice questions covering the syllabus"
-                        quiz_resp = rag_engine.answer_query(query=query, mode="quiz", top_k=25, question_count=int(num_questions))
-                        if quiz_resp["quiz_data"]:
-                            quiz_obj = quiz_resp["quiz_data"]
-                            quiz_obj["title"] = f"AI Quiz on: {quiz_topic.title() if quiz_topic else 'Full Course Syllabus'} ({len(quiz_obj.get('questions', []))} Questions)"
-                            st.session_state.quiz_instance_id = int(time.time() * 1000)
-                            st.session_state.current_quiz = quiz_obj
-                            st.session_state.quiz_submitted = False
-                            st.session_state.quiz_eval_results = None
-                            st.session_state.user_quiz_answers = {}
-                            st.rerun()
+            st.markdown(f"#### 🏆 {quiz.get('title', 'Syllabus Quiz')}")
             st.markdown("---")
 
             questions = quiz.get("questions", [])
