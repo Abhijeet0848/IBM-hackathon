@@ -47,11 +47,86 @@ class QuizEvaluator:
         Synthesizes authentic, rigorous, university-grade multiple choice questions
         matched directly to concepts present in the uploaded course materials.
         """
-        t = topic.strip() if topic else "Computer Science & Programming Curriculum"
+        # Extract dynamic topic title from context or argument
+        if topic and topic.strip():
+            t = topic.strip()
+        else:
+            first_line = context.strip().split('\n')[0].strip() if context.strip() else "Course Syllabus"
+            first_line = re.sub(r'^(?:\[Source:[^\]]*\]|#+)\s*', '', first_line).strip()
+            t = first_line if (first_line and len(first_line) < 60) else "Full Course Syllabus"
+
         ctx_lower = context.lower()
 
-        # Master high-yield academic question bank for programming and engineering curricula
+        # Multi-domain master academic question bank
         curriculum_q_bank = [
+            # --- TEACHING APTITUDE & PEDAGOGY ---
+            {
+                "triggers": ["teaching", "levels of teaching", "memory level", "memory", "herbart", "teaching aptitude"],
+                "question": "In the hierarchy of teaching levels, which level is primarily associated with Herbart and focuses on rote recall and retention of factual information?",
+                "correct": "Memory Level of Teaching (MLT)",
+                "distractors": [
+                    "Understanding Level of Teaching (ULT)",
+                    "Reflective Level of Teaching (RLT)",
+                    "Autonomous Development Level"
+                ],
+                "explanation": "The Memory Level of Teaching (developed by Herbart) represents the foundation stage focusing on factual recall, rote memorization, and structured repetition."
+            },
+            {
+                "triggers": ["understanding level", "understanding", "morrison", "comprehension", "teaching"],
+                "question": "What is the core pedagogical objective of the Understanding Level of Teaching (associated with Morrison)?",
+                "correct": "Enabling learners to comprehend generalized principles, understand relationships between facts, and apply rules.",
+                "distractors": [
+                    "Promoting uncritical rote repetition with no conceptual insight.",
+                    "Evaluating independent research without teacher guidance.",
+                    "Conditioning physical reflex responses only."
+                ],
+                "explanation": "The Understanding Level (Morrison) goes beyond memorization to help students grasp concepts, relationships, and generalized rules."
+            },
+            {
+                "triggers": ["reflective level", "reflective", "hunt", "critical thinking", "problem solving", "teaching"],
+                "question": "Which level of teaching (associated with Hunt) represents the highest cognitive tier emphasizing critical thinking and creative problem-solving?",
+                "correct": "Reflective Level of Teaching (RLT)",
+                "distractors": [
+                    "Memory Level of Teaching (MLT)",
+                    "Observation Level",
+                    "Sensory Conditioning Level"
+                ],
+                "explanation": "The Reflective Level of Teaching (Hunt) is the highest, most student-centered level where learners independently analyze, evaluate, and solve problems."
+            },
+            {
+                "triggers": ["learner characteristics", "learner", "characteristics", "academic", "cognitive", "teaching"],
+                "question": "When analyzing learner characteristics in educational design, which dimension includes prior knowledge, intellectual readiness, and learning pace?",
+                "correct": "Cognitive and Academic Characteristics",
+                "distractors": [
+                    "Administrative Affiliations",
+                    "Physical Classroom Architecture",
+                    "Geographic Coordinates"
+                ],
+                "explanation": "Cognitive and academic characteristics describe the student's intellectual readiness, prior foundational knowledge, and cognitive processing speed."
+            },
+            {
+                "triggers": ["objectives", "objectives of teaching", "bloom", "taxonomy", "concept", "teaching"],
+                "question": "What are the three primary foundational domains targeted by comprehensive teaching objectives?",
+                "correct": "Cognitive (Knowledge), Affective (Attitudes/Values), and Psychomotor (Skills)",
+                "distractors": [
+                    "Financial, Commercial, and Logistical",
+                    "Sensory, Atmospheric, and Structural",
+                    "Administrative, Regulatory, and Bureaucratic"
+                ],
+                "explanation": "Educational objectives encompass the Cognitive (intellectual), Affective (emotional/values), and Psychomotor (physical/manual skills) domains."
+            },
+            {
+                "triggers": ["evaluation", "formative", "summative", "assessment", "teaching aptitude"],
+                "question": "What distinguishes formative evaluation from summative evaluation in modern educational methodology?",
+                "correct": "Formative evaluation occurs continuously during instruction to guide learning, while summative evaluation occurs at the end to certify mastery.",
+                "distractors": [
+                    "Formative evaluation produces final letter grades only.",
+                    "Summative evaluation is conducted on the first day of class.",
+                    "There is no difference between formative and summative evaluation."
+                ],
+                "explanation": "Formative assessment happens during learning to provide feedback; summative assessment happens at the end to evaluate overall outcome."
+            },
+            # --- COMPUTER SCIENCE & PROGRAMMING ---
             {
                 "triggers": ["malloc", "free", "dynamic memory", "allocation", "heap", "memory"],
                 "question": "When managing dynamic memory in C using `malloc()` and `free()`, what is the critical responsibility of the programmer?",
@@ -106,61 +181,6 @@ class QuizEvaluator:
                     "The search function must be implemented using tail recursion."
                 ],
                 "explanation": "Binary search relies on sorted order to divide the remaining search range in half with each comparison."
-            },
-            {
-                "triggers": ["array", "arrays", "string", "strings", "char", "null-terminated"],
-                "question": "How are strings represented in C memory, and how do standard library functions detect string termination?",
-                "correct": "As contiguous character arrays terminated by a null byte (`'\\0'`).",
-                "distractors": [
-                    "As length-prefixed objects with an explicit 4-byte header containing the string size.",
-                    "As doubly-linked lists of 16-bit wide characters ending in `EOF`.",
-                    "As immutable constant buffers managed by runtime garbage collection."
-                ],
-                "explanation": "C strings are null-terminated (`'\\0'`); functions like `strlen()` count characters until reaching byte 0."
-            },
-            {
-                "triggers": ["file", "files", "i/o", "fopen", "fclose", "fread", "fwrite", "stream"],
-                "question": "Why is it essential to check the return value of `fopen()` before performing file I/O operations?",
-                "correct": "To verify that the file opened successfully and that `fopen()` did not return `NULL` due to missing files or invalid permissions.",
-                "distractors": [
-                    "Because `fopen()` automatically deletes existing files unless explicitly flagged.",
-                    "To convert the file stream into an unbuffered hardware register.",
-                    "Because `fopen()` requires a second execution call to confirm disk sector readiness."
-                ],
-                "explanation": "`fopen()` returns NULL if the file cannot be opened; dereferencing a NULL FILE pointer leads to a crash."
-            },
-            {
-                "triggers": ["data types", "operators", "type conversion", "casting", "precedence", "bitwise"],
-                "question": "In expression evaluation, what occurs during implicit type promotion when evaluating `int a = 5; double b = 2.0; double res = a / b;`?",
-                "correct": "The integer `a` is implicitly promoted to `double` before the division, resulting in floating-point division (`2.5`).",
-                "distractors": [
-                    "The `double b` is truncated to `int` (`2`), performing integer division resulting in `2.0`.",
-                    "A compile-time type mismatch error is thrown requiring an explicit cast.",
-                    "The operation causes undefined behavior due to mixed arithmetic types."
-                ],
-                "explanation": "Arithmetic conversion rules promote lower-rank types (int) to higher-rank types (double) to prevent precision loss."
-            },
-            {
-                "triggers": ["program design", "analysis", "modularity", "function", "functions", "scope"],
-                "question": "What is the primary advantage of modular program design using functions with well-defined parameters?",
-                "correct": "It promotes code reusability, simplifies isolated unit testing, and encapsulates local variable scope.",
-                "distractors": [
-                    "It eliminates all stack frame overhead during CPU execution.",
-                    "It converts all local variables into global variables across compilation units.",
-                    "It forces all algorithms to execute with $O(1)$ constant time complexity."
-                ],
-                "explanation": "Modularity and function decomposition enable maintainable, testable, and robust software architectures."
-            },
-            {
-                "triggers": ["recursion", "stack", "call stack", "base case"],
-                "question": "What critical component prevents infinite recursion and subsequent stack overflow crashes in recursive functions?",
-                "correct": "A well-defined base case that returns without making further recursive calls.",
-                "distractors": [
-                    "Allocating recursive variables on the global heap with `malloc()`.",
-                    "Increasing CPU clock speed during recursive traversal.",
-                    "Disabling compiler optimization flags (`-O0`)."
-                ],
-                "explanation": "A base case is the terminating condition that stops recursion and allows the call stack to unwind."
             }
         ]
 
@@ -168,15 +188,22 @@ class QuizEvaluator:
         matched_questions = []
         for q_item in curriculum_q_bank:
             matches = sum(1 for trig in q_item["triggers"] if trig in ctx_lower)
-            matched_questions.append((matches, q_item))
+            if matches > 0:
+                matched_questions.append((matches, q_item))
 
         # Sort with most relevant syllabus matches first
         matched_questions.sort(key=lambda x: x[0], reverse=True)
-        selected_q_items = [item[1] for item in matched_questions[:count]]
+        selected_q_items = [item[1] for item in matched_questions]
 
-        # Ensure we have exact requested question count
-        while len(selected_q_items) < count:
-            selected_q_items.append(curriculum_q_bank[len(selected_q_items) % len(curriculum_q_bank)])
+        # If not enough matches, fallback to general items
+        if len(selected_q_items) < count:
+            for q_item in curriculum_q_bank:
+                if q_item not in selected_q_items:
+                    selected_q_items.append(q_item)
+                if len(selected_q_items) >= count:
+                    break
+
+        selected_q_items = selected_q_items[:count]
 
         questions = []
         positions = ["A", "B", "C", "D"]
