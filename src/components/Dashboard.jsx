@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { 
   Lightbulb, Trophy, Bot, Calendar, FileUp, 
-  Flame, Award, PlayCircle, Home, Sparkles 
+  Flame, Award, PlayCircle, Home 
 } from 'lucide-react';
+
 import ELI10Explainer from './ELI10Explainer';
 import KahootQuiz from './KahootQuiz';
 import DoubtSolverChat from './DoubtSolverChat';
