@@ -25,6 +25,7 @@ from src.quiz_evaluator import QuizEvaluator
 from src.gamification import GamificationEngine
 from src.study_planner import StudyPlanner
 from src.resource_finder import ResourceFinder
+from src.flashcard_engine import FlashcardEngine
 
 # Page configuration
 st.set_page_config(
@@ -84,6 +85,9 @@ if "quiz_eval_results" not in st.session_state:
 
 if "user_quiz_answers" not in st.session_state:
     st.session_state.user_quiz_answers = {}
+
+if "current_flashcards" not in st.session_state:
+    st.session_state.current_flashcards = None
 
 if "page" in st.query_params:
     st.session_state.view_mode = st.query_params["page"]
@@ -259,10 +263,11 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
     st.markdown(render_motivation_banner(all_mantras), unsafe_allow_html=True)
 
     # Main Navigation Tabs (Spacious & Immediately Accessible)
-    tab_dashboard, tab_chat, tab_quiz, tab_explorer = st.tabs([
+    tab_dashboard, tab_chat, tab_quiz, tab_flashcards, tab_explorer = st.tabs([
         "📅 Study Schedule Planner",
         "💬 Doubt Solver & Deep Dives",
         "🎮 Gamified Kahoot Quizzes",
+        "🗂️ Interactive Flashcards",
         "🔍 Knowledge & Vector Explorer"
     ])
 
@@ -896,7 +901,51 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                             )
 
     # ----------------------------------------------------------------------
-    # TAB 4: VECTOR DB & KNOWLEDGE EXPLORER
+    # TAB 4: INTERACTIVE AI FLASHCARDS
+    # ----------------------------------------------------------------------
+    with tab_flashcards:
+        st.markdown("### 🗂️ Interactive AI Flashcard & Spaced Recall Arena")
+        st.caption("Auto-extract key definitions, core formulas, and fundamental principles into interactive 3D flip cards with Leitner spaced repetition sorting.")
+
+        if stats["total_chunks"] == 0:
+            st.warning("⚠️ No documents uploaded yet. Upload a syllabus in the Study Schedule Planner to generate custom flashcards.")
+        else:
+            fc_col1, fc_col2, fc_col3 = st.columns([1.5, 1.5, 2.5])
+            with fc_col1:
+                card_count = st.selectbox("Deck Size:", [4, 8, 12, 16, 20], index=1, key="fc_deck_size_select")
+            with fc_col2:
+                st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+                if st.button("✨ Generate Deck", type="primary", use_container_width=True, key="btn_gen_flashcards"):
+                    all_chunks = st.session_state.ingestion_pipeline.get_all_chunks(limit=30)
+                    ctx = "\n\n".join([c["content"] for c in all_chunks])
+                    with st.spinner("Synthesizing active recall flashcards from syllabus..."):
+                        cards = FlashcardEngine.generate_flashcards(ctx, count=int(card_count), llm_client=llm_client)
+                        st.session_state.current_flashcards = cards
+                        reward = GamificationEngine.award_xp(st.session_state.student_xp, "ask_question")
+                        st.session_state.student_xp = reward["new_xp"]
+                        st.toast(f"🎉 Generated {len(cards)} flashcards! +{reward['earned_xp']} XP")
+                        st.rerun()
+            with fc_col3:
+                if st.session_state.current_flashcards:
+                    st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+                    fc_md = "# AI Study Buddy — Flashcard Deck\n\n"
+                    for fc in st.session_state.current_flashcards:
+                        fc_md += f"### ❓ Q: {fc['front']}\n**💡 Answer:** {fc['back']}\n*Category: {fc.get('category', 'General')}*\n\n---\n\n"
+                    st.download_button("💾 Export Deck (.md)", data=fc_md, file_name="study_flashcards.md", mime="text/markdown", use_container_width=True)
+
+            # Auto-generate starter cards if none yet
+            if not st.session_state.current_flashcards:
+                all_chunks = st.session_state.ingestion_pipeline.get_all_chunks(limit=30)
+                if all_chunks:
+                    ctx = "\n\n".join([c["content"] for c in all_chunks])
+                    st.session_state.current_flashcards = FlashcardEngine.generate_flashcards(ctx, count=8, llm_client=None)
+
+            if st.session_state.current_flashcards:
+                st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+                components.html(FlashcardEngine.render_interactive_flashcard_deck(st.session_state.current_flashcards), height=440)
+
+    # ----------------------------------------------------------------------
+    # TAB 5: VECTOR DB & KNOWLEDGE EXPLORER
     # ----------------------------------------------------------------------
     with tab_explorer:
         st.markdown("### 🔍 ChromaDB Vector Knowledge Explorer")
