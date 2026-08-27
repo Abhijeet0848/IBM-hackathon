@@ -554,6 +554,23 @@ div[data-baseweb="textarea"]:focus-within {
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
 }
 
+/* Completely Hide Streamlit "Press Ctrl+Enter to apply" helper text */
+div[data-testid="InputInstructions"],
+div[data-testid="stTextArea"] [data-testid="InputInstructions"],
+div[data-testid="stTextInput"] [data-testid="InputInstructions"],
+.stTextArea [data-testid="InputInstructions"],
+div[data-baseweb="textarea"] + div,
+div[data-baseweb="textarea"] ~ div,
+span[data-testid="stWidgetInstructions"],
+[data-testid="stWidgetInstructions"] {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    opacity: 0 !important;
+}
+
 /* Chat Messages */
 div[data-testid="stChatMessage"] {
     background: #ffffff !important;
