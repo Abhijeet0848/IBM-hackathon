@@ -207,28 +207,6 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
     daily_quote = GamificationEngine.get_daily_smart_reminder()
     st.markdown(render_top_nav(lvl_info, st.session_state.student_xp, st.session_state.study_streak, daily_quote, show_back=True), unsafe_allow_html=True)
 
-    # Gemini Live Engine Setting Expander
-    with st.expander("⚡ AI Engine & Gemini API Key (Optional — Free from Google AI Studio)"):
-        col_gk1, col_gk2 = st.columns([3.2, 1.2])
-        with col_gk1:
-            entered_k = st.text_input(
-                "Google Gemini API Key:",
-                value=st.session_state.get("custom_gemini_key", ""),
-                type="password",
-                placeholder="Paste AIzaSy... key to enable live cloud inference on any syllabus",
-                help="Get your free API key at https://aistudio.google.com/app/apikey"
-            )
-            if entered_k != st.session_state.get("custom_gemini_key", ""):
-                st.session_state.custom_gemini_key = entered_k
-                st.rerun()
-        with col_gk2:
-            st.write("")
-            st.write("")
-            if llm_client.is_connected():
-                st.success("🟢 Live Gemini Connected")
-            else:
-                st.caption("⚪ Built-in Offline Fallback Active")
-
     # Main Navigation Tabs (Spacious & Immediately Accessible)
     tab_dashboard, tab_chat, tab_quiz, tab_explorer = st.tabs([
         "📅 Study Schedule Planner",
