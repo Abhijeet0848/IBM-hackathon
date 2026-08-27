@@ -159,7 +159,8 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
         {activeTab === 'kahoot' && <KahootQuiz onAddXP={handleAddXP} />}
         {activeTab === 'doubts' && <DoubtSolverChat onAddXP={handleAddXP} />}
         {activeTab === 'revision' && <RevisionPlanner onAddXP={handleAddXP} />}
-        {activeTab === 'syllabus' && <SyllabusUploader onAddXP={handleAddXP} />}
+        {activeTab === 'syllabus' && <SyllabusUploader onAddXP={handleAddXP} onNavigateTab={setActiveTab} />}
+
       </main>
 
       {/* Architecture Modal */}
