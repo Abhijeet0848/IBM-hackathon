@@ -1,9 +1,8 @@
 import React from 'react';
 import { 
-  ArrowRight, BrainCircuit, Sparkles, 
-  Lightbulb, Trophy, Bot, Zap, ChevronRight 
+  ArrowRight, Sparkles, Lightbulb, Trophy, 
+  Bot, Zap, ChevronRight, BookOpen, Layers, CheckCircle2 
 } from 'lucide-react';
-
 
 const LandingPage = ({ onStart, onOpenInterview }) => {
   return (
@@ -15,7 +14,7 @@ const LandingPage = ({ onStart, onOpenInterview }) => {
 
       {/* Header */}
       <header className="border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-xl sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 p-[1px] shadow-lg shadow-blue-500/25">
               <div className="w-full h-full bg-slate-950 rounded-[15px] flex items-center justify-center">
@@ -30,10 +29,10 @@ const LandingPage = ({ onStart, onOpenInterview }) => {
 
           <div className="flex items-center gap-3">
             <button
-              onClick={onStart}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-blue-600/20 transition-all hover:scale-105 flex items-center gap-1.5"
+              onClick={() => onStart('eli10')}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-blue-600/20 transition-all hover:scale-105 flex items-center gap-1.5 cursor-pointer"
             >
-              <span>Meet IBM Bob</span>
+              <span>Open Study Workspace</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -62,8 +61,8 @@ const LandingPage = ({ onStart, onOpenInterview }) => {
         {/* Call to Actions */}
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-16">
           <button
-            onClick={onStart}
-            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl text-base shadow-xl shadow-blue-600/30 transition-all hover:scale-[1.03] flex items-center justify-center gap-2 group"
+            onClick={() => onStart('eli10')}
+            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl text-base shadow-xl shadow-blue-600/30 transition-all hover:scale-[1.03] flex items-center justify-center gap-2 group cursor-pointer"
           >
             <span>Start Learning with Bob</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -71,7 +70,7 @@ const LandingPage = ({ onStart, onOpenInterview }) => {
 
           <button
             onClick={onOpenInterview}
-            className="w-full sm:w-auto px-7 py-4 bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-200 font-semibold rounded-2xl text-base transition-all hover:border-slate-600 flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-7 py-4 bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-200 font-semibold rounded-2xl text-base transition-all hover:border-slate-600 flex items-center justify-center gap-2 cursor-pointer"
           >
             <Zap className="w-5 h-5 text-amber-400" />
             <span>Practice Technical Screener</span>
@@ -98,12 +97,15 @@ const LandingPage = ({ onStart, onOpenInterview }) => {
           </div>
         </div>
 
-        {/* Feature Cards Grid */}
+        {/* Interactive Feature Cards Grid (Clickable) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-left">
           
-          <div className="glass-panel-interactive p-6 rounded-2xl flex flex-col justify-between">
+          <div 
+            onClick={() => onStart('eli10')}
+            className="glass-panel-interactive p-6 rounded-3xl flex flex-col justify-between cursor-pointer group"
+          >
             <div>
-              <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <Lightbulb className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-bold text-slate-100 mb-2">“Explain Like I’m 10” Mode</h3>
@@ -112,14 +114,17 @@ const LandingPage = ({ onStart, onOpenInterview }) => {
               </p>
             </div>
             <div className="flex items-center text-xs font-semibold text-amber-400 gap-1 mt-2">
-              <span>Interactive Simplicity Slider</span>
-              <ChevronRight className="w-3.5 h-3.5" />
+              <span>Try ELI10 Explainer</span>
+              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
 
-          <div className="glass-panel-interactive p-6 rounded-2xl flex flex-col justify-between">
+          <div 
+            onClick={() => onStart('kahoot')}
+            className="glass-panel-interactive p-6 rounded-3xl flex flex-col justify-between cursor-pointer group"
+          >
             <div>
-              <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <Trophy className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-bold text-slate-100 mb-2">Kahoot-Style Practice Tests</h3>
@@ -128,14 +133,17 @@ const LandingPage = ({ onStart, onOpenInterview }) => {
               </p>
             </div>
             <div className="flex items-center text-xs font-semibold text-purple-400 gap-1 mt-2">
-              <span>Speed Timers & Multipliers</span>
-              <ChevronRight className="w-3.5 h-3.5" />
+              <span>Launch Kahoot Arena</span>
+              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
 
-          <div className="glass-panel-interactive p-6 rounded-2xl flex flex-col justify-between">
+          <div 
+            onClick={() => onStart('doubts')}
+            className="glass-panel-interactive p-6 rounded-3xl flex flex-col justify-between cursor-pointer group"
+          >
             <div>
-              <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <Bot className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-bold text-slate-100 mb-2">Doubt-Solving Chatbot</h3>
@@ -144,8 +152,8 @@ const LandingPage = ({ onStart, onOpenInterview }) => {
               </p>
             </div>
             <div className="flex items-center text-xs font-semibold text-blue-400 gap-1 mt-2">
-              <span>Vector Grounded Citations</span>
-              <ChevronRight className="w-3.5 h-3.5" />
+              <span>Ask IBM Bob</span>
+              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
 
@@ -158,9 +166,9 @@ const LandingPage = ({ onStart, onOpenInterview }) => {
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p>© 2026 IBM Bob — AI Study Buddy & Personalized Learning Companion. Powered by IBM SkillsBuild.</p>
           <div className="flex items-center gap-6">
-            <span className="hover:text-slate-400 cursor-pointer">Syllabus RAG</span>
-            <span className="hover:text-slate-400 cursor-pointer">Kahoot Arena</span>
-            <span className="hover:text-slate-400 cursor-pointer">ELI10 Engine</span>
+            <span onClick={() => onStart('syllabus')} className="hover:text-slate-300 cursor-pointer">Syllabus Ingestion</span>
+            <span onClick={() => onStart('kahoot')} className="hover:text-slate-300 cursor-pointer">Kahoot Arena</span>
+            <span onClick={() => onStart('eli10')} className="hover:text-slate-300 cursor-pointer">ELI10 Engine</span>
           </div>
         </div>
       </footer>
