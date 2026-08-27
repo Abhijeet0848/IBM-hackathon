@@ -4,6 +4,7 @@ Binds Document Ingestion, ChromaDB Retrieval, Prompt Engineering, and LLM Infere
 """
 
 import time
+import re
 from typing import Dict, Any, List, Optional
 from src.ingestion import DocumentIngestionPipeline
 from src.llm_client import LLMClient
@@ -43,14 +44,24 @@ class RAGEngine:
         """
         start_time = time.time()
 
-        # Step 1: Retrieve context chunks
-        all_chunks = self.ingestion.get_all_chunks(limit=30)
+        # Step 1: Retrieve context chunks with smart hybrid retrieval
+        all_chunks = self.ingestion.get_all_chunks(limit=50)
         
-        # If quiz mode or small document, pass comprehensive chunks
-        if mode in ["quiz", "plan"] or len(all_chunks) <= 6:
+        # If quiz/plan mode or small document (<= 15 chunks), pass all chunks for 100% full context
+        if mode in ["quiz", "plan"] or len(all_chunks) <= 15:
             chunks = all_chunks
         else:
+            # Query similarity with both query and keyword terms
+            clean_q = re.sub(r'^(what is|explain|tell me about|how does|what are)\s+', '', query, flags=re.IGNORECASE).strip()
             chunks = self.ingestion.query_similarity(query_text=query, n_results=top_k)
+            if clean_q and clean_q.lower() != query.lower():
+                extra_chunks = self.ingestion.query_similarity(query_text=clean_q, n_results=top_k)
+                existing_ids = {c["id"] for c in chunks}
+                for ec in extra_chunks:
+                    if ec["id"] not in existing_ids:
+                        chunks.append(ec)
+                        existing_ids.add(ec["id"])
+            
             if not chunks:
                 chunks = all_chunks[:top_k]
 

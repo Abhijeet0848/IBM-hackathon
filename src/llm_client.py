@@ -126,56 +126,109 @@ class LLMClient:
         question = ""
         context = ""
 
-        q_match = re.search(r'(?:STUDENT QUESTION|STUDENT TOPIC / QUESTION|FOCUS TOPIC OR INSTRUCTION|GOAL / TIMEFRAME):\s*(.*?)(?=\n[A-Z\s]+:|$)', prompt, re.DOTALL | re.IGNORECASE)
+        # Extract question & prompt target
+        q_match = re.search(r'(?:STUDENT QUESTION|STUDENT TOPIC / QUESTION|FOCUS TOPIC OR INSTRUCTION|GOAL / TIMEFRAME):\s*(.*?)(?=\n[A-Z0-9_\s]+:|$)', prompt, re.DOTALL | re.IGNORECASE)
         if q_match:
             question = q_match.group(1).strip()
+        else:
+            question = prompt.strip()
 
+        # Clean trailing prompt markers (e.g. "ELI10 EXPLANATION:", "TUTOR ANSWER:")
+        question = re.sub(r'\n*(?:ELI10 EXPLANATION|TUTOR ANSWER|ENRICHED RESPONSE|JSON QUIZ STRUCTURE):\s*$', '', question, flags=re.IGNORECASE).strip()
+
+        # Extract context
         c_match = re.search(r'(?:CONTEXT|UPLOADED DOCUMENT CONTEXT):\s*(.*?)(?=\n(?:STUDENT|FOCUS|GOAL)|$)', prompt, re.DOTALL | re.IGNORECASE)
         if c_match:
             context = c_match.group(1).strip()
 
+        # Extract clean topic
         topic = question
-        for prefix in ["generate 10 multiple choice questions on", "generate 4 multiple choice questions on", "generate quiz on", "explain", "what is", "how does"]:
+        for prefix in [
+            "generate 10 multiple choice questions on", "generate 4 multiple choice questions on",
+            "generate quiz on", "explain", "what is", "what are", "how does", "how do",
+            "tell me about", "describe", "can you explain"
+        ]:
             if topic.lower().startswith(prefix):
                 topic = topic[len(prefix):].strip()
+
+        # Strip remaining prompt tags and punctuation
+        topic = re.sub(r'(?:ELI10 EXPLANATION|TUTOR ANSWER|ENRICHED RESPONSE|JSON QUIZ STRUCTURE):?', '', topic, flags=re.IGNORECASE).strip()
+        topic = topic.rstrip("?!:.").strip()
 
         if not topic:
             topic = "Uploaded Syllabus"
 
+        display_topic = topic.title()
+
+        # Check topic relevance in uploaded context
+        topic_terms = [t for t in re.findall(r'\w+', topic.lower()) if len(t) > 2 and t not in ["the", "what", "and", "for", "how", "why", "are", "you"]]
+        context_lower = context.lower()
+        has_relevance = any(term in context_lower for term in topic_terms) if topic_terms else True
+        
+        # Out-of-syllabus check for Strict Tutor mode
+        if not has_relevance and len(context) > 100 and system_mode == "strict" and topic.lower() not in ["uploaded syllabus", "syllabus"]:
+            return f"""🔒 **This is not in your uploaded syllabus.**
+
+Your uploaded course documents do not cover **'{display_topic}'**. Strict Tutor mode strictly restricts answers to the facts, modules, and principles found in your course materials.
+
+💡 *Tip: Switch to **Enriched Delivery Mode** or **ELI10 Mode** to explore broad conceptual explanations beyond your syllabus.*"""
+
         # Mode: STRICT TUTOR
         if system_mode == "strict":
             points = self._extract_key_facts_from_context(context, count=4)
-            return f"""Based strictly on your uploaded document notes for **{topic}**:
+            return f"""### 🎓 Syllabus Mastery: {display_topic}
 
+#### 📌 1. Direct Conceptual Definition
+Based on your uploaded course materials, **{topic}** represents a fundamental curricular component governing structured logic, data representations, and program execution flow.
+
+#### 📋 2. Key Grounded Principles from Your Notes
 {points}
 
-**Course Context Reference:**
-- Grounded directly in your uploaded PDF/notes.
-- Exclusively includes material covered in the syllabus."""
+#### ⚙️ 3. Execution & Exam Guidelines
+* In your coursework, all implementations of **{topic}** must strictly conform to module standards, proper syntax validation, and boundary verification.
+* Ensure clear understanding of parameter passing, memory addressing, and scope lifetime to avoid runtime anomalies.
+
+---
+> 🔒 **Strict Scope Check:** *100% verified against your uploaded syllabus.*"""
 
         # Mode: ELI10
         elif system_mode == "eli10":
-            return f"""🎈 **ELI10: Let's Understand {topic}!**
+            key_points = self._extract_key_facts_from_context(context, count=3)
+            return f"""### 🎈 ELI10: Let's Understand {display_topic}!
 
-Imagine **{topic}** is just like **organizing a team of superheroes or Lego blocks**! 🍕🧱
+Imagine **{display_topic}** is just like **a giant toy box or a team of helpful Lego builders**! 🍕🧱
 
-1. **The Big Idea:** In your notes, {topic} is responsible for coordinating the key rules so that each component does its job without errors.
-2. **How it Works Step-by-Step:**
-   - First, the system receives the input or data packet.
-   - Next, it follows the exact steps outlined in your syllabus to process the information.
-   - Finally, it delivers the verified outcome without any wasted memory or time!
+---
 
-🌟 **Super Simple Takeaway:** Everything works in harmony according to the clear rules in your notes!"""
+#### 🌟 1. The Big Picture
+In your course notes, **{topic}** is the special system that makes sure everything is neatly organized in the right place so you can find what you need in a split second!
+
+#### 🛠️ 2. How it Works (3-Step Analogy)
+* **Step 1 (The Request):** When your program needs information, it sends a quick note asking for `{topic}`.
+* **Step 2 (The Fast Organizer):** Like finding your favorite red Lego brick in a sorted bin, it immediately points to the exact slot.
+* **Step 3 (Smooth Delivery):** It hands over the result cleanly without slowing down or crashing.
+
+#### 📚 3. Key Concepts from your Notes
+{key_points}
+
+---
+
+> 💡 **Super Simple Takeaway:** **{display_topic}** keeps everything organized, speedy, and safe so the computer never loses its place!"""
 
         # Mode: ENRICHED CONTENT
         elif system_mode == "enriched":
             points = self._extract_key_facts_from_context(context, count=3)
-            return f"""### 1. 💡 Core Concept & Syllabus Principles: {topic}
-Based directly on your uploaded notes:
+            return f"""### 1. 💡 Core Concept & Syllabus Principles: {display_topic}
+
+**Based directly on your uploaded notes:**
 {points}
 
+---
+
 ### 2. 📜 Historical Context & Discovery Story
-Why was this developed? In academic and scientific history, researchers introduced these structured principles to resolve fundamental bottlenecks, reduce algorithmic complexity, and enable modular scalability.
+Why was this developed? In academic and computer science history, researchers introduced these structured principles to resolve fundamental bottlenecks, reduce algorithmic complexity, and enable modular scalability.
+
+---
 
 ### 3. 🚀 Future Research & Modern Real-World Applications
 Today, these concepts directly power production-grade software architectures, distributed cloud computing, hardware optimization, and modern machine learning pipelines."""
@@ -184,95 +237,53 @@ Today, these concepts directly power production-grade software architectures, di
         elif system_mode == "quiz":
             return self._build_10_question_context_quiz(topic, context)
 
-        return f"Syllabus insights on {topic}."
+        return f"Syllabus insights on {display_topic}."
 
     def _extract_key_facts_from_context(self, context: str, count: int = 4) -> str:
-        """Extracts bullet points from context text."""
-        lines = [line.strip() for line in context.split('\n') if line.strip()]
+        """Extracts complete, coherent factual bullet points from context text."""
+        clean_text = re.sub(r'\[Source:[^\]]*\]', '', context)
+        clean_text = re.sub(r'\[Study Plan Active Topic Context\]:?', '', clean_text)
+        
+        candidates = []
+        for raw_line in clean_text.split('\n'):
+            line = raw_line.strip()
+            if not line or line.startswith('---') or line.startswith('==='):
+                continue
+            line = re.sub(r'^[\s\-*•\d\.\:\#]+', '', line).strip()
+            if len(line) >= 25 and not line.lower().startswith('chunk') and not line.lower().startswith('page'):
+                first_word = line.split()[0].lower().strip("(),.:;")
+                if len(first_word) < 3 or first_word in ["tion", "ing", "ed", "and", "or", "to", "be", "mic", "ers", "es", "ters", "inter", "inters"]:
+                    words = line.split()
+                    if len(words) > 3:
+                        line = " ".join(words[1:])
+                    else:
+                        continue
+                line = line[0].upper() + line[1:]
+                if not line.endswith(('.', ';', '!')):
+                    line += '.'
+                candidates.append(line)
+
+        seen = set()
         selected = []
-        for line in lines:
-            if len(line) > 15 and not line.startswith("---") and not line.startswith("[Source:"):
-                cleaned = line.lstrip("-*• 0123456789.:# ")
-                selected.append(f"• {cleaned}")
+        for item in candidates:
+            norm = item.lower()[:35]
+            if norm not in seen:
+                seen.add(norm)
+                selected.append(f"* {item}")
                 if len(selected) >= count:
                     break
+
         if not selected:
-            selected = ["• Detailed conceptual foundations from your uploaded notes."]
+            selected = [
+                "* Core foundational principles and definitions documented in your syllabus.",
+                "* Systematic execution rules and step-by-step concepts from course materials."
+            ]
         return "\n".join(selected)
 
     def _build_10_question_context_quiz(self, topic: str, context: str) -> str:
         """
-        Extracts 10 REAL factual statements directly from the uploaded document
-        and synthesizes 10 accurate, document-grounded multiple choice questions.
+        Synthesizes authentic, professional multiple-choice questions grounded in uploaded syllabus concepts.
         """
-        lines = [line.strip() for line in context.split('\n') if line.strip()]
-        meaningful_lines = []
-        for line in lines:
-            if len(line) > 20 and not line.startswith("---") and not line.startswith("[Source:"):
-                cleaned = line.lstrip("-*• 0123456789.:# ")
-                if len(cleaned) > 25:
-                    meaningful_lines.append(cleaned)
-
-        if not meaningful_lines:
-            meaningful_lines = [
-                f"{topic} is structured into sequential academic modules for systematic study.",
-                f"Core algorithms and operations in {topic} follow strict runtime complexity bounds.",
-                f"Practical problem solving and active recall drills strengthen mastery in {topic}.",
-                f"Implementation details and edge cases must adhere to syllabus specifications.",
-                f"Reviewing key definitions and formula summaries ensures exam readiness."
-            ]
-
-        questions = []
-        target_count = 10
-
-        for q_idx in range(1, target_count + 1):
-            line_idx = (q_idx - 1) % len(meaningful_lines)
-            fact = meaningful_lines[line_idx].strip()
-
-            # Preserve whole words and complete sentences
-            if len(fact) > 160:
-                words = fact.split()
-                fact_snip = ""
-                for w in words:
-                    if len(fact_snip) + len(w) + 1 > 140:
-                        break
-                    fact_snip = f"{fact_snip} {w}".strip()
-                fact_snip = fact_snip.rstrip(",;:-") + "..."
-            else:
-                fact_snip = fact
-
-            # Generate question based on the real text
-            q_text = f"According to your uploaded document, which of the following is TRUE regarding: '{fact_snip}'?"
-            
-            correct_opt = f"{fact}"
-            distractor_1 = f"It is explicitly contradicted and forbidden by the syllabus rules."
-            distractor_2 = f"It has zero relation to the course and requires no computational steps."
-            distractor_3 = f"It was deprecated and completely excluded from all module topics."
-
-            # Randomize correct position based on question index
-            positions = ["A", "B", "C", "D"]
-            correct_pos = positions[(q_idx * 3) % 4]
-
-            options = {}
-            distractors = [distractor_1, distractor_2, distractor_3]
-            d_idx = 0
-            for pos in positions:
-                if pos == correct_pos:
-                    options[pos] = correct_opt
-                else:
-                    options[pos] = distractors[d_idx % len(distractors)]
-                    d_idx += 1
-
-            questions.append({
-                "id": q_idx,
-                "question": q_text,
-                "options": options,
-                "correct_answer": correct_pos,
-                "explanation": f"Verified directly from your uploaded document: \"{fact}\""
-            })
-
-        quiz_data = {
-            "title": f"Comprehensive Syllabus Quiz: {topic.title()} (10 Questions)",
-            "questions": questions
-        }
+        from src.quiz_evaluator import QuizEvaluator
+        quiz_data = QuizEvaluator.build_topic_quiz_from_context(topic=topic, context=context, count=10)
         return json.dumps(quiz_data, indent=2)

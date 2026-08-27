@@ -17,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Professional SaaS Theme CSS
+# Professional SaaS Theme CSS (Light)
 PROFESSIONAL_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -25,20 +25,20 @@ PROFESSIONAL_CSS = """
 /* Global resets & typography */
 html, body, [class*="css"], .stApp {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-    background-color: #0b0f19 !important;
-    color: #e2e8f0 !important;
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
 }
 
 /* App Header */
 .app-header {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid #e2e8f0;
     padding-bottom: 1.25rem;
     margin-bottom: 1.75rem;
 }
 .app-title {
     font-size: 1.75rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #0f172a;
     letter-spacing: -0.02em;
     margin: 0;
     display: flex;
@@ -47,21 +47,21 @@ html, body, [class*="css"], .stApp {
 }
 .app-desc {
     font-size: 0.95rem;
-    color: #94a3b8;
+    color: #475569;
     margin-top: 0.35rem;
     line-height: 1.5;
 }
 
 /* Card Containers */
 [data-testid="stVerticalBlockBorderWrapper"] {
-    background: #131b2e !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
     border-radius: 12px !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
     transition: border-color 0.15s ease;
 }
 [data-testid="stVerticalBlockBorderWrapper"]:hover {
-    border-color: rgba(99, 102, 241, 0.3) !important;
+    border-color: #93c5fd !important;
 }
 
 /* Inputs & Selectboxes */
@@ -69,16 +69,16 @@ html, body, [class*="css"], .stApp {
 .stNumberInput > div > div > input,
 .stSelectbox > div > div,
 .stTextArea > div > div > textarea {
-    background-color: #0f172a !important;
-    border: 1px solid #334155 !important;
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
     border-radius: 8px !important;
-    color: #f8fafc !important;
+    color: #0f172a !important;
     font-size: 0.9rem !important;
 }
 .stTextInput > div > div > input:focus,
 .stSelectbox > div > div:focus-within {
-    border-color: #6366f1 !important;
-    box-shadow: 0 0 0 1px #6366f1 !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 1px #2563eb !important;
 }
 
 /* Buttons */
@@ -88,40 +88,40 @@ html, body, [class*="css"], .stApp {
     font-size: 0.9rem !important;
     padding: 0.5rem 1rem !important;
     transition: all 0.15s ease !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 .stButton > button[kind="primary"] {
-    background: #4f46e5 !important;
+    background: #2563eb !important;
     color: #ffffff !important;
     border: none !important;
 }
 .stButton > button[kind="primary"]:hover {
-    background: #4338ca !important;
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
+    background: #1d4ed8 !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
 }
 .stButton > button:not([kind="primary"]) {
-    background: #1e293b !important;
-    color: #e2e8f0 !important;
+    background: #f1f5f9 !important;
+    color: #1e293b !important;
+    border: 1px solid #cbd5e1 !important;
 }
 .stButton > button:not([kind="primary"]):hover {
-    background: #334155 !important;
-    color: #ffffff !important;
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
 }
 
 /* Clean Progress Bar */
 .stProgress > div > div > div > div {
-    background-color: #6366f1 !important;
+    background-color: #2563eb !important;
 }
 
 /* Metric Display */
 [data-testid="stMetricValue"] {
     font-size: 1.4rem !important;
     font-weight: 700 !important;
-    color: #ffffff !important;
+    color: #0f172a !important;
 }
 [data-testid="stMetricLabel"] {
     font-size: 0.8rem !important;
-    color: #94a3b8 !important;
+    color: #64748b !important;
     font-weight: 500 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
@@ -129,8 +129,8 @@ html, body, [class*="css"], .stApp {
 
 /* Sidebar */
 section[data-testid="stSidebar"] {
-    background-color: #0d1322 !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background-color: #ffffff !important;
+    border-right: 1px solid #e2e8f0 !important;
 }
 
 /* Tags & Badges */
@@ -142,20 +142,20 @@ section[data-testid="stSidebar"] {
     font-weight: 600;
     letter-spacing: 0.02em;
 }
-.tag-indigo { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3); }
-.tag-emerald { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
-.tag-slate { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
+.tag-indigo { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.tag-emerald { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.tag-slate { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
 
 /* Task List Style */
 .task-bullet {
-    background: #0f172a;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-left: 3px solid #6366f1;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-left: 3px solid #2563eb;
     border-radius: 6px;
     padding: 0.5rem 0.75rem;
     margin-bottom: 0.4rem;
     font-size: 0.88rem;
-    color: #e2e8f0;
+    color: #1e293b;
     line-height: 1.4;
 }
 </style>

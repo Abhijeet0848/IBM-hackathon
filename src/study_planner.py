@@ -454,8 +454,8 @@ class StudyPlanner:
             if any(k in line.lower() for k in ["course:", "syllabus:", "subject:", "title:"]):
                 course_name = line.strip("# :*-")
                 continue
-            cleaned = line.lstrip("-*• 0123456789.:# ")
-            if len(cleaned) > 10 and not cleaned.startswith("---") and not cleaned.startswith("[Source:"):
+            cleaned = re.sub(r'^[\s\-*•#0-9.:)]+', '', line).strip()
+            if len(cleaned) > 5 and not cleaned.startswith("---") and not cleaned.startswith("[Source:"):
                 extracted_topics.append(cleaned[:90])
 
         if not extracted_topics:
@@ -561,14 +561,14 @@ class StudyPlanner:
                     ]
                 else:  # balanced
                     tasks = [
-                        f"📖 [Theory] Study concept: {topic}",
-                        f"🛠️ [Practice] Work through practical examples & formula sheet for {topic[:35]}",
-                        f"🧠 [Recall] Test conceptual mastery with ELI10 mode on {topic[:30]}"
+                        f"📖 [Theory] Core definitions and foundations of {topic[:45]}",
+                        f"🛠️ [Practice] Practical exercises and problems on {topic[:40]}",
+                        f"🧠 [Recall] Active recall check on {topic[:35]}"
                     ]
 
                 days_list.append({
                     "day_number": d,
-                    "focus_module": f"Topic: {topic[:50]}",
+                    "focus_module": topic[:50],
                     "difficulty": "Beginner" if d <= 2 and student_level == "beginner" else "Intermediate",
                     "tasks": tasks,
                     "estimated_time_minutes": minutes_per_day,
