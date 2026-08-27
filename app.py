@@ -130,12 +130,116 @@ def render_homepage(study_planner):
         st.markdown("#### 🚀 Ready to Begin Your Learning Journey?")
         st.write("Launch your personalized AI study companion to generate custom day-by-day roadmaps from your uploaded course notes, solve doubts with multi-persona explainers, and test your knowledge with active recall drills.")
         st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
-        if st.button("🚀 Start IBM Bob Study", key="home_start_btn", type="primary", use_container_width=True):
-            st.query_params["page"] = "workspace"
-            st.session_state.view_mode = "workspace"
-            st.rerun()
+        col_btn1, col_btn2 = st.columns([2.5, 1.5])
+        with col_btn1:
+            if st.button("🚀 Launch AI Study Workspace", key="home_start_btn", type="primary", use_container_width=True):
+                st.query_params["page"] = "workspace"
+                st.session_state.view_mode = "workspace"
+                st.rerun()
+        with col_btn2:
+            if st.button("📂 Explore Vector Store", key="home_vector_btn", use_container_width=True):
+                st.query_params["page"] = "workspace"
+                st.session_state.view_mode = "workspace"
+                st.rerun()
+
+    # 1-Click Starter Courses (Instant Pre-loaded Syllabi)
+    st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+    st.markdown("### ⚡ Quick Launch: Popular Sample Syllabi")
+    st.caption("Click any subject below to load a pre-configured syllabus and generate your custom schedule instantly:")
+    
+    sample_col1, sample_col2, sample_col3 = st.columns(3)
+    
+    with sample_col1:
+        with st.container(border=True):
+            st.markdown("##### 🎓 Teaching Aptitude")
+            st.caption("Pedagogy, levels of teaching, learner characteristics & evaluation systems.")
+            if st.button("🚀 Load Teaching Aptitude", key="btn_sample_pedagogy", use_container_width=True):
+                import io
+                syllabus_txt = (
+                    "Teaching Aptitude: Concept, objectives, levels of teaching (memory, understanding, reflective), learner characteristics.\n"
+                    "Methods of teaching in institutions of higher learning (teacher-centred vs. learner-centred methods; off-line vs. on-line methods).\n"
+                    "Teaching support system (traditional, modern, and ICT based).\n"
+                    "Evaluation systems (elements and types of evaluation, evaluation in choice based credit system, computer based testing, innovations in evaluation systems)."
+                )
+                st.session_state.ingestion_pipeline.reset_database()
+                f = io.BytesIO(syllabus_txt.encode('utf-8'))
+                f.name = "Teaching_Aptitude_Syllabus.txt"
+                st.session_state.ingestion_pipeline.process_and_store(f, "Teaching_Aptitude_Syllabus.txt")
+                st.session_state.personalized_plan = study_planner.generate_study_schedule(
+                    context_text=syllabus_txt,
+                    days=7,
+                    hours_per_day=2.0,
+                    strategy_key="balanced",
+                    level_key="intermediate"
+                )
+                st.session_state.chat_history = []
+                st.session_state.current_quiz = None
+                st.session_state.view_mode = "workspace"
+                st.query_params["page"] = "workspace"
+                st.rerun()
+
+    with sample_col2:
+        with st.container(border=True):
+            st.markdown("##### 🌐 Current Events & Affairs")
+            st.caption("National & international events, bilateral summits, policy reforms & space missions.")
+            if st.button("🚀 Load Current Events", key="btn_sample_curren", use_container_width=True):
+                import io
+                syllabus_txt = (
+                    "Current Affairs & Contemporary Issues:\n"
+                    "National and international events of importance, summits and bilateral partnerships.\n"
+                    "Government initiatives, schemes, and socioeconomic policy reforms.\n"
+                    "Science, space missions, environmental agreements, and climate governance.\n"
+                    "Global trade, geopolitical dynamics, and international organizations."
+                )
+                st.session_state.ingestion_pipeline.reset_database()
+                f = io.BytesIO(syllabus_txt.encode('utf-8'))
+                f.name = "Current_Events_Syllabus.txt"
+                st.session_state.ingestion_pipeline.process_and_store(f, "Current_Events_Syllabus.txt")
+                st.session_state.personalized_plan = study_planner.generate_study_schedule(
+                    context_text=syllabus_txt,
+                    days=7,
+                    hours_per_day=2.0,
+                    strategy_key="balanced",
+                    level_key="intermediate"
+                )
+                st.session_state.chat_history = []
+                st.session_state.current_quiz = None
+                st.session_state.view_mode = "workspace"
+                st.query_params["page"] = "workspace"
+                st.rerun()
+
+    with sample_col3:
+        with st.container(border=True):
+            st.markdown("##### 💻 Data Structures & Algorithms")
+            st.caption("Arrays, Linked Lists, Binary Trees, Graphs, Dynamic Programming & Big-O analysis.")
+            if st.button("🚀 Load DSA Course", key="btn_sample_dsa", use_container_width=True):
+                import io
+                syllabus_txt = (
+                    "Data Structures and Algorithms:\n"
+                    "Asymptotic notation, time and space complexity analysis.\n"
+                    "Linear data structures: Arrays, Linked Lists, Stacks, Queues.\n"
+                    "Non-linear data structures: Binary Trees, Binary Search Trees, AVL Trees, Heaps, and Graphs.\n"
+                    "Algorithms: Sorting, Binary Search, Breadth-First Search, Depth-First Search, Dynamic Programming, Greedy Algorithms."
+                )
+                st.session_state.ingestion_pipeline.reset_database()
+                f = io.BytesIO(syllabus_txt.encode('utf-8'))
+                f.name = "DSA_Syllabus.txt"
+                st.session_state.ingestion_pipeline.process_and_store(f, "DSA_Syllabus.txt")
+                st.session_state.personalized_plan = study_planner.generate_study_schedule(
+                    context_text=syllabus_txt,
+                    days=7,
+                    hours_per_day=2.0,
+                    strategy_key="balanced",
+                    level_key="intermediate"
+                )
+                st.session_state.chat_history = []
+                st.session_state.current_quiz = None
+                st.session_state.view_mode = "workspace"
+                st.query_params["page"] = "workspace"
+                st.rerun()
 
     # 4 Core Pillars (Feature Grid)
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
     st.markdown("### ⚡ AI Study Buddy Capabilities")
     col_f1, col_f2 = st.columns(2)
     with col_f1:
@@ -197,7 +301,7 @@ def render_homepage(study_planner):
         <div class="step-card">
             <div class="step-num">1</div>
             <div style="font-weight: 700; color: #0f172a; margin-bottom: 4px;">Upload Syllabus / Notes</div>
-            <div style="font-size: 0.83rem; color: #64748b;">Drop your course PDF, markdown, or text notes in the left sidebar. The system chunks and vectors your material instantly.</div>
+            <div style="font-size: 0.83rem; color: #64748b;">Drop your course PDF, markdown, or text notes in the planner. The system chunks and vectors your material instantly.</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -215,9 +319,21 @@ def render_homepage(study_planner):
         <div class="step-card">
             <div class="step-num">3</div>
             <div style="font-weight: 700; color: #0f172a; margin-bottom: 4px;">Learn, Drill & Master</div>
-            <div style="font-size: 0.83rem; color: #64748b;">Track daily milestones, ask doubts with the AI Tutor, click verified Wikipedia references, and crush Kahoot quizzes.</div>
+            <div style="font-size: 0.83rem; color: #64748b;">Track daily milestones, ask doubts with the AI Tutor, click verified academic references, and crush Kahoot quizzes.</div>
         </div>
         """, unsafe_allow_html=True)
+
+    # Frequently Asked Questions Accordion
+    st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+    st.markdown("### 💡 Frequently Asked Questions")
+    with st.expander("🛡️ How does the AI Tutor prevent hallucinations?"):
+        st.write("In **Strict Syllabus Mode**, the multi-LLM RAG engine restricts its responses exclusively to the retrieved context chunks from your uploaded document. If a concept is not present in your notes, it explicitly states so and asks for clarification rather than making up answers.")
+
+    with st.expander("📅 Can I sync the generated study schedule with my calendar?"):
+        st.write("Yes! You can export your personalized day-by-day plan as an RFC 5545 `.ics` file with one click. This file can be imported directly into **Google Calendar, Apple Calendar, or Microsoft Outlook** with automatic reminders set for each study session.")
+
+    with st.expander("🎮 How does the Kahoot Quiz Arena work?"):
+        st.write("The quiz arena dynamically generates multiple-choice questions evaluated strictly against your uploaded syllabus. You can select any question count (from 3 to 100), receive instant scorecards, earn XP and streak points, and review in-depth explanations for every answer.")
 
 # ======================================================================
 # VIEW 2: STUDY WORKSPACE
