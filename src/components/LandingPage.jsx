@@ -27,20 +27,9 @@ const LandingPage = ({ onStart, onOpenInterview }) => {
               <p className="text-[11px] text-slate-500 hidden sm:block">Personalized Learning Companion</p>
             </div>
           </div>
-
-          {/* Header Action Buttons */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => onStart('eli10')}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition-all hover:scale-102 flex items-center gap-1.5 cursor-pointer"
-            >
-              <span>Open Study Workspace</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-
         </div>
       </header>
+
 
       {/* Hero Section */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center max-w-5xl mx-auto w-full">
