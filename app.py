@@ -750,7 +750,7 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
         if stats["total_chunks"] == 0:
             st.info("👈 Upload your syllabus in the Study Schedule Planner first to generate custom AI quizzes.")
 
-        q_col1, q_col2, q_col3 = st.columns([2.6, 1.2, 1.2])
+        q_col1, q_col2, q_col3 = st.columns([2.5, 1.2, 1.3])
         with q_col1:
             quiz_topic = st.text_input(
                 "🎯 Focus Topic / Concept (Optional):",
@@ -762,14 +762,15 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                 "🔢 Question Count:",
                 min_value=3,
                 max_value=30,
-                value=10,
+                value=8,
                 step=1,
                 key="quiz_num_questions"
             )
         with q_col3:
             st.write("")
             st.write("")
-            gen_quiz_btn = st.button("🔥 Launch AI Quiz", type="primary", use_container_width=True)
+            btn_label = "🔄 Regenerate Quiz" if st.session_state.current_quiz else "🔥 Launch AI Quiz"
+            gen_quiz_btn = st.button(btn_label, type="primary", use_container_width=True)
 
         if gen_quiz_btn:
             if stats["total_chunks"] == 0:
@@ -795,7 +796,23 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
         # Render Kahoot-Style Quiz Form
         if st.session_state.current_quiz:
             quiz = st.session_state.current_quiz
-            st.markdown(f"#### 🏆 {quiz.get('title', 'Syllabus Quiz')}")
+            col_q_title, col_q_regen = st.columns([3.8, 1.2])
+            with col_q_title:
+                st.markdown(f"#### 🏆 {quiz.get('title', 'Syllabus Quiz')}")
+            with col_q_regen:
+                if st.button("🔄 New Quiz", key="btn_regen_inline", use_container_width=True):
+                    with st.spinner(f"Generating {num_questions} fresh questions..."):
+                        query = f"Generate {num_questions} multiple choice questions on {quiz_topic}" if quiz_topic else f"Generate {num_questions} comprehensive multiple choice questions covering the syllabus"
+                        quiz_resp = rag_engine.answer_query(query=query, mode="quiz", top_k=25, question_count=int(num_questions))
+                        if quiz_resp["quiz_data"]:
+                            quiz_obj = quiz_resp["quiz_data"]
+                            quiz_obj["title"] = f"AI Quiz on: {quiz_topic.title() if quiz_topic else 'Full Course Syllabus'} ({len(quiz_obj.get('questions', []))} Questions)"
+                            st.session_state.quiz_instance_id = int(time.time() * 1000)
+                            st.session_state.current_quiz = quiz_obj
+                            st.session_state.quiz_submitted = False
+                            st.session_state.quiz_eval_results = None
+                            st.session_state.user_quiz_answers = {}
+                            st.rerun()
             st.markdown("---")
 
             questions = quiz.get("questions", [])
