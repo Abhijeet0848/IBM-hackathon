@@ -16,49 +16,17 @@
   }
 }
 
-/* Fallback card styles for guaranteed visual beauty */
-.card-light {
+/* Light Card Utility */
+.card-clean {
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 1rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
 }
 
-.card-light:hover {
-  border-color: #93c5fd;
-  box-shadow: 0 10px 15px -3px rgba(15, 98, 254, 0.08);
-  transform: translateY(-2px);
-}
-
-/* Custom dark glass panels for workspace mode */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.glass-panel-interactive {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.glass-panel-interactive:hover {
-  background: rgba(30, 41, 59, 0.85);
-  border-color: rgba(96, 165, 250, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(15, 98, 254, 0.2);
-}
-
-/* Custom Gradients */
-.gradient-text-ibm {
-  background: linear-gradient(135deg, #0f62fe 0%, #0043ce 50%, #4589ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.card-clean:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
 }
 
 /* Custom Scrollbar */

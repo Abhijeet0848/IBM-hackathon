@@ -4,7 +4,6 @@ import {
   Trash2 
 } from 'lucide-react';
 
-
 const PRESET_PROMPTS = [
   "Can you explain Virtual DOM reconciliation from my React notes?",
   "What is the difference between TCP and UDP for my networking exam?",
@@ -58,7 +57,7 @@ const DoubtSolverChat = ({ onAddXP }) => {
         reply = `**TCP vs UDP Comparison:**\n\n- **TCP (Transmission Control Protocol):** Connection-oriented, guarantees packet delivery via 3-way handshake and retransmission. Best for web browsing (HTTP/HTTPS) and file transfers.\n- **UDP (User Datagram Protocol):** Connectionless, lightweight, no delivery guarantee, minimal latency. Best for live gaming, video streaming, and VoIP.`;
         citations = ["ChromaDB Chunk #4: Networking_Protocols.pdf"];
       } else if (qLower.includes('vector') || qLower.includes('chroma')) {
-        reply = `**Vector Embeddings & ChromaDB:**\n\nText chunks are transformed into multi-dimensional floating-point vectors by embedding models. When you ask a doubt, your query is embedded and matched against stored document vectors using Cosine Similarity ($$A \\cdot B / (||A|| \\cdot ||B||)$$) to extract the most relevant syllabus context!`;
+        reply = `**Vector Embeddings & ChromaDB:**\n\nText chunks are transformed into multi-dimensional floating-point vectors by embedding models. When you ask a doubt, your query is embedded and matched against stored document vectors using Cosine Similarity to extract the most relevant syllabus context!`;
         citations = ["ChromaDB Chunk #2: RAG_Vector_Search.pdf", "IBM Granite AI Spec"];
       } else {
         reply = `Based on your course materials for **${query}**:\n\nThe fundamental principle is to break the problem into modular, testable components. Always verify edge cases and establish clear input/output contracts before writing code.`;
@@ -75,7 +74,7 @@ const DoubtSolverChat = ({ onAddXP }) => {
       ]);
 
       if (onAddXP) onAddXP(20);
-    }, 1200);
+    }, 1100);
   };
 
   const handleVoiceToggle = () => {
@@ -84,7 +83,7 @@ const DoubtSolverChat = ({ onAddXP }) => {
       setTimeout(() => {
         setInput("Can you explain Virtual DOM reconciliation from my React notes?");
         setIsVoiceActive(false);
-      }, 2500);
+      }, 2000);
     }
   };
 
@@ -100,28 +99,28 @@ const DoubtSolverChat = ({ onAddXP }) => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-4 animate-in fade-in duration-300">
+    <div className="w-full max-w-4xl mx-auto space-y-4">
       
       {/* Top Banner */}
-      <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+      <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
             <Bot className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-white text-sm">IBM Bob's 24/7 Doubt-Solving AI</h3>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-semibold">
+              <h3 className="font-bold text-slate-900 text-sm">IBM Bob's 24/7 Doubt-Solving AI</h3>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold">
                 ● RAG Active
               </span>
             </div>
-            <p className="text-xs text-slate-400">Trained on your uploaded syllabus & IBM SkillsBuild resources</p>
+            <p className="text-xs text-slate-500">Trained on your uploaded syllabus & notes</p>
           </div>
         </div>
 
         <button
           onClick={handleClearChat}
-          className="text-xs text-slate-400 hover:text-rose-400 flex items-center gap-1 transition-colors p-2"
+          className="text-xs text-slate-500 hover:text-rose-600 flex items-center gap-1 transition-colors p-2 cursor-pointer"
           title="Clear Chat History"
         >
           <Trash2 className="w-4 h-4" />
@@ -131,22 +130,22 @@ const DoubtSolverChat = ({ onAddXP }) => {
 
       {/* Suggested Doubt Prompts */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs text-slate-400 font-semibold flex items-center gap-1">
-          <Sparkles className="w-3.5 h-3.5 text-blue-400" /> Quick Questions:
+        <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+          <Sparkles className="w-3.5 h-3.5 text-blue-600" /> Quick Questions:
         </span>
         {PRESET_PROMPTS.map((prompt, i) => (
           <button
             key={i}
             onClick={() => handleSend(prompt)}
-            className="px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-blue-500/50 text-slate-300 hover:text-white text-xs font-medium transition-all"
+            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-blue-400 text-slate-700 text-xs font-medium transition-all cursor-pointer shadow-xs"
           >
             {prompt}
           </button>
         ))}
       </div>
 
-      {/* Chat Messages Container */}
-      <div className="p-6 rounded-3xl glass-panel h-[520px] flex flex-col justify-between overflow-hidden shadow-2xl border border-slate-800">
+      {/* Chat Messages Box */}
+      <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs h-[520px] flex flex-col justify-between overflow-hidden">
         
         <div className="overflow-y-auto space-y-4 pr-2">
           {messages.map((msg, idx) => (
@@ -159,8 +158,8 @@ const DoubtSolverChat = ({ onAddXP }) => {
               <div
                 className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
                   msg.role === 'user'
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                    : 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'bg-blue-50 text-blue-600 border border-blue-200'
                 }`}
               >
                 {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
@@ -171,7 +170,7 @@ const DoubtSolverChat = ({ onAddXP }) => {
                   className={`p-4 rounded-2xl text-xs sm:text-sm leading-relaxed ${
                     msg.role === 'user'
                       ? 'bg-blue-600 text-white rounded-tr-none'
-                      : 'bg-slate-900/90 text-slate-200 border border-slate-800 rounded-tl-none shadow-sm'
+                      : 'bg-slate-50 text-slate-800 border border-slate-200 rounded-tl-none'
                   }`}
                 >
                   <p className="whitespace-pre-line">{msg.content}</p>
@@ -182,16 +181,16 @@ const DoubtSolverChat = ({ onAddXP }) => {
                     {msg.citations.map((c, i) => (
                       <span
                         key={i}
-                        className="text-[10px] font-mono text-cyan-400 bg-cyan-950/40 border border-cyan-800/50 px-2 py-0.5 rounded-md flex items-center gap-1"
+                        className="text-[10px] font-mono text-cyan-800 bg-cyan-50 border border-cyan-200 px-2 py-0.5 rounded-md flex items-center gap-1"
                       >
-                        <BookOpen className="w-3 h-3 text-cyan-400" />
+                        <BookOpen className="w-3 h-3 text-cyan-600" />
                         <span>{c}</span>
                       </span>
                     ))}
                   </div>
                 )}
 
-                <span className={`text-[10px] text-slate-500 block px-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                <span className={`text-[10px] text-slate-400 block px-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
                   {msg.timestamp}
                 </span>
               </div>
@@ -200,13 +199,13 @@ const DoubtSolverChat = ({ onAddXP }) => {
 
           {isThinking && (
             <div className="flex gap-3 max-w-[80%]">
-              <div className="w-8 h-8 rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center shrink-0">
                 <Bot className="w-4 h-4" />
               </div>
-              <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 rounded-tl-none flex items-center gap-1.5 text-slate-400 text-xs">
-                <span className="w-2 h-2 rounded-full bg-blue-400 animate-bounce"></span>
-                <span className="w-2 h-2 rounded-full bg-blue-400 animate-bounce [animation-delay:0.2s]"></span>
-                <span className="w-2 h-2 rounded-full bg-blue-400 animate-bounce [animation-delay:0.4s]"></span>
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 rounded-tl-none flex items-center gap-1.5 text-slate-500 text-xs">
+                <span className="w-2 h-2 rounded-full bg-blue-600 animate-bounce"></span>
+                <span className="w-2 h-2 rounded-full bg-blue-600 animate-bounce [animation-delay:0.2s]"></span>
+                <span className="w-2 h-2 rounded-full bg-blue-600 animate-bounce [animation-delay:0.4s]"></span>
                 <span className="ml-2 font-medium">IBM Bob searching vector index...</span>
               </div>
             </div>
@@ -216,9 +215,9 @@ const DoubtSolverChat = ({ onAddXP }) => {
         </div>
 
         {/* Input Bar */}
-        <div className="pt-4 border-t border-slate-800 flex flex-col gap-2">
+        <div className="pt-4 border-t border-slate-100 flex flex-col gap-2">
           {isVoiceActive && (
-            <div className="flex items-center gap-2 text-xs text-red-400 px-3 py-1.5 bg-red-950/40 border border-red-900/50 rounded-xl animate-pulse">
+            <div className="flex items-center gap-2 text-xs text-red-600 px-3 py-1.5 bg-red-50 border border-red-200 rounded-xl animate-pulse">
               <span className="w-2 h-2 rounded-full bg-red-500"></span>
               <span>Listening to speech input simulation...</span>
             </div>
@@ -227,20 +226,20 @@ const DoubtSolverChat = ({ onAddXP }) => {
           <div className="flex items-center gap-2">
             <button
               onClick={handleVoiceToggle}
-              className={`p-3 rounded-xl border transition-all ${
+              className={`p-3 rounded-xl border transition-all cursor-pointer ${
                 isVoiceActive
-                  ? 'bg-red-500/20 border-red-500/40 text-red-400 animate-pulse'
-                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200 hover:bg-slate-800'
+                  ? 'bg-red-50 border-red-300 text-red-600 animate-pulse'
+                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:text-slate-900 hover:bg-slate-100'
               }`}
-              title="Voice Speech-to-Text Doubt"
+              title="Voice Doubt Simulation"
             >
               {isVoiceActive ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
             </button>
 
             <input
               type="text"
-              className="flex-1 px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:border-blue-500"
-              placeholder="Ask Bob any doubt from your syllabus or paste a question..."
+              className="flex-1 px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 text-xs sm:text-sm focus:bg-white focus:outline-none focus:border-blue-600"
+              placeholder="Ask Bob any doubt from your syllabus..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
@@ -249,7 +248,7 @@ const DoubtSolverChat = ({ onAddXP }) => {
             <button
               onClick={() => handleSend()}
               disabled={!input.trim() || isThinking}
-              className="px-5 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-1.5 shadow-md shadow-blue-600/20 transition-all hover:scale-105"
+              className="px-5 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
             >
               <span>Ask Bob</span>
               <Send className="w-4 h-4" />

@@ -5,12 +5,11 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-
 const SIMPLICITY_MODES = [
-  { id: 'eli10', name: '👶 Like I’m 10', desc: 'Fun metaphors, real-world toys & simple language' },
-  { id: 'story', name: '🧙 Story / Adventure', desc: 'Explains concept through a hero’s journey' },
-  { id: 'highschool', name: '🎒 High School', desc: 'Clear diagrams, direct logic & structured bullet points' },
-  { id: 'professor', name: '🎓 University Deep-Dive', desc: 'Rigorous definitions, math foundations & technical nuances' },
+  { id: 'eli10', name: '👶 Like I’m 10', desc: 'Everyday metaphors & simple toys' },
+  { id: 'story', name: '🧙 Story Adventure', desc: 'Hero’s journey narrative' },
+  { id: 'highschool', name: '🎒 High School', desc: 'Structured logic & bullet points' },
+  { id: 'professor', name: '🎓 University Level', desc: 'Rigorous definitions & math foundations' },
 ];
 
 const PRESET_TOPICS = [
@@ -50,8 +49,8 @@ const ELI10Explainer = ({ onAddXP }) => {
       setIsSimplifying(false);
       const match = PRESET_TOPICS.find(t => t.topic.toLowerCase().includes(targetTopic.toLowerCase())) || {
         topic: targetTopic,
-        eli10: `Imagine ${targetTopic} as a giant playground game where every participant has a specific rule to follow. When everything works in harmony, the system produces the expected outcome effortlessly without getting confused!`,
-        analogy: `A friendly playground puzzle where everyone plays their exact turn.`,
+        eli10: `Imagine ${targetTopic} as a friendly playground game where every participant has a specific rule to follow. When everything works in harmony, the system produces the expected outcome effortlessly without getting confused!`,
+        analogy: `A playground puzzle where everyone plays their exact turn.`,
         keyTakeaway: `Breaks complex domain barriers into intuitive, bite-sized components.`
       };
 
@@ -63,7 +62,7 @@ const ELI10Explainer = ({ onAddXP }) => {
         spread: 50,
         origin: { y: 0.6 }
       });
-    }, 1100);
+    }, 1000);
   };
 
   const handleCopy = () => {
@@ -82,28 +81,28 @@ const ELI10Explainer = ({ onAddXP }) => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300">
+    <div className="w-full max-w-4xl mx-auto space-y-6">
       
-      {/* Header Banner */}
-      <div className="p-6 rounded-3xl glass-panel bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 border border-blue-500/20 space-y-4">
+      {/* Top Banner Card */}
+      <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-            <Lightbulb className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
+            <Lightbulb className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg sm:text-xl font-bold text-white">IBM Bob's "Explain Like I'm 10" Learning Assistant</h2>
-              <span className="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-semibold">
-                ELI10 Engine
+              <h2 className="text-lg font-bold text-slate-900">“Explain Like I’m 10” Learning Assistant</h2>
+              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold">
+                ELI10 Mode
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">Turn heavy, complex syllabus topics into crystal-clear everyday analogies.</p>
+            <p className="text-xs text-slate-500">Turn complex syllabus concepts into simple everyday analogies.</p>
           </div>
         </div>
 
-        {/* Quick Topic Chips */}
-        <div className="flex flex-wrap items-center gap-2 pt-2">
-          <span className="text-xs text-slate-400 font-semibold">Try sample topics:</span>
+        {/* Quick Sample Topics */}
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+          <span className="text-xs text-slate-500 font-medium">Try sample:</span>
           {PRESET_TOPICS.map((p, idx) => (
             <button
               key={idx}
@@ -111,7 +110,7 @@ const ELI10Explainer = ({ onAddXP }) => {
                 setTopicInput(p.topic);
                 handleSimplify(p.topic);
               }}
-              className="px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-blue-500/50 text-slate-300 hover:text-white text-xs font-medium transition-all"
+              className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-all cursor-pointer"
             >
               {p.topic}
             </button>
@@ -119,18 +118,18 @@ const ELI10Explainer = ({ onAddXP }) => {
         </div>
       </div>
 
-      {/* Input & Simplicity Controls */}
-      <div className="p-6 rounded-3xl glass-panel space-y-5">
+      {/* Input & Mode Configuration */}
+      <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-5">
         
         <div className="space-y-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-            <Wand2 className="w-4 h-4 text-blue-400" />
-            Enter any difficult concept or paste textbook excerpt
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+            <Wand2 className="w-4 h-4 text-blue-600" />
+            Enter concept or question
           </label>
           <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
-              className="flex-1 px-4 py-3.5 bg-slate-950 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:border-blue-500"
+              className="flex-1 px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 text-sm focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
               placeholder="e.g. Asynchronous event loops, Fourier transforms, Polymorphism..."
               value={topicInput}
               onChange={(e) => setTopicInput(e.target.value)}
@@ -139,7 +138,7 @@ const ELI10Explainer = ({ onAddXP }) => {
             <button
               onClick={() => handleSimplify()}
               disabled={isSimplifying}
-              className="px-6 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 text-white font-bold rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 transition-all hover:scale-105"
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
             >
               {isSimplifying ? (
                 <>
@@ -158,22 +157,22 @@ const ELI10Explainer = ({ onAddXP }) => {
 
         {/* Simplicity Mode Selector */}
         <div className="space-y-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
-            Select Explanation Style
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+            Explanation Style
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {SIMPLICITY_MODES.map((mode) => (
               <button
                 key={mode.id}
                 onClick={() => setSelectedMode(mode.id)}
-                className={`p-3 rounded-2xl border text-left transition-all ${
+                className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                   selectedMode === mode.id
-                    ? 'bg-blue-600/20 border-blue-500 text-blue-300 shadow-md shadow-blue-500/10'
-                    : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                    ? 'bg-blue-50 border-blue-500 text-blue-900 shadow-xs'
+                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
                 }`}
               >
-                <div className="font-bold text-xs sm:text-sm text-slate-200 mb-1">{mode.name}</div>
-                <div className="text-[11px] text-slate-500 line-clamp-2 leading-tight">{mode.desc}</div>
+                <div className="font-bold text-xs sm:text-sm text-slate-900 mb-0.5">{mode.name}</div>
+                <div className="text-[11px] text-slate-500 leading-tight">{mode.desc}</div>
               </button>
             ))}
           </div>
@@ -181,59 +180,59 @@ const ELI10Explainer = ({ onAddXP }) => {
 
       </div>
 
-      {/* Explanation Output Card */}
+      {/* Output Card */}
       {currentResult && (
-        <div className="p-8 rounded-3xl glass-panel bg-gradient-to-b from-slate-900/90 to-slate-950 border border-slate-800 shadow-2xl space-y-6 animate-in fade-in duration-300">
+        <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4 animate-in fade-in duration-200">
           
-          <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <span className="text-[11px] font-bold text-blue-400 uppercase tracking-wider">Concept Breakdown</span>
-              <h3 className="text-xl font-black text-white mt-0.5">{currentResult.topic}</h3>
+              <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider">Concept Summary</span>
+              <h3 className="text-lg font-bold text-slate-900 mt-0.5">{currentResult.topic}</h3>
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleAudio}
-                className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                   isPlayingAudio
-                    ? 'bg-red-500/20 border-red-500/40 text-red-400 animate-pulse'
-                    : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                    ? 'bg-red-50 border-red-300 text-red-600 animate-pulse'
+                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                 }`}
-                title="Listen to Bob's Voice"
+                title="Listen to audio simulation"
               >
-                {isPlayingAudio ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                {isPlayingAudio ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
                 <span>{isPlayingAudio ? "Speaking..." : "Listen"}</span>
               </button>
 
               <button
                 onClick={handleCopy}
-                className="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all"
-                title="Copy to notes"
+                className="px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+                title="Copy text"
               >
-                {isCopied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{isCopied ? "Copied!" : "Copy"}</span>
               </button>
             </div>
           </div>
 
-          {/* Analogy Pill */}
-          <div className="p-4 rounded-2xl bg-amber-950/30 border border-amber-500/30 flex items-start gap-3">
+          {/* Analogy Box */}
+          <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-3">
             <span className="text-xl shrink-0">💡</span>
             <div>
-              <span className="text-xs font-bold text-amber-300 uppercase tracking-wider block">The 10-Year-Old Metaphor</span>
-              <p className="text-sm font-semibold text-slate-200 mt-0.5">{currentResult.analogy}</p>
+              <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block">The 10-Year-Old Metaphor</span>
+              <p className="text-sm font-semibold text-amber-950 mt-0.5">{currentResult.analogy}</p>
             </div>
           </div>
 
-          {/* Full Simplified Text */}
-          <div className="p-6 rounded-2xl bg-slate-950/80 border border-slate-800/80 text-slate-200 text-sm sm:text-base leading-relaxed space-y-4">
+          {/* Explanation Body */}
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm leading-relaxed">
             <p className="whitespace-pre-line">{currentResult.eli10}</p>
           </div>
 
           {/* Key Takeaway */}
-          <div className="flex items-center gap-2 text-xs text-slate-400 pt-2">
-            <Sparkles className="w-4 h-4 text-blue-400 shrink-0" />
-            <span><strong className="text-slate-200">Key Takeaway:</strong> {currentResult.keyTakeaway}</span>
+          <div className="flex items-center gap-2 text-xs text-slate-600 pt-1">
+            <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
+            <span><strong className="text-slate-900">Key Takeaway:</strong> {currentResult.keyTakeaway}</span>
           </div>
 
         </div>

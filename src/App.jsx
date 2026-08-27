@@ -18,11 +18,8 @@ function App() {
   }
 
   return (
-    <div className={`min-h-screen font-sans selection:bg-blue-600 selection:text-white ${
-      currentView === 'landing' ? 'bg-slate-50 text-slate-900' : 'bg-slate-950 text-slate-100'
-    }`}>
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-600 selection:text-white">
       {currentView === 'landing' && (
-
         <LandingPage
           onStart={handleStartTab}
           onOpenInterview={() => setShowInterviewModal(true)}

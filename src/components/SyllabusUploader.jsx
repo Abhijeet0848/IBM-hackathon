@@ -36,7 +36,7 @@ const SyllabusUploader = ({ onAddXP }) => {
         spread: 60,
         origin: { y: 0.6 }
       });
-    }, 1400);
+    }, 1200);
   };
 
   const handleClearDocs = () => {
@@ -44,51 +44,51 @@ const SyllabusUploader = ({ onAddXP }) => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300">
+    <div className="w-full max-w-4xl mx-auto space-y-6">
       
-      {/* Header & Stats Banner */}
+      {/* Stats Banner */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         
-        <div className="p-5 rounded-2xl glass-panel flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
-            <FileText className="w-6 h-6" />
+        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0">
+            <FileText className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xl font-black text-white">{docs.length}</div>
-            <div className="text-xs text-slate-400 font-medium">Uploaded Documents</div>
+            <div className="text-xl font-bold text-slate-900">{docs.length}</div>
+            <div className="text-xs text-slate-500 font-medium">Uploaded Documents</div>
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl glass-panel flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
-            <Database className="w-6 h-6" />
+        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 shrink-0">
+            <Database className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xl font-black text-white">{totalChunks}</div>
-            <div className="text-xs text-slate-400 font-medium">ChromaDB Vector Chunks</div>
+            <div className="text-xl font-bold text-slate-900">{totalChunks}</div>
+            <div className="text-xs text-slate-500 font-medium">ChromaDB Vector Chunks</div>
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl glass-panel flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
-            <Sparkles className="w-6 h-6" />
+        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0">
+            <Sparkles className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-2xl font-black text-emerald-400">100%</div>
-            <div className="text-xs text-slate-400 font-medium">RAG Grounding Accuracy</div>
+            <div className="text-xl font-bold text-emerald-600">100%</div>
+            <div className="text-xs text-slate-500 font-medium">RAG Grounding Accuracy</div>
           </div>
         </div>
 
       </div>
 
       {/* Upload Dropzone */}
-      <div className="p-6 rounded-3xl glass-panel space-y-4">
+      <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-bold text-white flex items-center gap-2">
-            <FileUp className="w-5 h-5 text-blue-400" />
-            Upload Course Syllabus & Lecture Materials
+          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <FileUp className="w-4 h-4 text-blue-600" />
+            Upload Syllabus & Lecture Materials
           </h3>
-          <span className="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-semibold">
+          <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold">
             ChromaDB RAG Engine
           </span>
         </div>
@@ -104,27 +104,27 @@ const SyllabusUploader = ({ onAddXP }) => {
           onClick={() => handleSimulateUpload("Data_Structures_Lecture_6.pdf")}
           className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer ${
             dragActive
-              ? 'border-blue-500 bg-blue-600/10 scale-[1.01]'
-              : 'border-slate-700/80 hover:border-blue-500/60 bg-slate-950/50 hover:bg-slate-900/60'
+              ? 'border-blue-500 bg-blue-50'
+              : 'border-slate-300 hover:border-blue-500 bg-slate-50 hover:bg-slate-100/60'
           }`}
         >
           {isIngesting ? (
-            <div className="space-y-3 py-4">
-              <RefreshCw className="w-10 h-10 text-blue-400 animate-spin mx-auto" />
-              <p className="text-sm font-bold text-white">Extracting text & computing vector embeddings...</p>
-              <p className="text-xs text-slate-400">Storing semantic chunks into local ChromaDB storage</p>
+            <div className="space-y-2 py-3">
+              <RefreshCw className="w-8 h-8 text-blue-600 animate-spin mx-auto" />
+              <p className="text-sm font-bold text-slate-900">Extracting text & computing vector embeddings...</p>
+              <p className="text-xs text-slate-500">Storing semantic chunks into ChromaDB</p>
             </div>
           ) : (
-            <div className="space-y-3">
-              <div className="w-14 h-14 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mx-auto">
-                <Upload className="w-7 h-7" />
+            <div className="space-y-2">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center mx-auto">
+                <Upload className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-sm font-bold text-white">Drag & drop syllabus files here, or click to browse</p>
-                <p className="text-xs text-slate-400 mt-1">Supports PDF, DOCX, TXT, MD (Max 25MB per file)</p>
+                <p className="text-sm font-bold text-slate-900">Drag & drop syllabus files here, or click to browse</p>
+                <p className="text-xs text-slate-500 mt-0.5">Supports PDF, DOCX, TXT, MD (Max 25MB)</p>
               </div>
               <div className="pt-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-800 text-blue-300 border border-slate-700 rounded-lg text-xs font-semibold">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white text-blue-700 border border-slate-200 rounded-lg text-xs font-semibold shadow-xs">
                   <span>Click to ingest sample lecture notes (+50 XP)</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </span>
@@ -134,50 +134,50 @@ const SyllabusUploader = ({ onAddXP }) => {
         </div>
       </div>
 
-      {/* Active Indexed Documents List */}
-      <div className="p-6 rounded-3xl glass-panel space-y-4">
+      {/* Document List */}
+      <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-indigo-400" />
-            Currently Indexed Knowledge Base ({docs.length})
+          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+            <Layers className="w-4 h-4 text-indigo-600" />
+            Currently Indexed Materials ({docs.length})
           </h4>
           {docs.length > 0 && (
             <button
               onClick={handleClearDocs}
-              className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 transition-colors"
+              className="text-xs text-rose-600 hover:text-rose-700 flex items-center gap-1 transition-colors cursor-pointer"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              <span>Clear Knowledge Base</span>
+              <span>Clear Vector Index</span>
             </button>
           )}
         </div>
 
         {docs.length > 0 ? (
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             {docs.map((doc, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between gap-4 hover:border-slate-700 transition-all"
+                className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-4"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-lg bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                     <FileText className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
-                    <h5 className="text-xs sm:text-sm font-bold text-white truncate">{doc.name}</h5>
-                    <span className="text-[11px] text-slate-400 font-mono">{doc.size} • {doc.chunks} semantic chunks</span>
+                    <h5 className="text-xs sm:text-sm font-bold text-slate-900 truncate">{doc.name}</h5>
+                    <span className="text-[11px] text-slate-500">{doc.size} • {doc.chunks} semantic chunks</span>
                   </div>
                 </div>
 
-                <span className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-[11px] font-semibold flex items-center gap-1 shrink-0">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+                <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md text-[11px] font-semibold flex items-center gap-1 shrink-0">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                   <span className="hidden sm:inline">Indexed in ChromaDB</span>
                 </span>
               </div>
             ))}
           </div>
         ) : (
-          <div className="p-8 text-center text-slate-500 text-xs">
+          <div className="p-6 text-center text-slate-400 text-xs">
             No course materials uploaded yet. Upload a syllabus above to enable RAG grounded explanations!
           </div>
         )}
