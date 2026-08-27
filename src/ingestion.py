@@ -52,12 +52,16 @@ class FastTextSplitter:
                 if not chunks or chunk != chunks[-1]:
                     chunks.append(chunk)
             
-            next_start = split_pos - self.chunk_overlap
-            if next_start <= start:
-                next_start = split_pos
-            start = next_start
+        cleaned_chunks = []
+        for c in (chunks if chunks else [text]):
+            c = c.strip()
+            # Strip severed leading sub-words (e.g. "f teaching" -> "Teaching", "eristics" -> skip)
+            c = re.sub(r'^(?:[a-zA-Z]\s+|tion\s+|ing\s+|ers\s+|eristics\b[\s\.\,]*)', '', c, flags=re.IGNORECASE).strip()
+            if len(c) >= 20 and (not cleaned_chunks or c.lower() != cleaned_chunks[-1].lower()):
+                c = c[0].upper() + c[1:]
+                cleaned_chunks.append(c)
 
-        return chunks if chunks else [text]
+        return cleaned_chunks if cleaned_chunks else [text]
 
 import chromadb
 from chromadb.api.types import Documents, EmbeddingFunction, Embeddings
