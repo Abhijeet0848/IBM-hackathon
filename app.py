@@ -664,7 +664,6 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                     )
                     st.session_state.student_xp = reward["new_xp"]
                     st.toast(f"✨ +{reward['earned_xp']} XP earned!")
-                    st.rerun()
 
     # ----------------------------------------------------------------------
     # TAB 3: GAMIFIED KAHOOT-STYLE QUIZZES
