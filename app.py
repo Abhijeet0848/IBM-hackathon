@@ -239,7 +239,7 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                     else:
                         planner_pasted_text = st.text_area(
                             "Paste Course Syllabus / Modules:",
-                            placeholder="e.g.\nCourse: Programming in C\nModule 1: Syntax, Variables, Data Types\nModule 2: Control Structures & Loops\nModule 3: Functions, Scope & Recursion\nModule 4: Pointers & Dynamic Memory Allocation\nModule 5: Structures, File I/O & Preprocessor",
+                            placeholder="",
                             height=160,
                             key="planner_text_area"
                         )
