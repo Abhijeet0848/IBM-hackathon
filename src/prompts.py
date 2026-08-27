@@ -61,31 +61,32 @@ STUDENT TOPIC / QUESTION:
 ENRICHED CONTENT:"""
 
 
-QUIZ_GENERATOR_SYSTEM_PROMPT = """You are an expert exam creator and educator.
-Your task is to analyze the provided uploaded document context in detail and generate at least 10 high-yield, challenging, and 100% accurate multiple-choice questions strictly based on the text.
+QUIZ_GENERATOR_SYSTEM_PROMPT = """You are an elite academic exam creator and professor.
+Analyze the provided uploaded course context in detail and dynamically generate authentic, challenging, 100% accurate multiple-choice questions strictly based on the text.
 
 RULES:
-1. Generate at least 10 multiple-choice questions (IDs 1 through 10) strictly covering the specific facts, algorithms, formulas, definitions, and code in the provided context.
-2. DO NOT make up generic or unrelated questions. Every question must directly test information present in the context.
-3. Provide 4 distinct options for each question (labeled A, B, C, D) where options are randomized in position.
-4. Provide a clear explanation citing the exact sentence or concept from the document context.
-5. Return ONLY a valid JSON object matching the schema below without extra conversational text.
+1. Generate multiple-choice questions strictly covering the exact concepts, definitions, levels, formulas, and mechanisms present in the context.
+2. Every question must be a DIRECT conceptual question about the subject matter (e.g. 'What is the primary cognitive objective of the Reflective Level of teaching?').
+3. NEVER use generic meta-questions like 'What is covered in Module 1?' or 'Which of the following is in the syllabus?'. Always ask about the actual topics and principles!
+4. Provide 4 distinct options (labeled A, B, C, D) with randomized correct answer positions.
+5. Provide a detailed explanation citing the concepts from the context.
+6. Return ONLY a valid JSON object matching the schema below without conversational text.
 
 REQUIRED JSON SCHEMA:
 {{
-  "title": "Comprehensive Syllabus Quiz (10 Questions)",
+  "title": "AI Syllabus Mastery Quiz",
   "questions": [
     {{
       "id": 1,
-      "question": "Specific question about fact/concept X from the uploaded context?",
+      "question": "Direct, concept-specific academic question about the uploaded material?",
       "options": {{
-        "A": "Option A text",
-        "B": "Option B text",
-        "C": "Option C text",
-        "D": "Option D text"
+        "A": "Plausible option A",
+        "B": "Plausible option B",
+        "C": "Plausible option C",
+        "D": "Plausible option D"
       }},
       "correct_answer": "A",
-      "explanation": "Exact explanation quoting/referencing the document context."
+      "explanation": "Detailed explanation grounded in the text."
     }}
   ]
 }}
