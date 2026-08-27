@@ -10,9 +10,9 @@ import math
 from typing import List, Dict, Any, Optional
 import pypdf
 
-# Standalone fast recursive character text splitter
+# Standalone robust recursive character & line-aware text splitter
 class FastTextSplitter:
-    def __init__(self, chunk_size=800, chunk_overlap=150, separators=None):
+    def __init__(self, chunk_size=800, chunk_overlap=100, separators=None):
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.separators = separators or ["\n\n", "\n", ". ", " ", ""]
@@ -20,21 +20,44 @@ class FastTextSplitter:
     def split_text(self, text: str) -> List[str]:
         if not text:
             return []
+        text = text.strip()
+        if len(text) <= self.chunk_size:
+            return [text]
+
         chunks = []
         start = 0
-        while start < len(text):
-            end = min(start + self.chunk_size, len(text))
-            if end < len(text):
-                for sep in self.separators:
-                    last_sep = text.rfind(sep, start, end)
-                    if last_sep > start:
-                        end = last_sep + len(sep)
-                        break
-            chunk = text[start:end].strip()
-            if chunk:
-                chunks.append(chunk)
-            start = max(start + 1, end - self.chunk_overlap)
-        return chunks
+        text_len = len(text)
+        
+        while start < text_len:
+            if text_len - start <= self.chunk_size:
+                last_chunk = text[start:].strip()
+                if last_chunk and len(last_chunk) >= 15 and (not chunks or last_chunk != chunks[-1]):
+                    chunks.append(last_chunk)
+                break
+                
+            end = start + self.chunk_size
+            # Find best separator to break naturally
+            split_pos = -1
+            for sep in self.separators:
+                pos = text.rfind(sep, start, end)
+                if pos > start:
+                    split_pos = pos + len(sep)
+                    break
+            
+            if split_pos == -1 or split_pos <= start:
+                split_pos = end
+
+            chunk = text[start:split_pos].strip()
+            if chunk and len(chunk) >= 15:
+                if not chunks or chunk != chunks[-1]:
+                    chunks.append(chunk)
+            
+            next_start = split_pos - self.chunk_overlap
+            if next_start <= start:
+                next_start = split_pos
+            start = next_start
+
+        return chunks if chunks else [text]
 
 import chromadb
 from chromadb.api.types import Documents, EmbeddingFunction, Embeddings

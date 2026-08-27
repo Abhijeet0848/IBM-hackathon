@@ -65,6 +65,16 @@ class RAGEngine:
             if not chunks:
                 chunks = all_chunks[:top_k]
 
+        # Deduplicate and filter out any fragment chunks
+        unique_chunks = []
+        seen_texts = set()
+        for c in chunks:
+            clean_c = re.sub(r'\s+', ' ', c["content"].strip())
+            if len(clean_c) >= 20 and clean_c.lower() not in seen_texts:
+                seen_texts.add(clean_c.lower())
+                unique_chunks.append(c)
+        chunks = unique_chunks if unique_chunks else chunks
+
         if not chunks and not topic_context_override:
             context_text = "NO COURSE MATERIALS UPLOADED. (Please upload your syllabus or lecture notes first)."
         else:
