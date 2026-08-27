@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+# Environment variables (secrets!)
+.env
+
+# Python cache and virtual environments
+__pycache__/
+*.pyc
+venv/
+
+# Local Vector Database
+chroma_db/
