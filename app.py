@@ -16,7 +16,7 @@ import src.styling
 importlib.reload(src.styling)
 import src.resource_finder
 importlib.reload(src.resource_finder)
-from src.styling import CUSTOM_CSS, render_top_nav, render_motivation_banner, render_quiz_results_dashboard
+from src.styling import CUSTOM_CSS, render_top_nav, render_motivation_banner, render_quiz_results_dashboard, render_pomodoro_timer
 from src.ingestion import DocumentIngestionPipeline
 from src.llm_client import LLMClient
 from src.rag_engine import RAGEngine
@@ -494,6 +494,9 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                     st.rerun()
 
             st.markdown("<br>", unsafe_allow_html=True)
+
+            # Interactive Pomodoro Focus Timer
+            st.markdown(render_pomodoro_timer(), unsafe_allow_html=True)
 
             # Filter Options
             filt_c1, filt_c2 = st.columns([3, 1])
