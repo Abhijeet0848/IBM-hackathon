@@ -675,11 +675,22 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                 with st.chat_message("assistant", avatar="💡" if msg.get("mode") == "enriched" else ("🎓" if msg.get("mode") == "strict" else "🧒")):
                     st.markdown(msg["content"])
                     if "citations" in msg and msg["citations"]:
-                        with st.expander(f"🔍 View {len(msg['citations'])} Verified Syllabus Citations"):
-                            for c_idx, c in enumerate(msg["citations"]):
-                                src = c["metadata"].get("source", "Syllabus")
-                                st.markdown(f"**Chunk #{c_idx+1} (`{src}`):**")
-                                st.code(c["content"], language="markdown")
+                        # Filter out fragments and clean leading severed characters
+                        valid_citations = []
+                        seen_c_texts = set()
+                        for c in msg["citations"]:
+                            raw_c = c.get("content", "").strip()
+                            clean_c = re.sub(r'^(?:[a-zA-Z]\s+|tion\s+|ing\s+|ers\s+|eristics\b[\s\.\,]*)', '', raw_c, flags=re.IGNORECASE).strip()
+                            if clean_c and len(clean_c) >= 20 and clean_c.lower() not in seen_c_texts:
+                                clean_c = clean_c[0].upper() + clean_c[1:]
+                                seen_c_texts.add(clean_c.lower())
+                                valid_citations.append((c.get("metadata", {}).get("source", "Syllabus"), clean_c))
+
+                        if valid_citations:
+                            with st.expander(f"🔍 View {len(valid_citations)} Verified Syllabus Citations"):
+                                for c_idx, (src, c_text) in enumerate(valid_citations):
+                                    st.markdown(f"**Chunk #{c_idx+1} (`{src}`):**")
+                                    st.code(c_text, language="markdown")
 
     # ----------------------------------------------------------------------
     # TAB 3: GAMIFIED KAHOOT-STYLE QUIZZES
