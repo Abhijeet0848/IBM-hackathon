@@ -70,10 +70,19 @@ elif "view_mode" not in st.session_state:
 
 # Core Engine Initializations
 gemini_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY", "")
+try:
+    if not gemini_key and hasattr(st, "secrets"):
+        gemini_key = st.secrets.get("GEMINI_API_KEY", "") or st.secrets.get("GOOGLE_API_KEY", "")
+except Exception:
+    pass
+
+if "custom_gemini_key" in st.session_state and st.session_state.custom_gemini_key:
+    gemini_key = st.session_state.custom_gemini_key.strip()
+
 llm_client = LLMClient(
     provider="🌟 Google Gemini (Free Generous Tier)",
     api_key=gemini_key if gemini_key else None,
-    model_id="gemini-flash-latest"
+    model_id="gemini-1.5-flash"
 )
 rag_engine = RAGEngine(st.session_state.ingestion_pipeline, llm_client)
 study_planner = StudyPlanner(llm_client)
@@ -197,6 +206,28 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
     lvl_info = GamificationEngine.get_level_info(st.session_state.student_xp)
     daily_quote = GamificationEngine.get_daily_smart_reminder()
     st.markdown(render_top_nav(lvl_info, st.session_state.student_xp, st.session_state.study_streak, daily_quote, show_back=True), unsafe_allow_html=True)
+
+    # Gemini Live Engine Setting Expander
+    with st.expander("⚡ AI Engine & Gemini API Key (Optional — Free from Google AI Studio)"):
+        col_gk1, col_gk2 = st.columns([3.2, 1.2])
+        with col_gk1:
+            entered_k = st.text_input(
+                "Google Gemini API Key:",
+                value=st.session_state.get("custom_gemini_key", ""),
+                type="password",
+                placeholder="Paste AIzaSy... key to enable live cloud inference on any syllabus",
+                help="Get your free API key at https://aistudio.google.com/app/apikey"
+            )
+            if entered_k != st.session_state.get("custom_gemini_key", ""):
+                st.session_state.custom_gemini_key = entered_k
+                st.rerun()
+        with col_gk2:
+            st.write("")
+            st.write("")
+            if llm_client.is_connected():
+                st.success("🟢 Live Gemini Connected")
+            else:
+                st.caption("⚪ Built-in Offline Fallback Active")
 
     # Main Navigation Tabs (Spacious & Immediately Accessible)
     tab_dashboard, tab_chat, tab_quiz, tab_explorer = st.tabs([
