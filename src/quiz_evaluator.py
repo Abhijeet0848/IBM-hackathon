@@ -44,194 +44,110 @@ class QuizEvaluator:
     @staticmethod
     def build_topic_quiz_from_context(topic: str, context: str, count: int = 10) -> Dict[str, Any]:
         """
-        Synthesizes authentic, rigorous, university-grade multiple choice questions
-        matched directly to concepts present in the uploaded course materials.
+        Dynamically synthesizes 100% custom multiple-choice questions extracted
+        in real time from the specific sentences, clauses, and concepts of the uploaded document.
+        Zero hardcoded or static question banks.
         """
-        # Extract dynamic topic title from context or argument
+        # Extract dynamic topic title
         if topic and topic.strip():
             t = topic.strip()
         else:
-            first_line = context.strip().split('\n')[0].strip() if context.strip() else "Course Syllabus"
+            first_line = context.strip().split('\n')[0].strip() if context.strip() else "Uploaded Syllabus"
             first_line = re.sub(r'^(?:\[Source:[^\]]*\]|#+)\s*', '', first_line).strip()
-            t = first_line if (first_line and len(first_line) < 60) else "Full Course Syllabus"
+            t = first_line if (first_line and len(first_line) < 60) else "Uploaded Course Syllabus"
 
-        ctx_lower = context.lower()
-
-        # Multi-domain master academic question bank
-        curriculum_q_bank = [
-            # --- TEACHING APTITUDE & PEDAGOGY ---
-            {
-                "triggers": ["teaching", "levels of teaching", "memory level", "memory", "herbart", "teaching aptitude"],
-                "question": "In the hierarchy of teaching levels, which level is primarily associated with Herbart and focuses on rote recall and retention of factual information?",
-                "correct": "Memory Level of Teaching (MLT)",
-                "distractors": [
-                    "Understanding Level of Teaching (ULT)",
-                    "Reflective Level of Teaching (RLT)",
-                    "Autonomous Development Level"
-                ],
-                "explanation": "The Memory Level of Teaching (developed by Herbart) represents the foundation stage focusing on factual recall, rote memorization, and structured repetition."
-            },
-            {
-                "triggers": ["understanding level", "understanding", "morrison", "comprehension", "teaching"],
-                "question": "What is the core pedagogical objective of the Understanding Level of Teaching (associated with Morrison)?",
-                "correct": "Enabling learners to comprehend generalized principles, understand relationships between facts, and apply rules.",
-                "distractors": [
-                    "Promoting uncritical rote repetition with no conceptual insight.",
-                    "Evaluating independent research without teacher guidance.",
-                    "Conditioning physical reflex responses only."
-                ],
-                "explanation": "The Understanding Level (Morrison) goes beyond memorization to help students grasp concepts, relationships, and generalized rules."
-            },
-            {
-                "triggers": ["reflective level", "reflective", "hunt", "critical thinking", "problem solving", "teaching"],
-                "question": "Which level of teaching (associated with Hunt) represents the highest cognitive tier emphasizing critical thinking and creative problem-solving?",
-                "correct": "Reflective Level of Teaching (RLT)",
-                "distractors": [
-                    "Memory Level of Teaching (MLT)",
-                    "Observation Level",
-                    "Sensory Conditioning Level"
-                ],
-                "explanation": "The Reflective Level of Teaching (Hunt) is the highest, most student-centered level where learners independently analyze, evaluate, and solve problems."
-            },
-            {
-                "triggers": ["learner characteristics", "learner", "characteristics", "academic", "cognitive", "teaching"],
-                "question": "When analyzing learner characteristics in educational design, which dimension includes prior knowledge, intellectual readiness, and learning pace?",
-                "correct": "Cognitive and Academic Characteristics",
-                "distractors": [
-                    "Administrative Affiliations",
-                    "Physical Classroom Architecture",
-                    "Geographic Coordinates"
-                ],
-                "explanation": "Cognitive and academic characteristics describe the student's intellectual readiness, prior foundational knowledge, and cognitive processing speed."
-            },
-            {
-                "triggers": ["objectives", "objectives of teaching", "bloom", "taxonomy", "concept", "teaching"],
-                "question": "What are the three primary foundational domains targeted by comprehensive teaching objectives?",
-                "correct": "Cognitive (Knowledge), Affective (Attitudes/Values), and Psychomotor (Skills)",
-                "distractors": [
-                    "Financial, Commercial, and Logistical",
-                    "Sensory, Atmospheric, and Structural",
-                    "Administrative, Regulatory, and Bureaucratic"
-                ],
-                "explanation": "Educational objectives encompass the Cognitive (intellectual), Affective (emotional/values), and Psychomotor (physical/manual skills) domains."
-            },
-            {
-                "triggers": ["evaluation", "formative", "summative", "assessment", "teaching aptitude"],
-                "question": "What distinguishes formative evaluation from summative evaluation in modern educational methodology?",
-                "correct": "Formative evaluation occurs continuously during instruction to guide learning, while summative evaluation occurs at the end to certify mastery.",
-                "distractors": [
-                    "Formative evaluation produces final letter grades only.",
-                    "Summative evaluation is conducted on the first day of class.",
-                    "There is no difference between formative and summative evaluation."
-                ],
-                "explanation": "Formative assessment happens during learning to provide feedback; summative assessment happens at the end to evaluate overall outcome."
-            },
-            # --- COMPUTER SCIENCE & PROGRAMMING ---
-            {
-                "triggers": ["malloc", "free", "dynamic memory", "heap allocation", "c memory"],
-                "question": "When managing dynamic memory in C using `malloc()` and `free()`, what is the critical responsibility of the programmer?",
-                "correct": "Ensuring allocated heap memory is properly freed to prevent memory leaks and verifying that `malloc()` did not return `NULL`.",
-                "distractors": [
-                    "Relying on the compiler to automatically deallocate heap memory upon function exit.",
-                    "Calling `free()` multiple times on the same pointer to ensure total memory reclamation.",
-                    "Assuming `malloc()` always succeeds and ignoring pointer validation."
-                ],
-                "explanation": "`malloc()` allocates uninitialized heap memory and returns NULL on failure; every allocated block must be freed exactly once."
-            },
-            {
-                "triggers": ["pointer", "pointer arithmetic", "dereference", "pointer address"],
-                "question": "In pointer arithmetic, what occurs when you increment an integer pointer (`ptr++`) on a system where `sizeof(int) == 4`?",
-                "correct": "The address value is incremented by 4 bytes, pointing to the next consecutive integer element in memory.",
-                "distractors": [
-                    "The address value is incremented by exactly 1 byte regardless of data type.",
-                    "The integer value stored at `*ptr` is incremented by 1.",
-                    "The pointer variable is converted into a floating-point address."
-                ],
-                "explanation": "Pointer arithmetic is scaled by the size of the referenced type (`sizeof(type)`)."
-            },
-            {
-                "triggers": ["control structures", "do-while", "while loop", "for loop", "branching logic"],
-                "question": "What fundamental behavior distinguishes a `do-while` loop from a standard `while` loop?",
-                "correct": "A `do-while` loop evaluates its condition after executing the body, guaranteeing at least one iteration.",
-                "distractors": [
-                    "A `do-while` loop executes concurrently across multiple CPU threads.",
-                    "A `do-while` loop cannot contain conditional `break` or `continue` statements.",
-                    "A standard `while` loop is only used for unbounded background operations."
-                ],
-                "explanation": "A `do-while` loop is a post-test loop, ensuring the loop body executes at least once before the condition is checked."
-            },
-            {
-                "triggers": ["struct ", "structs", "unions in c", "user-defined struct"],
-                "question": "What is the primary architectural memory difference between a `struct` and a `union`?",
-                "correct": "A `struct` allocates separate memory for each member, while a `union` overlays all members in a single shared memory space equal to its largest member.",
-                "distractors": [
-                    "A `union` can only store primitive numeric types, whereas a `struct` only holds pointers.",
-                    "Members of a `struct` cannot be accessed using the direct member selector operator (`.`).",
-                    "A `union` dynamically reallocates memory on the heap during runtime."
-                ],
-                "explanation": "All members of a union share the same memory location, meaning only one member can be meaningfully used at any given time."
-            },
-            {
-                "triggers": ["binary search", "linear search", "sorting algorithm", "search algorithms"],
-                "question": "What is the mandatory prerequisite condition for performing an $O(\\log n)$ Binary Search on an array?",
-                "correct": "The array elements must be pre-sorted in contiguous ascending or descending order.",
-                "distractors": [
-                    "The array size must be an exact power of two ($2^k$).",
-                    "The array must contain only positive floating-point values.",
-                    "The search function must be implemented using tail recursion."
-                ],
-                "explanation": "Binary search relies on sorted order to divide the remaining search range in half with each comparison."
-            }
-        ]
-
-        # Score questions based on syllabus context matches
-        matched_questions = []
-        for q_item in curriculum_q_bank:
-            matches = sum(1 for trig in q_item["triggers"] if trig in ctx_lower)
-            if matches > 0:
-                matched_questions.append((matches, q_item))
-
-        # Sort with most relevant syllabus matches first
-        matched_questions.sort(key=lambda x: x[0], reverse=True)
-        selected_q_items = [item[1] for item in matched_questions]
-
-        # Extract dynamic concept questions directly from context text
-        clean_lines = [
+        # 1. Clean and extract distinct meaningful lines from the uploaded document
+        raw_lines = [
             re.sub(r'^(?:\[Source:[^\]]*\]|#+|\d+[\.\)]\s*|\*|\-)\s*', '', line).strip()
             for line in context.split('\n')
-            if len(line.strip()) > 15 and not line.strip().startswith('---')
+            if len(line.strip()) >= 15 and not line.strip().startswith('---') and not line.strip().startswith('===')
         ]
 
-        if not selected_q_items and clean_lines:
-            for c_idx, cl in enumerate(clean_lines):
-                parts = [p.strip() for p in re.split(r'[,:;]', cl) if len(p.strip()) > 3]
-                if parts:
-                    main_concept = parts[0]
-                    other_concepts = parts[1:] if len(parts) > 1 else [f"Advanced {main_concept}", f"Foundations of {main_concept}"]
-                    selected_q_items.append({
-                        "question": f"According to your uploaded syllabus on '{t}', which of the following is a primary curricular focus under '{main_concept}'?",
-                        "correct": f"Studying and mastering {', '.join(parts[:3]) if len(parts) > 1 else main_concept}.",
-                        "distractors": [
-                            f"This concept is explicitly marked as non-examinable in your coursework.",
-                            f"Only applies to unrelated third-party external domains.",
-                            f"Requires purely hypothetical approximations without theoretical grounding."
-                        ],
-                        "explanation": f"Grounded directly in your uploaded syllabus module: '{cl}'."
-                    })
+        if not raw_lines:
+            raw_lines = [context.strip() if context.strip() else f"Course curriculum on {t}"]
 
-        # If we have matched domain items, cycle within the matched domain rather than mixing unrelated subjects
-        if selected_q_items:
-            final_items = []
-            while len(final_items) < count:
-                final_items.extend(selected_q_items)
-            selected_q_items = final_items[:count]
-        else:
-            selected_q_items = curriculum_q_bank[:count]
+        # 2. Extract atomic concepts, terms, and clauses
+        all_concepts = []
+        for line in raw_lines:
+            # Split by commas, semicolons, colons, or parentheses
+            clauses = [re.sub(r'[\(\)\[\]]', '', c).strip(' .:,;') for c in re.split(r'[,;:\n]|\band\b', line) if len(c.strip(' .:,;')) > 3]
+            for c in clauses:
+                if len(c) >= 3 and c.lower() not in [x.lower() for x in all_concepts]:
+                    all_concepts.append(c)
+
+        if not all_concepts:
+            all_concepts = [t, "Foundational Principles", "Core Syllabus Concepts", "Course Modules"]
+
+        # 3. Dynamically synthesize questions for each line/concept
+        q_items = []
+        for idx, line in enumerate(raw_lines):
+            clauses = [re.sub(r'[\(\)\[\]]', '', c).strip(' .:,;') for c in re.split(r'[,;:\n]|\band\b', line) if len(c.strip(' .:,;')) > 3]
+            main_term = clauses[0] if clauses else f"Module {idx+1}"
+            related_terms = clauses[1:] if len(clauses) > 1 else [f"Systematic study of {main_term}"]
+
+            # Template Type 1: Core Focus
+            q_items.append({
+                "question": f"According to your uploaded document, which of the following is an essential topic covered under '{main_term}'?",
+                "correct": f"{', '.join(related_terms[:3]) if related_terms else main_term}",
+                "distractors": [
+                    f"This subject is explicitly omitted from your coursework.",
+                    f"Only applies as an external unverified hypothesis.",
+                    f"Replaced entirely by non-examinable background reading."
+                ],
+                "explanation": f"Grounded directly in your uploaded syllabus: '{line}'."
+            })
+
+            # Template Type 2: Conceptual Scope
+            if len(clauses) > 1:
+                target_term = clauses[1]
+                q_items.append({
+                    "question": f"In your course curriculum on '{t}', what role does '{target_term}' play in relation to '{main_term}'?",
+                    "correct": f"It is a core component and learning requirement specified alongside '{main_term}'.",
+                    "distractors": [
+                        f"It is defined as an obsolete concept no longer evaluated.",
+                        f"It operates independently without any connection to '{main_term}'.",
+                        f"It is solely used for administrative scheduling with no academic content."
+                    ],
+                    "explanation": f"Referenced directly from your notes: '{line}'."
+                })
+
+            # Template Type 3: Factual Verification
+            q_items.append({
+                "question": f"Which of the following statements is TRUE regarding the syllabus requirements for '{main_term}'?",
+                "correct": f"Students must study and master: {line}.",
+                "distractors": [
+                    f"Students are only required to memorize historical trivia without applying '{main_term}'.",
+                    f"The module on '{main_term}' has been removed from the current term's evaluation.",
+                    f"It strictly forbids practical exercises or conceptual definitions."
+                ],
+                "explanation": f"Directly cited from your uploaded text: '{line}'."
+            })
+
+        # Ensure we have enough dynamic items to satisfy the requested question count
+        if not q_items:
+            q_items.append({
+                "question": f"Based on your uploaded course notes, what is the primary focus of '{t}'?",
+                "correct": f"Mastering the syllabus modules and key objectives documented in your notes.",
+                "distractors": [
+                    f"Unrelated third-party external topics not present in your syllabus.",
+                    f"Hypothetical theories with no academic relevance.",
+                    f"Non-examinable general knowledge."
+                ],
+                "explanation": f"Grounded directly in your uploaded syllabus."
+            })
+
+        # Cycle dynamically generated items
+        final_q_items = []
+        while len(final_q_items) < count:
+            for item in q_items:
+                final_q_items.append(item)
+                if len(final_q_items) >= count:
+                    break
 
         questions = []
         positions = ["A", "B", "C", "D"]
 
-        for q_idx, q_item in enumerate(selected_q_items, start=1):
+        for q_idx, q_item in enumerate(final_q_items[:count], start=1):
             q_text = q_item["question"]
             correct_opt = q_item["correct"]
             distractors = q_item["distractors"]
@@ -255,7 +171,7 @@ class QuizEvaluator:
             })
 
         return {
-            "title": f"Academic Mastery Drill: {t.title()} ({len(questions)} Questions)",
+            "title": f"AI Syllabus Quiz: {t.title()} ({len(questions)} Questions)",
             "questions": questions
         }
 
