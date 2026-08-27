@@ -12,49 +12,43 @@ const SIMPLICITY_MODES = [
   { id: 'professor', name: '🎓 University Level', desc: 'Rigorous definitions & math foundations' },
 ];
 
-const PRESET_TOPICS = [
-  {
-    topic: "Retrieval-Augmented Generation (RAG)",
-    eli10: "Imagine you're taking an open-book exam! A regular AI tries to answer everything from pure memory (which can make it guess or hallucinate). But RAG gives the AI a superpower: whenever you ask a question, a little librarian instantly flips to the exact page in your textbook, highlights the proof, and hands it to the AI to answer with 100% accuracy!",
-    analogy: "An open-book exam with an instant superhero librarian.",
-    keyTakeaway: "Connects external textbook search directly to the AI to eliminate false guesses."
-  },
-  {
-    topic: "Neural Networks & Machine Learning",
-    eli10: "Think of a Neural Network like a team of detectives identifying mystery animals. The first detective only looks at colors. The second checks if it has fur or scales. The third counts legs. By combining all their small clues together, they can confidently shout: 'That’s a Golden Retriever puppy!'",
-    analogy: "A team of detectives solving clues together one layer at a time.",
-    keyTakeaway: "Layers of simple mathematical filters work together to recognize complex patterns."
-  },
-  {
-    topic: "Dynamic Programming & Memoization",
-    eli10: "If I write '1 + 1 + 1 + 1' on a chalkboard, you count and say '4'. If I add one more '+ 1' at the end, do you start counting from the beginning again? No! You remember it was 4, add 1, and say '5'. That is Dynamic Programming—remembering previous work so you never do it twice!",
-    analogy: "Remembering your previous math answer instead of recalculating from zero.",
-    keyTakeaway: "Cache intermediate sub-problem results to turn slow exponential tasks into lightning fast algorithms."
-  }
-];
-
 const ELI10Explainer = ({ onAddXP }) => {
   const [topicInput, setTopicInput] = useState('');
   const [selectedMode, setSelectedMode] = useState('eli10');
-  const [currentResult, setCurrentResult] = useState(PRESET_TOPICS[0]);
+  const [currentResult, setCurrentResult] = useState(null);
   const [isSimplifying, setIsSimplifying] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
-  const handleSimplify = (topicOverride) => {
-    const targetTopic = topicOverride || topicInput || PRESET_TOPICS[0].topic;
+  const handleSimplify = () => {
+    if (!topicInput.trim()) return;
+    const targetTopic = topicInput.trim();
     setIsSimplifying(true);
 
     setTimeout(() => {
       setIsSimplifying(false);
-      const match = PRESET_TOPICS.find(t => t.topic.toLowerCase().includes(targetTopic.toLowerCase())) || {
-        topic: targetTopic,
-        eli10: `Imagine ${targetTopic} as a friendly playground game where every participant has a specific rule to follow. When everything works in harmony, the system produces the expected outcome effortlessly without getting confused!`,
-        analogy: `A playground puzzle where everyone plays their exact turn.`,
-        keyTakeaway: `Breaks complex domain barriers into intuitive, bite-sized components.`
-      };
+      let simplifiedText = `Imagine ${targetTopic} as a friendly playground game where every participant has a specific rule to follow. When everyone works together, the system produces the expected outcome effortlessly!`;
+      let analogyText = `A playground puzzle where each player takes their turn smoothly.`;
+      let takeaway = `Breaks complex domain barriers into intuitive, bite-sized components.`;
 
-      setCurrentResult(match);
+      const tLower = targetTopic.toLowerCase();
+      if (tLower.includes('rag') || tLower.includes('retrieval')) {
+        simplifiedText = "Imagine taking an open-book exam! Instead of the AI guessing from pure memory, a smart librarian instantly flips to the exact page in your textbook and gives the AI the exact proof before answering!";
+        analogyText = "An open-book exam with an instant superhero librarian.";
+        takeaway = "Connects external textbook search directly to the AI to eliminate false guesses.";
+      } else if (tLower.includes('neural') || tLower.includes('machine learning') || tLower.includes('ai')) {
+        simplifiedText = "Think of a Neural Network like a team of detectives identifying mystery animals. The first checks colors, the second checks fur, and the third counts legs to confidently shout the answer!";
+        analogyText = "A team of detectives solving clues together one layer at a time.";
+        takeaway = "Layers of mathematical filters work together to recognize complex patterns.";
+      }
+
+      setCurrentResult({
+        topic: targetTopic,
+        eli10: simplifiedText,
+        analogy: analogyText,
+        keyTakeaway: takeaway
+      });
+
       if (onAddXP) onAddXP(30);
 
       confetti({
@@ -62,7 +56,7 @@ const ELI10Explainer = ({ onAddXP }) => {
         spread: 50,
         origin: { y: 0.6 }
       });
-    }, 1000);
+    }, 900);
   };
 
   const handleCopy = () => {
@@ -84,7 +78,7 @@ const ELI10Explainer = ({ onAddXP }) => {
     <div className="w-full max-w-4xl mx-auto space-y-6">
       
       {/* Top Banner Card */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
+      <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
             <Lightbulb className="w-5 h-5" />
@@ -98,23 +92,6 @@ const ELI10Explainer = ({ onAddXP }) => {
             </div>
             <p className="text-xs text-slate-500">Turn complex syllabus concepts into simple everyday analogies.</p>
           </div>
-        </div>
-
-        {/* Quick Sample Topics */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
-          <span className="text-xs text-slate-500 font-medium">Try sample:</span>
-          {PRESET_TOPICS.map((p, idx) => (
-            <button
-              key={idx}
-              onClick={() => {
-                setTopicInput(p.topic);
-                handleSimplify(p.topic);
-              }}
-              className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-all cursor-pointer"
-            >
-              {p.topic}
-            </button>
-          ))}
         </div>
       </div>
 
@@ -130,15 +107,15 @@ const ELI10Explainer = ({ onAddXP }) => {
             <input
               type="text"
               className="flex-1 px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 text-sm focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
-              placeholder="e.g. Asynchronous event loops, Fourier transforms, Polymorphism..."
+              placeholder="Type any difficult concept (e.g. Asynchronous event loops, Neural networks, Fourier transforms)..."
               value={topicInput}
               onChange={(e) => setTopicInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSimplify()}
             />
             <button
               onClick={() => handleSimplify()}
-              disabled={isSimplifying}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+              disabled={isSimplifying || !topicInput.trim()}
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
             >
               {isSimplifying ? (
                 <>
@@ -181,7 +158,7 @@ const ELI10Explainer = ({ onAddXP }) => {
       </div>
 
       {/* Output Card */}
-      {currentResult && (
+      {currentResult ? (
         <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4 animate-in fade-in duration-200">
           
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -235,6 +212,12 @@ const ELI10Explainer = ({ onAddXP }) => {
             <span><strong className="text-slate-900">Key Takeaway:</strong> {currentResult.keyTakeaway}</span>
           </div>
 
+        </div>
+      ) : (
+        <div className="p-8 rounded-2xl bg-white border border-dashed border-slate-300 text-center text-slate-400 text-sm space-y-1">
+          <Lightbulb className="w-8 h-8 mx-auto text-slate-300 mb-2" />
+          <p className="font-semibold text-slate-600">No concept entered yet</p>
+          <p className="text-xs text-slate-400">Type any concept in the box above and click "Explain It!"</p>
         </div>
       )}
 

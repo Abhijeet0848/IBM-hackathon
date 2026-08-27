@@ -13,8 +13,8 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
 
   // Gamification Global State
-  const [studentXP, setStudentXP] = useState(320);
-  const [studyStreak] = useState(4);
+  const [studentXP, setStudentXP] = useState(0);
+  const [studyStreak] = useState(1);
 
   const handleAddXP = (amount) => {
     setStudentXP(prev => prev + amount);

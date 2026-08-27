@@ -41,20 +41,20 @@ const REVISION_WEEKS = [
   },
   {
     week: 4,
-    title: "Kahoot Practice Arena & Mock Technical Screener",
+    title: "Kahoot Practice Arena & Review Simulation",
     hours: "18 Hours",
     spacedInterval: "Final Mastery Simulation",
     tasks: [
       { id: 'w4-1', title: "Achieve >90% score on all syllabus Kahoot quizzes", xp: 50 },
-      { id: 'w4-2', title: "Complete 3 AI Technical Mock Interviews with IBM Bob", xp: 50 },
-      { id: 'w4-3', title: "Export final IBM SkillsBuild certification dossier", xp: 50 }
+      { id: 'w4-2', title: "Review all flagged course doubts with Bob", xp: 50 },
+      { id: 'w4-3', title: "Complete comprehensive syllabus practice checklist", xp: 50 }
     ]
   }
 ];
 
 const RevisionPlanner = ({ onAddXP }) => {
-  const [examDate, setExamDate] = useState('2026-09-20');
-  const [studyHours, setStudyHours] = useState(3);
+  const [examDate, setExamDate] = useState('');
+  const [studyHours, setStudyHours] = useState(2);
   const [learningStyle, setLearningStyle] = useState('Hands-on Projects & Code');
   const [completedTasks, setCompletedTasks] = useState({});
 

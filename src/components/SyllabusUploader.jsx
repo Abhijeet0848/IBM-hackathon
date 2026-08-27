@@ -5,27 +5,45 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-const SAMPLE_INGESTED_DOCS = [
-  { name: "CS301_Distributed_Systems_Syllabus.pdf", chunks: 42, size: "2.4 MB", status: "Indexed in ChromaDB" },
-  { name: "IBM_SkillsBuild_AI_Foundations.pdf", chunks: 28, size: "1.8 MB", status: "Indexed in ChromaDB" },
-  { name: "React_19_Architecture_Notes.md", chunks: 19, size: "450 KB", status: "Indexed in ChromaDB" }
-];
-
 const SyllabusUploader = ({ onAddXP }) => {
-  const [docs, setDocs] = useState(SAMPLE_INGESTED_DOCS);
+  const [docs, setDocs] = useState([]);
   const [isIngesting, setIsIngesting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
 
   const totalChunks = docs.reduce((acc, d) => acc + d.chunks, 0);
 
-  const handleSimulateUpload = (fileName = "Operating_Systems_Lecture_4.pdf") => {
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsIngesting(true);
+    setTimeout(() => {
+      setIsIngesting(false);
+      const newDoc = {
+        name: file.name,
+        chunks: Math.floor(Math.random() * 20) + 12,
+        size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+        status: "Indexed in ChromaDB"
+      };
+      setDocs(prev => [newDoc, ...prev]);
+      if (onAddXP) onAddXP(50);
+
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.6 }
+      });
+    }, 1200);
+  };
+
+  const handleSimulateDrop = (fileName = "Course_Syllabus.pdf") => {
     setIsIngesting(true);
     setTimeout(() => {
       setIsIngesting(false);
       const newDoc = {
         name: fileName,
-        chunks: Math.floor(Math.random() * 20) + 15,
-        size: "1.2 MB",
+        chunks: 18,
+        size: "1.4 MB",
         status: "Indexed in ChromaDB"
       };
       setDocs(prev => [newDoc, ...prev]);
@@ -74,8 +92,8 @@ const SyllabusUploader = ({ onAddXP }) => {
             <Sparkles className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl font-bold text-emerald-600">100%</div>
-            <div className="text-xs text-slate-500 font-medium">RAG Grounding Accuracy</div>
+            <div className="text-xl font-bold text-emerald-600">{docs.length > 0 ? "100%" : "0%"}</div>
+            <div className="text-xs text-slate-500 font-medium">RAG Grounding Ready</div>
           </div>
         </div>
 
@@ -93,21 +111,27 @@ const SyllabusUploader = ({ onAddXP }) => {
           </span>
         </div>
 
-        <div
+        <label
           onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
           onDragLeave={() => setDragActive(false)}
           onDrop={(e) => {
             e.preventDefault();
             setDragActive(false);
-            handleSimulateUpload("Uploaded_Course_Material.pdf");
+            handleSimulateDrop(e.dataTransfer.files?.[0]?.name || "Uploaded_Syllabus.pdf");
           }}
-          onClick={() => handleSimulateUpload("Data_Structures_Lecture_6.pdf")}
-          className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer ${
+          className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer block ${
             dragActive
               ? 'border-blue-500 bg-blue-50'
               : 'border-slate-300 hover:border-blue-500 bg-slate-50 hover:bg-slate-100/60'
           }`}
         >
+          <input
+            type="file"
+            accept=".pdf,.txt,.md,.docx"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+
           {isIngesting ? (
             <div className="space-y-2 py-3">
               <RefreshCw className="w-8 h-8 text-blue-600 animate-spin mx-auto" />
@@ -123,15 +147,9 @@ const SyllabusUploader = ({ onAddXP }) => {
                 <p className="text-sm font-bold text-slate-900">Drag & drop syllabus files here, or click to browse</p>
                 <p className="text-xs text-slate-500 mt-0.5">Supports PDF, DOCX, TXT, MD (Max 25MB)</p>
               </div>
-              <div className="pt-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white text-blue-700 border border-slate-200 rounded-lg text-xs font-semibold shadow-xs">
-                  <span>Click to ingest sample lecture notes (+50 XP)</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
             </div>
           )}
-        </div>
+        </label>
       </div>
 
       {/* Document List */}
@@ -177,8 +195,8 @@ const SyllabusUploader = ({ onAddXP }) => {
             ))}
           </div>
         ) : (
-          <div className="p-6 text-center text-slate-400 text-xs">
-            No course materials uploaded yet. Upload a syllabus above to enable RAG grounded explanations!
+          <div className="p-8 text-center text-slate-400 text-xs border border-dashed border-slate-200 rounded-xl">
+            No course materials uploaded yet. Upload a syllabus above to start indexing course concepts.
           </div>
         )}
       </div>

@@ -15,8 +15,8 @@ const DoubtSolverChat = ({ onAddXP }) => {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Hello! I am **IBM Bob**, your 24/7 AI Learning Companion. I am trained on your uploaded course documents and IBM SkillsBuild modules. What doubts can I resolve for you today?",
-      citations: ["ChromaDB Index: Course_Syllabus_Overview.pdf"],
+      content: "Hello! I am **IBM Bob**, your 24/7 AI Learning Companion. Ask me any question or doubt from your syllabus, and I will provide clear step-by-step explanations.",
+      citations: [],
       timestamp: 'Just now'
     }
   ]);
