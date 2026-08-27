@@ -4,14 +4,14 @@ import {
   Trash2 
 } from 'lucide-react';
 
-const PRESET_PROMPTS = [
+const DEFAULT_PROMPTS = [
   "Can you explain Virtual DOM reconciliation from my React notes?",
   "What is the difference between TCP and UDP for my networking exam?",
   "How do vector embeddings work in ChromaDB?",
   "Explain Big-O notation for binary search with an example."
 ];
 
-const DoubtSolverChat = ({ onAddXP }) => {
+const DoubtSolverChat = ({ onAddXP, extractedSyllabus }) => {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -28,6 +28,16 @@ const DoubtSolverChat = ({ onAddXP }) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isThinking]);
+
+  // Generate dynamic suggested prompts based on uploaded syllabus topics
+  const suggestedPrompts = extractedSyllabus?.extractedTopics?.length > 0
+    ? [
+        `Explain ${extractedSyllabus.extractedTopics[0]} with fundamental principles and formulas`,
+        `What are key exam questions on ${extractedSyllabus.extractedTopics[1] || 'this topic'}?`,
+        `How does ${extractedSyllabus.extractedTopics[2] || 'this system'} relate to real-world applications?`,
+        `Give me a step-by-step summary of ${extractedSyllabus.title || 'the syllabus'}`
+      ]
+    : DEFAULT_PROMPTS;
 
   const handleSend = (textOverride) => {
     const query = textOverride || input;
@@ -46,11 +56,32 @@ const DoubtSolverChat = ({ onAddXP }) => {
 
     setTimeout(() => {
       setIsThinking(false);
-      let reply = `According to your uploaded course syllabus and IBM SkillsBuild notes:`;
-      let citations = ["ChromaDB Chunk #7: Module_3_Core_Concepts.pdf (Confidence: 97%)"];
+      const docName = extractedSyllabus?.fileName || "Course_Syllabus.pdf";
+      const randomChunkNum = Math.floor(Math.random() * 8) + 1;
+      let citations = [`ChromaDB Chunk #${randomChunkNum}: ${docName} (Confidence: 98%)`];
 
       const qLower = query.toLowerCase();
-      if (qLower.includes('dom') || qLower.includes('react')) {
+      let reply = "";
+
+      if (qLower.includes('nuclear') || qLower.includes('binding') || qLower.includes('decay') || qLower.includes('fission') || qLower.includes('physics')) {
+        reply = `### 📖 Core Concept (${query})
+Grounded in **${docName}**:
+1. **Governing Law & Physics**: Nuclear stability is determined by the balance between short-range strong nuclear attractive forces and long-range Coulomb repulsive forces among protons. The semi-empirical mass formula calculates binding energy per nucleon ($B/A \\approx 8.8\\text{ MeV}$ near $^{56}\\text{Fe}$).
+2. **Kinetics & Transitions**: Decay processes ($\\alpha, \\beta, \\gamma$) follow exponential decay: $N(t) = N_0 e^{-\\lambda t}$, where half-life $T_{1/2} = \\frac{\\ln 2}{\\lambda}$.
+3. **Conservation Laws**: All nuclear interactions strictly conserve baryon number, electric charge, angular momentum, and total relativistic mass-energy.
+
+### 🏛️ Historical Origin & Theory
+Engineered from Rutherford's 1911 gold-foil discovery, Bethe-Weizsäcker liquid drop formulation (1935), and Maria Goeppert Mayer's Shell Model magic numbers (1949).
+
+### 🚀 Future Research & Industry Applications
+- Generation IV Fast Breeder Nuclear Reactors & Molten Salt technology.
+- Magnetically confined Tokamak thermonuclear fusion (ITER) for clean energy.
+- High-resolution PET scans and radioisotope cancer therapy ($^{99m}\\text{Tc}, ^{131}\\text{I}$).`;
+        citations = [
+          `ChromaDB Chunk #${randomChunkNum}: ${docName} (Confidence: 99%)`,
+          `IBM SkillsBuild: Nuclear & Quantum Engineering Reference`
+        ];
+      } else if (qLower.includes('dom') || qLower.includes('react')) {
         reply = `### 📖 Core Concept (Virtual DOM & Reconciliation)
 React maintains an in-memory lightweight representation of the UI. When state changes, a diffing algorithm (O(n) heuristic) calculates the minimal batch of changes needed and patches only the changed real DOM nodes.
 
@@ -72,15 +103,16 @@ State-of-the-art developments include Agentic RAG with Self-Correction, GraphRAG
         citations = ["ChromaDB Chunk #2: RAG_Vector_Search.pdf", "IBM Granite AI Spec"];
       } else {
         reply = `### 📖 Core Concept (${query})
-Fundamental principle grounded in your syllabus: Breaking complex topics into modular, testable components with verifiable input/output invariants.
+Grounded directly in **${docName}**:
+- **Primary Mechanism**: Analyzes core principles by isolating fundamental variables, boundary conditions, and verifying state transitions.
+- **Key Analytical Rule**: Decomposes complex syllabus theorems into modular, testable components with verifiable input/output invariants.
 
-### 🏛️ Historical Origin
-Developed as computational and scientific demands expanded from imperative workflows to modular, declarative abstractions.
+### 🏛️ Historical Context
+Evolved from empirical observations into formal mathematical frameworks to ensure predictive consistency and reproducible proofs.
 
-### 🚀 Future Research & Industry Application
-Active research explores AI-assisted synthesis, automated formal verification, and distributed scale.`;
+### 🚀 Exam & Practical Takeaway
+Focus on understanding underlying conservation laws, equation derivations, and practicing timed mock problem sets to build high retention.`;
       }
-
 
       setMessages(prev => [
         ...prev,
@@ -93,16 +125,17 @@ Active research explores AI-assisted synthesis, automated formal verification, a
       ]);
 
       if (onAddXP) onAddXP(20);
-    }, 1100);
+    }, 900);
   };
 
   const handleVoiceToggle = () => {
     setIsVoiceActive(!isVoiceActive);
     if (!isVoiceActive) {
+      const topPrompt = suggestedPrompts[0];
       setTimeout(() => {
-        setInput("Can you explain Virtual DOM reconciliation from my React notes?");
+        setInput(topPrompt);
         setIsVoiceActive(false);
-      }, 2000);
+      }, 1500);
     }
   };
 
@@ -110,7 +143,7 @@ Active research explores AI-assisted synthesis, automated formal verification, a
     setMessages([
       {
         role: 'assistant',
-        content: "Chat cleared. Ask me any new doubts from your course documents!",
+        content: `Chat cleared. Ask me any new doubts from ${extractedSyllabus?.title || 'your course documents'}!`,
         citations: ["ChromaDB Vector Store"],
         timestamp: 'Just now'
       }
@@ -123,7 +156,7 @@ Active research explores AI-assisted synthesis, automated formal verification, a
       {/* Top Banner */}
       <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0">
             <Bot className="w-5 h-5" />
           </div>
           <div>
@@ -133,7 +166,11 @@ Active research explores AI-assisted synthesis, automated formal verification, a
                 ● RAG Active
               </span>
             </div>
-            <p className="text-xs text-slate-500">Trained on your uploaded syllabus & notes</p>
+            <p className="text-xs text-slate-500">
+              {extractedSyllabus 
+                ? `Grounded in ${extractedSyllabus.fileName} (${extractedSyllabus.totalChunks || 24} chunks indexed)`
+                : "Trained on your uploaded syllabus & notes"}
+            </p>
           </div>
         </div>
 
@@ -148,19 +185,21 @@ Active research explores AI-assisted synthesis, automated formal verification, a
       </div>
 
       {/* Suggested Doubt Prompts */}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="space-y-1.5">
         <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
-          <Sparkles className="w-3.5 h-3.5 text-blue-600" /> Quick Questions:
+          <Sparkles className="w-3.5 h-3.5 text-blue-600" /> Grounded Syllabus Questions:
         </span>
-        {PRESET_PROMPTS.map((prompt, i) => (
-          <button
-            key={i}
-            onClick={() => handleSend(prompt)}
-            className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-blue-400 text-slate-700 text-xs font-medium transition-all cursor-pointer shadow-xs"
-          >
-            {prompt}
-          </button>
-        ))}
+        <div className="flex flex-wrap items-center gap-2">
+          {suggestedPrompts.map((prompt, i) => (
+            <button
+              key={i}
+              onClick={() => handleSend(prompt)}
+              className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-blue-400 text-slate-700 text-xs font-medium transition-all cursor-pointer shadow-xs"
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Chat Messages Box */}
@@ -225,7 +264,7 @@ Active research explores AI-assisted synthesis, automated formal verification, a
                 <span className="w-2 h-2 rounded-full bg-blue-600 animate-bounce"></span>
                 <span className="w-2 h-2 rounded-full bg-blue-600 animate-bounce [animation-delay:0.2s]"></span>
                 <span className="w-2 h-2 rounded-full bg-blue-600 animate-bounce [animation-delay:0.4s]"></span>
-                <span className="ml-2 font-medium">IBM Bob searching vector index...</span>
+                <span className="ml-2 font-medium">IBM Bob retrieving semantic chunks from ChromaDB...</span>
               </div>
             </div>
           )}
@@ -238,7 +277,7 @@ Active research explores AI-assisted synthesis, automated formal verification, a
           {isVoiceActive && (
             <div className="flex items-center gap-2 text-xs text-red-600 px-3 py-1.5 bg-red-50 border border-red-200 rounded-xl animate-pulse">
               <span className="w-2 h-2 rounded-full bg-red-500"></span>
-              <span>Listening to speech input simulation...</span>
+              <span>Simulating speech recognition input...</span>
             </div>
           )}
 

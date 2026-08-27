@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   X, Layers, Database, Bot, Calendar, Trophy, 
-  Sparkles, FileText, ArrowDown, ArrowRight, CheckCircle2 
+  ArrowDown 
 } from 'lucide-react';
 
 const ArchitectureModal = ({ onClose }) => {

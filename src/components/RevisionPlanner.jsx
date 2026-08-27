@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Calendar, Clock, CheckCircle2, 
-  Layers, Sparkles, RefreshCw 
+  Layers, Sparkles, RefreshCw, BookOpen 
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-const REVISION_WEEKS = [
+const DEFAULT_REVISION_WEEKS = [
   {
     week: 1,
     title: "Phase 1: Core Fundamentals & Concept Review",
@@ -48,11 +48,51 @@ const REVISION_WEEKS = [
   }
 ];
 
-const RevisionPlanner = ({ onAddXP }) => {
+const RevisionPlanner = ({ onAddXP, extractedSyllabus }) => {
   const [selectedDuration, setSelectedDuration] = useState('14'); // '7' | '14' | '30'
   const [studyHours, setStudyHours] = useState('2');
   const [completedTasks, setCompletedTasks] = useState({});
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Compute customized weeks/phases dynamically according to duration, study hours & syllabus
+  const activeWeeks = useMemo(() => {
+    const rawModules = extractedSyllabus?.modules || DEFAULT_REVISION_WEEKS;
+    const dailyHrs = parseInt(studyHours, 10) || 2;
+    const days = parseInt(selectedDuration, 10) || 14;
+    const totalStudyHours = days * dailyHrs;
+
+    if (days === 7) {
+      // 7-day fast-track: 2 focused phases
+      const hrsPerPhase = Math.round(totalStudyHours / 2);
+      return [
+        {
+          week: 1,
+          title: rawModules[0]?.title ? `Sprint 1 (Days 1-3): ${rawModules[0].title.replace(/^Phase\s*\d+:\s*/i, '')}` : "Sprint 1: Core Fundamentals & Theory",
+          hours: `${hrsPerPhase} Hours`,
+          tasks: rawModules[0]?.tasks ? rawModules[0].tasks.map((t, idx) => ({ ...t, id: `sprint-1-${idx}` })) : []
+        },
+        {
+          week: 2,
+          title: rawModules[1]?.title ? `Sprint 2 (Days 4-7): ${rawModules[1].title.replace(/^Phase\s*\d+:\s*/i, '')} & Practice` : "Sprint 2: Applied Analysis & Exam Simulation",
+          hours: `${totalStudyHours - hrsPerPhase} Hours`,
+          tasks: [
+            ...(rawModules[1]?.tasks?.slice(0, 2) || []),
+            { id: 'sprint-2-exam', title: `Complete Kahoot timed practice exam on ${extractedSyllabus?.title || 'Course'}`, xp: 50 }
+          ].map((t, idx) => ({ ...t, id: `sprint-2-${idx}` }))
+        }
+      ];
+    }
+
+    // 14 or 30 days: 4 structured phases with scaled hours
+    const numPhases = Math.min(4, rawModules.length);
+    const hrsPerPhase = Math.round(totalStudyHours / numPhases);
+
+    return rawModules.slice(0, 4).map((mod, idx) => ({
+      ...mod,
+      week: idx + 1,
+      hours: `${hrsPerPhase + (idx % 2 === 0 ? 0 : 2)} Hours`
+    }));
+  }, [extractedSyllabus, selectedDuration, studyHours]);
 
   const toggleTask = (taskId, xpVal = 25) => {
     setCompletedTasks(prev => {
@@ -81,23 +121,34 @@ const RevisionPlanner = ({ onAddXP }) => {
         spread: 70,
         origin: { y: 0.6 }
       });
-    }, 700);
+    }, 600);
   };
 
-  const totalTasksCount = REVISION_WEEKS.reduce((acc, w) => acc + w.tasks.length, 0);
+  const totalTasksCount = activeWeeks.reduce((acc, w) => acc + (w.tasks?.length || 0), 0);
   const completedCount = Object.values(completedTasks).filter(Boolean).length;
-  const progressPct = Math.round((completedCount / totalTasksCount) * 100);
+  const progressPct = totalTasksCount > 0 ? Math.round((completedCount / totalTasksCount) * 100) : 0;
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
       
-      {/* Clean Simple Header */}
+      {/* Clean Header */}
       <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-5">
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Revision & Study Planner</h2>
-            <p className="text-xs text-slate-500">Plan your syllabus revision with spaced repetition milestones.</p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-lg font-bold text-slate-900">Revision & Study Planner</h2>
+              {extractedSyllabus && (
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold flex items-center gap-1">
+                  <BookOpen className="w-3.5 h-3.5" /> Extracted from PDF: {extractedSyllabus.title}
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              {extractedSyllabus 
+                ? `Milestones and tasks structured directly from ${extractedSyllabus.fileName}.`
+                : "Plan your syllabus revision with spaced repetition milestones."}
+            </p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -111,7 +162,26 @@ const RevisionPlanner = ({ onAddXP }) => {
           </div>
         </div>
 
-        {/* Simple Clean Controls */}
+        {/* Extracted Topics Pill Bar */}
+        {extractedSyllabus?.extractedTopics && extractedSyllabus.extractedTopics.length > 0 && (
+          <div className="pt-2 border-t border-slate-100">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
+              Targeted Syllabus Topics:
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {extractedSyllabus.extractedTopics.map((topic, i) => (
+                <span
+                  key={i}
+                  className="px-2 py-0.5 bg-slate-100 text-slate-700 rounded-md text-[11px] font-medium border border-slate-200"
+                >
+                  {topic}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Controls */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-100">
           
           {/* Target Duration */}
@@ -168,12 +238,12 @@ const RevisionPlanner = ({ onAddXP }) => {
               {isGenerating ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Planning...</span>
+                  <span>Structuring from Document...</span>
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4" />
-                  <span>Generate Plan</span>
+                  <span>Update Study Plan</span>
                 </>
               )}
             </button>
@@ -186,13 +256,13 @@ const RevisionPlanner = ({ onAddXP }) => {
       <div className="space-y-3">
         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-2">
           <Layers className="w-4 h-4 text-blue-600" />
-          Study Checklist ({selectedDuration}-Day Schedule)
+          Study Checklist ({selectedDuration}-Day Schedule {extractedSyllabus ? `for ${extractedSyllabus.title}` : ''})
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {REVISION_WEEKS.map((w) => {
-            const weekDoneCount = w.tasks.filter(t => completedTasks[t.id]).length;
-            const isWeekAllDone = weekDoneCount === w.tasks.length;
+          {activeWeeks.map((w) => {
+            const weekDoneCount = (w.tasks || []).filter(t => completedTasks[t.id]).length;
+            const isWeekAllDone = weekDoneCount > 0 && weekDoneCount === (w.tasks || []).length;
 
             return (
               <div
@@ -205,7 +275,7 @@ const RevisionPlanner = ({ onAddXP }) => {
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-xs font-bold">
-                    Week {w.week} ({w.hours})
+                    Phase {w.week} ({w.hours})
                   </span>
                   {isWeekAllDone && (
                     <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
@@ -217,7 +287,7 @@ const RevisionPlanner = ({ onAddXP }) => {
                 <h4 className="text-sm font-bold text-slate-900 mb-3">{w.title}</h4>
 
                 <div className="pt-2 border-t border-slate-100 space-y-2">
-                  {w.tasks.map((task) => (
+                  {(w.tasks || []).map((task) => (
                     <label
                       key={task.id}
                       className="flex items-start gap-2.5 text-xs text-slate-700 cursor-pointer p-1.5 rounded-lg hover:bg-slate-50 transition-all"

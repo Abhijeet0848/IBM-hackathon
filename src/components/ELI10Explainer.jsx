@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Sparkles, Lightbulb, Volume2, 
-  VolumeX, Copy, Check, Wand2, RefreshCw 
+  VolumeX, Copy, Check, Wand2, RefreshCw, BookOpen, Tag 
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -12,7 +12,7 @@ const SIMPLICITY_MODES = [
   { id: 'professor', name: '🎓 University Level', desc: 'Rigorous definitions & math foundations' },
 ];
 
-const ELI10Explainer = ({ onAddXP }) => {
+const ELI10Explainer = ({ onAddXP, extractedSyllabus }) => {
   const [topicInput, setTopicInput] = useState('');
   const [selectedMode, setSelectedMode] = useState('eli10');
   const [currentResult, setCurrentResult] = useState(null);
@@ -20,26 +20,39 @@ const ELI10Explainer = ({ onAddXP }) => {
   const [isCopied, setIsCopied] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
-  const handleSimplify = () => {
-    if (!topicInput.trim()) return;
-    const targetTopic = topicInput.trim();
+  const handleSimplify = (overrideTopic) => {
+    const targetTopic = (overrideTopic || topicInput).trim();
+    if (!targetTopic) return;
+    if (overrideTopic) setTopicInput(overrideTopic);
     setIsSimplifying(true);
 
     setTimeout(() => {
       setIsSimplifying(false);
-      let simplifiedText = `Imagine ${targetTopic} as a friendly playground game where every participant has a specific rule to follow. When everyone works together, the system produces the expected outcome effortlessly!`;
-      let analogyText = `A playground puzzle where each player takes their turn smoothly.`;
-      let takeaway = `Breaks complex domain barriers into intuitive, bite-sized components.`;
-
       const tLower = targetTopic.toLowerCase();
-      if (tLower.includes('rag') || tLower.includes('retrieval')) {
+      let simplifiedText = "";
+      let analogyText = "";
+      let takeaway = "";
+
+      if (tLower.includes('nuclear') || tLower.includes('binding') || tLower.includes('mass defect')) {
+        simplifiedText = "Imagine the nucleus of an atom like a group of friendly magnets squeezed super tightly into a tiny ball! When they snap together, a tiny bit of their weight turns into pure superpower glue (Binding Energy) to keep them from flying apart.";
+        analogyText = "A super-glue magnetic hug that releases energy when it locks in place.";
+        takeaway = "Mass defect is converted into binding energy according to Einstein's E = mc².";
+      } else if (tLower.includes('decay') || tLower.includes('radioactiv') || tLower.includes('half-life')) {
+        simplifiedText = "Think of radioactive atoms like popcorn kernels in a hot pan! You can't predict which exact kernel will pop next, but you know that after exactly 2 minutes (one half-life), exactly half of all the kernels will have popped!";
+        analogyText = "A pan of popcorn where exactly 50% pop every fixed round of time.";
+        takeaway = "Radioactivity is random individually, but follows exact exponential decay as a group.";
+      } else if (tLower.includes('fission') || tLower.includes('fusion') || tLower.includes('reactor')) {
+        simplifiedText = "Fission is like shooting a bowling ball at a giant water balloon until it splits in two and throws out smaller balls. Fusion is the opposite: smashing two tiny droplets together so hard that they merge into one big droplet, powering the Sun!";
+        analogyText = "Fission splits a giant balloon; Fusion smashes droplets together to build a sun.";
+        takeaway = "Both fission and fusion convert mass difference into vast amounts of usable energy.";
+      } else if (tLower.includes('rag') || tLower.includes('retrieval')) {
         simplifiedText = "Imagine taking an open-book exam! Instead of the AI guessing from pure memory, a smart librarian instantly flips to the exact page in your textbook and gives the AI the exact proof before answering!";
         analogyText = "An open-book exam with an instant superhero librarian.";
         takeaway = "Connects external textbook search directly to the AI to eliminate false guesses.";
-      } else if (tLower.includes('neural') || tLower.includes('machine learning') || tLower.includes('ai')) {
-        simplifiedText = "Think of a Neural Network like a team of detectives identifying mystery animals. The first checks colors, the second checks fur, and the third counts legs to confidently shout the answer!";
-        analogyText = "A team of detectives solving clues together one layer at a time.";
-        takeaway = "Layers of mathematical filters work together to recognize complex patterns.";
+      } else {
+        simplifiedText = `Imagine ${targetTopic} as a specialized team system where every rule ensures stability and precision. When applied to real-world problems, it transforms confusing complexities into manageable, predictable steps.`;
+        analogyText = `A finely tuned clockwork mechanism where each gear performs its role smoothly.`;
+        takeaway = `Breaks down complex domain concepts into intuitive, verified fundamentals.`;
       }
 
       setCurrentResult({
@@ -56,7 +69,7 @@ const ELI10Explainer = ({ onAddXP }) => {
         spread: 50,
         origin: { y: 0.6 }
       });
-    }, 900);
+    }, 700);
   };
 
   const handleCopy = () => {
@@ -70,7 +83,7 @@ const ELI10Explainer = ({ onAddXP }) => {
   const toggleAudio = () => {
     setIsPlayingAudio(!isPlayingAudio);
     if (!isPlayingAudio) {
-      setTimeout(() => setIsPlayingAudio(false), 6000);
+      setTimeout(() => setIsPlayingAudio(false), 5000);
     }
   };
 
@@ -98,6 +111,28 @@ const ELI10Explainer = ({ onAddXP }) => {
       {/* Input & Mode Configuration */}
       <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-5">
         
+        {/* Extracted Syllabus Quick Topic Chips */}
+        {extractedSyllabus?.extractedTopics && extractedSyllabus.extractedTopics.length > 0 && (
+          <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-200/80 space-y-2">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
+              <BookOpen className="w-3.5 h-3.5 text-amber-700" />
+              <span>Suggested topics from {extractedSyllabus.title}:</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {extractedSyllabus.extractedTopics.map((topic, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSimplify(topic)}
+                  className="px-2.5 py-1 bg-white hover:bg-amber-100/70 border border-amber-300 text-amber-900 rounded-lg text-xs font-medium transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
+                >
+                  <Tag className="w-2.5 h-2.5 text-amber-600" />
+                  <span>{topic}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
           <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
             <Wand2 className="w-4 h-4 text-blue-600" />
@@ -107,7 +142,7 @@ const ELI10Explainer = ({ onAddXP }) => {
             <input
               type="text"
               className="flex-1 px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 text-sm focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
-              placeholder="Type any difficult concept (e.g. Asynchronous event loops, Neural networks, Fourier transforms)..."
+              placeholder="Type any difficult concept (e.g. Binding Energy, Radioactive Half-Life, Gamow Barrier)..."
               value={topicInput}
               onChange={(e) => setTopicInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSimplify()}
@@ -217,7 +252,7 @@ const ELI10Explainer = ({ onAddXP }) => {
         <div className="p-8 rounded-2xl bg-white border border-dashed border-slate-300 text-center text-slate-400 text-sm space-y-1">
           <Lightbulb className="w-8 h-8 mx-auto text-slate-300 mb-2" />
           <p className="font-semibold text-slate-600">No concept entered yet</p>
-          <p className="text-xs text-slate-400">Type any concept in the box above and click "Explain It!"</p>
+          <p className="text-xs text-slate-400">Type any concept in the box above or click a topic chip to generate an instant explanation</p>
         </div>
       )}
 

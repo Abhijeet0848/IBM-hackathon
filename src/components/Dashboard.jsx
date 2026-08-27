@@ -10,11 +10,16 @@ import RevisionPlanner from './RevisionPlanner';
 import SyllabusUploader from './SyllabusUploader';
 import ArchitectureModal from './ArchitectureModal';
 
-const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
+const Dashboard = ({ 
+  initialTab = 'syllabus', 
+  onHomeClick, 
+  extractedSyllabus, 
+  onSyllabusExtracted 
+}) => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [showArchitecture, setShowArchitecture] = useState(false);
 
-  // Gamification Global State (Architecture Layer 3)
+  // Gamification Global State
   const [studentXP, setStudentXP] = useState(0);
   const [studyStreak] = useState(1);
 
@@ -86,7 +91,7 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
 
           </div>
 
-          {/* Clean Light Tab Navigation */}
+          {/* Clean Light Tab Navigation (Workflow Order) */}
           <div className="flex overflow-x-auto space-x-1 py-2 border-t border-slate-100 no-scrollbar">
             <button
               onClick={() => setActiveTab('syllabus')}
@@ -97,7 +102,7 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
               }`}
             >
               <FileUp className="w-4 h-4" />
-              <span>Upload Syllabus / Notes</span>
+              <span>1. Upload Syllabus / Notes</span>
             </button>
 
             <button
@@ -109,7 +114,7 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
               }`}
             >
               <Calendar className="w-4 h-4" />
-              <span>Revision & Study Plans</span>
+              <span>2. Revision & Study Plans</span>
             </button>
 
             <button
@@ -121,7 +126,7 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
               }`}
             >
               <Lightbulb className="w-4 h-4" />
-              <span>“Explain Like I’m 10”</span>
+              <span>3. “Explain Like I’m 10”</span>
             </button>
 
             <button
@@ -133,7 +138,7 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
               }`}
             >
               <Bot className="w-4 h-4" />
-              <span>Doubt-Solving Chatbot</span>
+              <span>4. Doubt-Solving Chatbot</span>
             </button>
 
             <button
@@ -145,22 +150,47 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
               }`}
             >
               <Trophy className="w-4 h-4" />
-              <span>Kahoot Practice Tests</span>
+              <span>5. Kahoot Practice Tests</span>
             </button>
           </div>
-
 
         </div>
       </header>
 
       {/* Main Tab Area */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full">
-        {activeTab === 'eli10' && <ELI10Explainer onAddXP={handleAddXP} />}
-        {activeTab === 'kahoot' && <KahootQuiz onAddXP={handleAddXP} />}
-        {activeTab === 'doubts' && <DoubtSolverChat onAddXP={handleAddXP} />}
-        {activeTab === 'revision' && <RevisionPlanner onAddXP={handleAddXP} />}
-        {activeTab === 'syllabus' && <SyllabusUploader onAddXP={handleAddXP} onNavigateTab={setActiveTab} />}
-
+        {activeTab === 'syllabus' && (
+          <SyllabusUploader 
+            onAddXP={handleAddXP} 
+            onNavigateTab={setActiveTab}
+            extractedSyllabus={extractedSyllabus}
+            onSyllabusExtracted={onSyllabusExtracted}
+          />
+        )}
+        {activeTab === 'revision' && (
+          <RevisionPlanner 
+            onAddXP={handleAddXP} 
+            extractedSyllabus={extractedSyllabus}
+          />
+        )}
+        {activeTab === 'eli10' && (
+          <ELI10Explainer 
+            onAddXP={handleAddXP} 
+            extractedSyllabus={extractedSyllabus}
+          />
+        )}
+        {activeTab === 'doubts' && (
+          <DoubtSolverChat 
+            onAddXP={handleAddXP} 
+            extractedSyllabus={extractedSyllabus}
+          />
+        )}
+        {activeTab === 'kahoot' && (
+          <KahootQuiz 
+            onAddXP={handleAddXP} 
+            extractedSyllabus={extractedSyllabus}
+          />
+        )}
       </main>
 
       {/* Architecture Modal */}

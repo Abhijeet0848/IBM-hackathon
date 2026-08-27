@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   RefreshCw, Check, Flame, Clock, 
-  Sparkles, Trophy, ArrowRight 
+  Sparkles, Trophy, ArrowRight, BookOpen 
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -57,7 +57,14 @@ const SAMPLE_QUESTIONS = [
   }
 ];
 
-const KahootQuiz = ({ onAddXP }) => {
+const KahootQuiz = ({ onAddXP, extractedSyllabus }) => {
+  const activeQuestions = useMemo(() => {
+    if (extractedSyllabus?.quizQuestions && extractedSyllabus.quizQuestions.length > 0) {
+      return extractedSyllabus.quizQuestions;
+    }
+    return SAMPLE_QUESTIONS;
+  }, [extractedSyllabus]);
+
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedOpt, setSelectedOpt] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -66,7 +73,18 @@ const KahootQuiz = ({ onAddXP }) => {
   const [timeLeft, setTimeLeft] = useState(20);
   const [isQuizComplete, setIsQuizComplete] = useState(false);
 
-  const currentQ = SAMPLE_QUESTIONS[currentIdx];
+  // Reset quiz if extracted syllabus changes
+  useEffect(() => {
+    setCurrentIdx(0);
+    setSelectedOpt(null);
+    setIsAnswered(false);
+    setScore(0);
+    setStreakMultiplier(1);
+    setTimeLeft(20);
+    setIsQuizComplete(false);
+  }, [extractedSyllabus]);
+
+  const currentQ = activeQuestions[currentIdx] || activeQuestions[0];
 
   const handleOptionClick = useCallback((idx) => {
     if (isAnswered) return;
@@ -75,7 +93,7 @@ const KahootQuiz = ({ onAddXP }) => {
 
     const isCorrect = idx === currentQ.correctIndex;
     if (isCorrect) {
-      const earnedScore = Math.round(currentQ.points * (timeLeft / 20) * streakMultiplier);
+      const earnedScore = Math.round(currentQ.points * (Math.max(1, timeLeft) / 20) * streakMultiplier);
       setScore(s => s + earnedScore);
       setStreakMultiplier(m => Math.min(3, m + 0.5));
       if (onAddXP) onAddXP(75);
@@ -106,7 +124,7 @@ const KahootQuiz = ({ onAddXP }) => {
   }, [timeLeft, isAnswered, isQuizComplete, handleOptionClick]);
 
   const handleNextQuestion = () => {
-    if (currentIdx + 1 < SAMPLE_QUESTIONS.length) {
+    if (currentIdx + 1 < activeQuestions.length) {
       setCurrentIdx(i => i + 1);
       setSelectedOpt(null);
       setIsAnswered(false);
@@ -141,11 +159,16 @@ const KahootQuiz = ({ onAddXP }) => {
             <Trophy className="w-5 h-5" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-bold text-slate-900 text-sm">Kahoot-Style Practice Arena</span>
               <span className="px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[11px] font-semibold">
                 IBM Bob Quiz
               </span>
+              {extractedSyllabus && (
+                <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold flex items-center gap-1">
+                  <BookOpen className="w-3 h-3" /> Grounded: {extractedSyllabus.title}
+                </span>
+              )}
             </div>
             <p className="text-xs text-slate-500">Topic: {currentQ?.topic || "Syllabus Mastery"}</p>
           </div>
@@ -161,7 +184,7 @@ const KahootQuiz = ({ onAddXP }) => {
           <div className="text-right">
             <div className="text-base font-extrabold text-blue-600 tracking-tight">{score} PTS</div>
             <div className="text-[10px] text-slate-500 uppercase font-semibold">
-              Q {currentIdx + 1} / {SAMPLE_QUESTIONS.length}
+              Q {currentIdx + 1} / {activeQuestions.length}
             </div>
           </div>
         </div>
@@ -207,7 +230,7 @@ const KahootQuiz = ({ onAddXP }) => {
                   {selectedOpt === currentQ.correctIndex ? (
                     <>
                       <Check className="w-5 h-5 text-emerald-600" />
-                      <span>Spot on! Correct Answer 🎉 (+{Math.round(currentQ.points * (timeLeft / 20) * streakMultiplier)} PTS)</span>
+                      <span>Spot on! Correct Answer 🎉 (+{Math.round(currentQ.points * (Math.max(1, timeLeft) / 20) * streakMultiplier)} PTS)</span>
                     </>
                   ) : (
                     <span>Incorrect! The correct answer was option {currentQ.correctIndex + 1}.</span>
@@ -263,7 +286,7 @@ const KahootQuiz = ({ onAddXP }) => {
                   onClick={handleNextQuestion}
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
                 >
-                  <span>{currentIdx + 1 < SAMPLE_QUESTIONS.length ? "Next Question" : "See Final Score"}</span>
+                  <span>{currentIdx + 1 < activeQuestions.length ? "Next Question" : "See Final Score"}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>

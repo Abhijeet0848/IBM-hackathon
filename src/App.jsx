@@ -4,9 +4,10 @@ import Dashboard from './components/Dashboard'
 
 function App() {
   const [currentView, setCurrentView] = useState('landing') // 'landing' | 'dashboard'
-  const [activeTab, setActiveTab] = useState('eli10')
+  const [activeTab, setActiveTab] = useState('syllabus')
+  const [extractedSyllabus, setExtractedSyllabus] = useState(null)
 
-  const handleStartTab = (tabName = 'eli10') => {
+  const handleStartTab = (tabName = 'syllabus') => {
     setActiveTab(tabName)
     setCurrentView('dashboard')
   }
@@ -27,6 +28,8 @@ function App() {
         <Dashboard
           initialTab={activeTab}
           onHomeClick={handleGoHome}
+          extractedSyllabus={extractedSyllabus}
+          onSyllabusExtracted={setExtractedSyllabus}
         />
       )}
     </div>
