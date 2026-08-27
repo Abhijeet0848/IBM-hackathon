@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
 import { 
   Lightbulb, Trophy, Bot, Calendar, FileUp, 
-  Flame, Award, PlayCircle, Home 
+  Flame, Award, Home 
 } from 'lucide-react';
 import ELI10Explainer from './ELI10Explainer';
 import KahootQuiz from './KahootQuiz';
 import DoubtSolverChat from './DoubtSolverChat';
 import RevisionPlanner from './RevisionPlanner';
 import SyllabusUploader from './SyllabusUploader';
-import MockInterviewModal from './MockInterviewModal';
 
 const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [showInterview, setShowInterview] = useState(false);
 
   // Gamification Global State
   const [studentXP, setStudentXP] = useState(320);
@@ -51,7 +49,7 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
             <div className="flex items-center gap-2 sm:gap-3">
               <button
                 onClick={onHomeClick}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all cursor-pointer"
               >
                 <Home className="w-3.5 h-3.5" />
                 <span>Home</span>
@@ -68,14 +66,6 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
                   <span>{studentXP} XP</span>
                 </span>
               </div>
-
-              <button
-                onClick={() => setShowInterview(true)}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer"
-              >
-                <PlayCircle className="w-4 h-4" />
-                <span>Mock Screener</span>
-              </button>
             </div>
           </div>
 
@@ -153,14 +143,6 @@ const Dashboard = ({ initialTab = 'eli10', onHomeClick }) => {
         {activeTab === 'revision' && <RevisionPlanner onAddXP={handleAddXP} />}
         {activeTab === 'syllabus' && <SyllabusUploader onAddXP={handleAddXP} />}
       </main>
-
-      {/* Mock Technical Screener Modal */}
-      {showInterview && (
-        <MockInterviewModal
-          onClose={() => setShowInterview(false)}
-          initialRole="Computer Science & AI Engineer"
-        />
-      )}
 
     </div>
   );

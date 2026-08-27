@@ -1,8 +1,9 @@
 import React from 'react';
 import { 
   ArrowRight, Sparkles, Lightbulb, Trophy, 
-  Bot, Zap, ChevronRight, FileUp, Calendar, ArrowUpRight 
+  Bot, ChevronRight, FileUp, Calendar, ArrowUpRight 
 } from 'lucide-react';
+
 
 
 const LandingPage = ({ onStart, onOpenInterview }) => {
@@ -61,23 +62,16 @@ const LandingPage = ({ onStart, onOpenInterview }) => {
         </p>
 
         {/* Action CTAs */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto mb-14">
+        <div className="flex items-center justify-center gap-3 w-full sm:w-auto mb-14">
           <button
             onClick={() => onStart('eli10')}
-            className="w-full sm:w-auto px-7 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-md hover:shadow-lg transition-all hover:scale-102 flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full sm:w-auto px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-md hover:shadow-lg transition-all hover:scale-102 flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>Start Learning with Bob</span>
             <ArrowRight className="w-4 h-4" />
           </button>
-
-          <button
-            onClick={onOpenInterview}
-            className="w-full sm:w-auto px-6 py-3.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 font-semibold rounded-xl text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
-          >
-            <Zap className="w-4 h-4 text-amber-500" />
-            <span>Practice Technical Screener</span>
-          </button>
         </div>
+
 
         {/* Key Features Section */}
         <div className="w-full text-left space-y-4">
