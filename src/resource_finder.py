@@ -221,18 +221,63 @@ class ResourceFinder:
                         "wikipedia_url": ResourceFinder.resolve_wikipedia_link(clean_t)
                     })
         
+        topic_lower = primary_topic.lower()
         encoded_primary = urllib.parse.quote_plus(primary_topic)
         primary_wiki = ResourceFinder.resolve_wikipedia_link(primary_topic)
 
+        # Dynamic Domain-Specific Reference Synthesis
+        if any(k in topic_lower for k in ['teaching', 'aptitude', 'pedagogy', 'learner', 'reflective', 'education', 'classroom', 'bloom', 'instruction']):
+            domain_name = "Pedagogy & Teaching Aptitude"
+            resource_tiles = [
+                {"title": "🌐 Wikipedia: Educational Psychology", "url": primary_wiki, "color": "resource-tile-blue"},
+                {"title": "📚 UGC NET & SWAYAM Pedagogy Frameworks", "url": f"https://www.google.com/search?q={encoded_primary}+UGC+NET+teaching+aptitude+SWAYAM", "color": "resource-tile-green"},
+                {"title": "▶️ NPTEL & Teacher Training Lectures", "url": f"https://www.youtube.com/results?search_query={encoded_primary}+teaching+aptitude+lectures", "color": "resource-tile-red"},
+                {"title": "📖 IGNOU & NCERT Pedagogy Textbooks", "url": f"https://www.google.com/search?tbm=bks&q={encoded_primary}+pedagogy+textbook", "color": "resource-tile-amber"},
+                {"title": "🔬 Research on Learning & Instruction", "url": f"https://scholar.google.com/scholar?q={encoded_primary}+instructional+design", "color": "resource-tile-purple"}
+            ]
+        elif any(k in topic_lower for k in ['current event', 'current affairs', 'national', 'international', 'general knowledge', 'politics', 'geopolitics', 'affairs', 'governance']):
+            domain_name = "Current Affairs & Global Studies"
+            resource_tiles = [
+                {"title": "🌐 Wikipedia: Global & National Affairs", "url": primary_wiki, "color": "resource-tile-blue"},
+                {"title": "📰 PIB & National Affairs Summaries", "url": f"https://www.google.com/search?q={encoded_primary}+PIB+current+affairs", "color": "resource-tile-green"},
+                {"title": "▶️ Sansad TV & Contemporary Analysis", "url": f"https://www.youtube.com/results?search_query={encoded_primary}+current+affairs+analysis", "color": "resource-tile-red"},
+                {"title": "📖 Monthly Analytical Compendiums & Books", "url": f"https://www.google.com/search?tbm=bks&q={encoded_primary}+current+affairs+compendium", "color": "resource-tile-amber"},
+                {"title": "🔬 Strategic & Policy Research Papers", "url": f"https://scholar.google.com/scholar?q={encoded_primary}+policy+review", "color": "resource-tile-purple"}
+            ]
+        elif any(k in topic_lower for k in ['chemistry', 'physics', 'biology', 'organic', 'mechanics', 'algebra', 'calculus', 'thermodynamics']):
+            domain_name = "STEM & Natural Sciences"
+            resource_tiles = [
+                {"title": "🌐 Wikipedia: Scientific Overview", "url": primary_wiki, "color": "resource-tile-blue"},
+                {"title": "🧪 Khan Academy & OpenStax Modules", "url": f"https://www.khanacademy.org/search?page_search_query={encoded_primary}", "color": "resource-tile-green"},
+                {"title": "▶️ MIT OCW & Science Lectures", "url": f"https://www.youtube.com/results?search_query={encoded_primary}+lecture+mit+ocw", "color": "resource-tile-red"},
+                {"title": "📖 Standard Reference Textbooks", "url": f"https://www.google.com/search?tbm=bks&q={encoded_primary}+textbook", "color": "resource-tile-amber"},
+                {"title": "🔬 ScienceDirect & Scholar Research", "url": f"https://scholar.google.com/scholar?q={encoded_primary}", "color": "resource-tile-purple"}
+            ]
+        elif any(k in topic_lower for k in ['programming', 'c programming', 'c++', 'python', 'java', 'data structure', 'algorithm', 'pointer', 'sql', 'database']):
+            domain_name = "Computer Science & Engineering"
+            resource_tiles = [
+                {"title": "🌐 Wikipedia: Technical Documentation", "url": primary_wiki, "color": "resource-tile-blue"},
+                {"title": "💻 GeeksforGeeks & Coding Tutorials", "url": f"https://www.google.com/search?q=site%3Ageeksforgeeks.org+{encoded_primary}", "color": "resource-tile-green"},
+                {"title": "▶️ CS50 & MIT Video Masterclasses", "url": f"https://www.youtube.com/results?search_query={encoded_primary}+programming+tutorial", "color": "resource-tile-red"},
+                {"title": "📖 CS Standard Reference Textbooks", "url": f"https://www.google.com/search?tbm=bks&q={encoded_primary}+computer+science+textbook", "color": "resource-tile-amber"},
+                {"title": "🎓 MIT OpenCourseWare & Lab Modules", "url": f"https://www.google.com/search?q=site%3Aocw.mit.edu+{encoded_primary}", "color": "resource-tile-purple"}
+            ]
+        else:
+            domain_name = "Academic & Syllabus Resources"
+            resource_tiles = [
+                {"title": f"🌐 Wikipedia: {primary_topic[:35]}", "url": primary_wiki, "color": "resource-tile-blue"},
+                {"title": "🔬 Google Scholar & Academic Papers", "url": f"https://scholar.google.com/scholar?q={encoded_primary}", "color": "resource-tile-green"},
+                {"title": "▶️ Educational Lectures & Masterclasses", "url": f"https://www.youtube.com/results?search_query={encoded_primary}+educational+lecture", "color": "resource-tile-red"},
+                {"title": "📖 Published Textbooks & Study Notes", "url": f"https://www.google.com/search?tbm=bks&q={encoded_primary}+textbook", "color": "resource-tile-amber"},
+                {"title": "🎓 Open Courseware & Study Materials", "url": f"https://www.google.com/search?q={encoded_primary}+open+courseware+syllabus", "color": "resource-tile-purple"}
+            ]
+
         return {
+            "domain": domain_name,
             "primary_topic": primary_topic,
             "primary_wiki": primary_wiki,
             "subtopics": subtopics[:3],
-            "scholar_url": f"https://scholar.google.com/scholar?q={encoded_primary}",
-            "youtube_url": f"https://www.youtube.com/results?search_query={encoded_primary}+educational+lecture",
-            "google_books_url": f"https://www.google.com/search?tbm=bks&q={encoded_primary}+textbook",
-            "mit_ocw_url": f"https://www.google.com/search?q={encoded_primary}+open+courseware+tutorial",
-            "khan_academy_url": f"https://www.khanacademy.org/search?page_search_query={encoded_primary}"
+            "resource_tiles": resource_tiles
         }
 
     @staticmethod
@@ -242,8 +287,6 @@ class ResourceFinder:
         return {
             "topic": res["primary_topic"],
             "wikipedia_url": res["primary_wiki"],
-            "scholar_url": res["scholar_url"],
-            "youtube_url": res["youtube_url"],
-            "google_books_url": res["google_books_url"],
-            "mit_ocw_url": res["mit_ocw_url"]
+            "domain": res.get("domain", "Academic"),
+            "resource_tiles": res.get("resource_tiles", [])
         }

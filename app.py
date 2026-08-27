@@ -558,17 +558,18 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                             tasks_list = d.get("tasks", [])
                             res_data = ResourceFinder.get_curated_resources_for_day(focus_mod, checkpoint, tasks_list)
                             
-                            # Primary Topic Cards
+                            # Dynamic Topic & Domain Header
+                            domain_badge = res_data.get("domain", "Academic Studies")
                             popover_html = (
-                                f'<div class="popover-header"><span>🎯</span><span><strong>Focus:</strong> {res_data["primary_topic"]}</span></div>'
-                                f'<div class="resource-tile-list">'
-                                f'<a href="{res_data["primary_wiki"]}" target="_blank" class="resource-tile resource-tile-blue"><span>🌐 Wikipedia Article</span><span>↗</span></a>'
-                                f'<a href="{res_data["scholar_url"]}" target="_blank" class="resource-tile resource-tile-green"><span>🔬 Google Scholar & Papers</span><span>↗</span></a>'
-                                f'<a href="{res_data["youtube_url"]}" target="_blank" class="resource-tile resource-tile-red"><span>▶️ Educational Video Lectures</span><span>↗</span></a>'
-                                f'<a href="{res_data["google_books_url"]}" target="_blank" class="resource-tile resource-tile-amber"><span>📖 Textbooks & Academic Notes</span><span>↗</span></a>'
-                                f'<a href="{res_data["mit_ocw_url"]}" target="_blank" class="resource-tile resource-tile-purple"><span>🎓 Courseware & Tutorials</span><span>↗</span></a>'
+                                f'<div class="popover-header" style="flex-direction: column; align-items: flex-start; gap: 4px;">'
+                                f'<div><span>🎯</span> <strong>Focus:</strong> {res_data["primary_topic"]}</div>'
+                                f'<div style="font-size: 0.74rem; font-weight: 700; color: #6366f1; background: #eef2ff; padding: 2px 8px; border-radius: 12px; border: 1px solid #c7d2fe;">🏷️ {domain_badge}</div>'
                                 f'</div>'
+                                f'<div class="resource-tile-list">'
                             )
+                            for tile in res_data.get("resource_tiles", []):
+                                popover_html += f'<a href="{tile["url"]}" target="_blank" class="resource-tile {tile.get("color", "resource-tile-blue")}"><span>{tile["title"]}</span><span>↗</span></a>'
+                            popover_html += '</div>'
                             st.markdown(popover_html, unsafe_allow_html=True)
                             
                             # Subtopics
