@@ -495,6 +495,16 @@ class StudyPlanner:
         days_list = []
         minutes_per_day = int(hours_per_day * 60)
 
+        def clean_topic_display(t_str: str, max_c: int = 75) -> str:
+            s = t_str.strip().rstrip(" ,;:.-")
+            if len(s) <= max_c:
+                return s
+            clipped = s[:max_c]
+            last_sp = clipped.rfind(" ")
+            if last_sp > 15:
+                return clipped[:last_sp].rstrip(" ,;:.-")
+            return clipped.rstrip(" ,;:.-")
+
         for d in range(1, days + 1):
             if d == days:
                 # Final Day: Comprehensive Review & Quiz Drills
@@ -531,48 +541,49 @@ class StudyPlanner:
             else:
                 idx = int(((d - 1) / max(1, days - 1)) * len(extracted_topics))
                 topic = extracted_topics[min(idx, len(extracted_topics) - 1)]
+                clean_t = clean_topic_display(topic, 75)
                 
                 # Determine past topic for spaced review
                 if d == 1:
                     spaced_note = "None (Day 1 Kickoff)"
                 elif d == 2:
-                    spaced_note = f"Review Day 1: {extracted_topics[0][:30]}"
+                    spaced_note = f"Review Day 1: {clean_topic_display(extracted_topics[0], 40)}"
                 else:
                     prev_idx = max(0, idx - 1)
-                    spaced_note = f"10m Recall on Day {d-1}: {extracted_topics[prev_idx][:30]}"
+                    spaced_note = f"10m Recall on Day {d-1}: {clean_topic_display(extracted_topics[prev_idx], 40)}"
 
                 if study_strategy == "exam_sprint":
                     tasks = [
-                        f"📖 [High-Yield Theory] Extract key testable definitions and theorems for {topic[:45]}",
-                        f"🛠️ [Speed Drills] Solve high-probability exam questions on {topic[:40]}",
+                        f"📖 [High-Yield Theory] Extract key testable definitions and theorems for {clean_t}",
+                        f"🛠️ [Speed Drills] Solve high-probability exam questions on {clean_t}",
                         f"🧠 [Active Recall] Complete active recall test in Kahoot Quiz Arena"
                     ]
                 elif study_strategy == "deep_dive":
                     tasks = [
-                        f"📖 [Deep Theory] Understand theoretical foundations & architectural proofs of {topic[:45]}",
-                        f"🛠️ [Implementation] Step-by-step practical derivation / problem analysis for {topic[:40]}",
+                        f"📖 [Deep Theory] Understand theoretical foundations & architectural proofs of {clean_t}",
+                        f"🛠️ [Implementation] Step-by-step practical derivation / problem analysis for {clean_t}",
                         f"🧠 [Synthesis] Teach concept in ELI10 mode to verify 100% intuition"
                     ]
                 elif study_strategy == "spaced_repetition":
                     tasks = [
                         f"🧠 [15m Spaced Recall] Quick recall review: {spaced_note}",
-                        f"📖 [New Concept] Study core mechanisms & properties of {topic[:45]}",
-                        f"🛠️ [Application] Solve 3 targeted exercises on {topic[:40]}"
+                        f"📖 [New Concept] Study core mechanisms & properties of {clean_t}",
+                        f"🛠️ [Application] Solve targeted practical exercises on {clean_t}"
                     ]
                 else:  # balanced
                     tasks = [
-                        f"📖 [Theory] Core definitions and foundations of {topic[:45]}",
-                        f"🛠️ [Practice] Practical exercises and problems on {topic[:40]}",
-                        f"🧠 [Recall] Active recall check on {topic[:35]}"
+                        f"📖 [Theory] Core definitions and foundations of {clean_t}",
+                        f"🛠️ [Practice] Practical exercises and problems on {clean_t}",
+                        f"🧠 [Recall] Active recall check on {clean_t}"
                     ]
 
                 days_list.append({
                     "day_number": d,
-                    "focus_module": topic[:50],
+                    "focus_module": clean_t,
                     "difficulty": "Beginner" if d <= 2 and student_level == "beginner" else "Intermediate",
                     "tasks": tasks,
                     "estimated_time_minutes": minutes_per_day,
-                    "checkpoint": f"Master {topic[:40]}",
+                    "checkpoint": f"Master {clean_t}",
                     "spaced_review_topic": spaced_note,
                     "completed": False
                 })
