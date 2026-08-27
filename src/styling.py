@@ -3,6 +3,8 @@ Comprehensive Luxury Pastel Theme Design System for AI Study Buddy
 Engineered with warm pastel mesh canvas, glassmorphic cards, soothing color accents, and crisp modern typography.
 """
 
+import json
+
 CUSTOM_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
