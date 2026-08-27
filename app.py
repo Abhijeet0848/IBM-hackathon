@@ -503,7 +503,7 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
             st.markdown("<br>", unsafe_allow_html=True)
 
             # Interactive Pomodoro Focus Timer
-            components.html(render_pomodoro_timer(), height=235)
+            components.html(render_pomodoro_timer(), height=310)
 
             # Filter Options
             filt_c1, filt_c2 = st.columns([3, 1])
