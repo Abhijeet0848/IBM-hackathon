@@ -16,7 +16,7 @@ import src.styling
 importlib.reload(src.styling)
 import src.resource_finder
 importlib.reload(src.resource_finder)
-from src.styling import CUSTOM_CSS, render_top_nav, render_motivation_banner
+from src.styling import CUSTOM_CSS, render_top_nav, render_motivation_banner, render_quiz_results_dashboard
 from src.ingestion import DocumentIngestionPipeline
 from src.llm_client import LLMClient
 from src.rag_engine import RAGEngine
@@ -859,27 +859,7 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                 feedback = res.get("feedback", "Great work on completing the quiz drill!")
 
                 st.markdown("---")
-                st.markdown("### 🏅 Score Breakdown & Performance Summary")
-                
-                c_s1, c_s2, c_s3, c_s4 = st.columns(4)
-                with c_s1:
-                    st.metric("🎯 Total Questions", f"{tot_q}")
-                with c_s2:
-                    st.metric("✅ Correct Answers", f"{corr_q}")
-                with c_s3:
-                    st.metric("❌ Incorrect / Wrong", f"{wrong_q}")
-                with c_s4:
-                    st.metric("📈 Accuracy Score", f"{score_p}%")
-
-                st.markdown(f"""
-                <div style="background: #ffffff; border: 1px solid #ede8e3; border-radius: 12px; padding: 0.9rem 1.25rem; margin: 1rem 0; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.02); flex-wrap: wrap; gap: 8px;">
-                    <div>
-                        <span style="font-weight: 700; color: #0f172a; font-size: 1.05rem;">Performance Tier: </span>
-                        <span class="badge {badge_class}">{badge}</span>
-                    </div>
-                    <div style="color: #475569; font-size: 0.94rem;">{feedback}</div>
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown(render_quiz_results_dashboard(res), unsafe_allow_html=True)
 
                 with st.expander("📋 View Detailed Question Review & Correct Answers", expanded=False):
                     for item in res.get("breakdown", []):

@@ -987,6 +987,81 @@ def render_motivation_banner(quote_obj):
         f'</div>'
     )
 
+def render_quiz_results_dashboard(res):
+    """Renders a sleek, modern, gamified scorecard for quiz evaluation results."""
+    tot_q = res.get("total_questions", len(res.get("breakdown", [])))
+    corr_q = res.get("correct_count", 0)
+    wrong_q = res.get("wrong_count", max(0, tot_q - corr_q))
+    score_p = res.get("score_pct", round(corr_q / tot_q * 100, 1) if tot_q > 0 else 0)
+    badge = res.get("badge", "Mastery")
+    feedback = res.get("feedback", "Great work on completing the quiz drill!")
+
+    # Performance tier coloring
+    if score_p >= 80:
+        tier_color = "#16a34a"
+        tier_bg = "#f0fdf4"
+        tier_border = "#bbf7d0"
+        tier_icon = "👑"
+    elif score_p >= 50:
+        tier_color = "#d97706"
+        tier_bg = "#fffbeb"
+        tier_border = "#fde68a"
+        tier_icon = "⚡"
+    else:
+        tier_color = "#dc2626"
+        tier_bg = "#fef2f2"
+        tier_border = "#fecaca"
+        tier_icon = "⚠️"
+
+    return f"""
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 18px; padding: 1.35rem 1.5rem; margin: 1.25rem 0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);">
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.85rem; margin-bottom: 1.15rem; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.4rem;">🏅</span>
+                <div>
+                    <div style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 800; color: #0f172a;">Quiz Performance Scorecard</div>
+                    <div style="font-size: 0.8rem; color: #64748b;">Active recall drill evaluated strictly against uploaded syllabus</div>
+                </div>
+            </div>
+            <div style="background: {tier_bg}; border: 1.5px solid {tier_border}; border-radius: 30px; padding: 0.35rem 0.95rem; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 1.05rem;">{tier_icon}</span>
+                <span style="font-weight: 800; font-size: 0.85rem; color: {tier_color}; text-transform: uppercase; letter-spacing: 0.04em;">{badge}</span>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 1.15rem;">
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.9rem 0.75rem; text-align: center;">
+                <div style="font-size: 1.2rem; margin-bottom: 2px;">🎯</div>
+                <div style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; color: #3b82f6; line-height: 1.2;">{tot_q}</div>
+                <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 3px;">Total Questions</div>
+            </div>
+
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 14px; padding: 0.9rem 0.75rem; text-align: center;">
+                <div style="font-size: 1.2rem; margin-bottom: 2px;">✅</div>
+                <div style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; color: #16a34a; line-height: 1.2;">{corr_q}</div>
+                <div style="font-size: 0.72rem; font-weight: 700; color: #15803d; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 3px;">Correct</div>
+            </div>
+
+            <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 14px; padding: 0.9rem 0.75rem; text-align: center;">
+                <div style="font-size: 1.2rem; margin-bottom: 2px;">❌</div>
+                <div style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; color: #dc2626; line-height: 1.2;">{wrong_q}</div>
+                <div style="font-size: 0.72rem; font-weight: 700; color: #b91c1c; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 3px;">Incorrect</div>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%); border: 1px solid #bfdbfe; border-radius: 14px; padding: 0.9rem 0.75rem; text-align: center;">
+                <div style="font-size: 1.2rem; margin-bottom: 2px;">📈</div>
+                <div style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; color: #4f46e5; line-height: 1.2;">{score_p}%</div>
+                <div style="font-size: 0.72rem; font-weight: 700; color: #4338ca; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 3px;">Accuracy</div>
+            </div>
+        </div>
+
+        <div style="background: #f8fafc; border-left: 4px solid {tier_color}; border-radius: 8px; padding: 0.75rem 1.15rem; font-size: 0.9rem; color: #334155; display: flex; align-items: center; gap: 10px;">
+            <span>💡</span>
+            <span><strong>Tutor Feedback:</strong> {feedback}</span>
+        </div>
+    </div>
+    """
+
 def render_hero():
     """Backward compatibility helper."""
     return ""
