@@ -232,7 +232,7 @@ class ResourceFinder:
             "youtube_url": f"https://www.youtube.com/results?search_query={encoded_primary}+educational+lecture",
             "google_books_url": f"https://www.google.com/search?tbm=bks&q={encoded_primary}+textbook",
             "mit_ocw_url": f"https://www.google.com/search?q={encoded_primary}+open+courseware+tutorial",
-            "gfg_url": f"https://www.google.com/search?q=site%3Ageeksforgeeks.org+{encoded_primary}"
+            "khan_academy_url": f"https://www.khanacademy.org/search?page_search_query={encoded_primary}"
         }
 
     @staticmethod
