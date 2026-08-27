@@ -26,6 +26,7 @@ from src.gamification import GamificationEngine
 from src.study_planner import StudyPlanner
 from src.resource_finder import ResourceFinder
 from src.flashcard_engine import FlashcardEngine
+from src.knowledge_radar import KnowledgeRadarEngine
 
 # Page configuration
 st.set_page_config(
@@ -883,6 +884,31 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
 
                 st.markdown("---")
                 st.markdown(render_quiz_results_dashboard(res), unsafe_allow_html=True)
+
+                # Visual Knowledge Radar & Weak-Area Diagnostics
+                diag = KnowledgeRadarEngine.analyze_quiz_diagnostics(res)
+                if diag["topics"]:
+                    st.markdown(KnowledgeRadarEngine.render_diagnostic_dashboard_html(diag), unsafe_allow_html=True)
+
+                    if diag["needs_remediation"] and diag["weakest_topic"]:
+                        weak_topic = diag["weakest_topic"]
+                        col_rem1, col_rem2 = st.columns([3.2, 1.8])
+                        with col_rem1:
+                            st.info(f"💡 **AI Adaptive Remediation:** Launch a targeted 1-Day Sprint on **{weak_topic}** to transform this weak area into mastery.")
+                        with col_rem2:
+                            st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+                            if st.button(f"⚡ Generate 1-Day Sprint Plan", key="btn_gen_remediation_plan", type="primary", use_container_width=True):
+                                all_chunks = st.session_state.ingestion_pipeline.get_all_chunks(limit=30)
+                                ctx = f"Focused Remediation Sprint on: {weak_topic}\n" + "\n".join([c["content"] for c in all_chunks[:6]])
+                                st.session_state.personalized_plan = study_planner.generate_study_schedule(
+                                    context_text=ctx,
+                                    days=1,
+                                    hours_per_day=2.0,
+                                    strategy_key="exam_cram",
+                                    level_key="intermediate"
+                                )
+                                st.toast(f"✨ 1-Day Remediation Plan for '{weak_topic}' Created! Open Tab 1 to start.")
+                                st.rerun()
 
                 with st.expander("📋 View Detailed Question Review & Correct Answers", expanded=False):
                     for item in res.get("breakdown", []):
