@@ -128,7 +128,7 @@ class QuizEvaluator:
             },
             # --- COMPUTER SCIENCE & PROGRAMMING ---
             {
-                "triggers": ["malloc", "free", "dynamic memory", "allocation", "heap", "memory"],
+                "triggers": ["malloc", "free", "dynamic memory", "heap allocation", "c memory"],
                 "question": "When managing dynamic memory in C using `malloc()` and `free()`, what is the critical responsibility of the programmer?",
                 "correct": "Ensuring allocated heap memory is properly freed to prevent memory leaks and verifying that `malloc()` did not return `NULL`.",
                 "distractors": [
@@ -139,7 +139,7 @@ class QuizEvaluator:
                 "explanation": "`malloc()` allocates uninitialized heap memory and returns NULL on failure; every allocated block must be freed exactly once."
             },
             {
-                "triggers": ["pointer", "pointers", "pointer arithmetic", "address", "dereference"],
+                "triggers": ["pointer", "pointer arithmetic", "dereference", "pointer address"],
                 "question": "In pointer arithmetic, what occurs when you increment an integer pointer (`ptr++`) on a system where `sizeof(int) == 4`?",
                 "correct": "The address value is incremented by 4 bytes, pointing to the next consecutive integer element in memory.",
                 "distractors": [
@@ -150,7 +150,7 @@ class QuizEvaluator:
                 "explanation": "Pointer arithmetic is scaled by the size of the referenced type (`sizeof(type)`)."
             },
             {
-                "triggers": ["control structures", "loop", "loops", "selection", "while", "for", "if", "branching"],
+                "triggers": ["control structures", "do-while", "while loop", "for loop", "branching logic"],
                 "question": "What fundamental behavior distinguishes a `do-while` loop from a standard `while` loop?",
                 "correct": "A `do-while` loop evaluates its condition after executing the body, guaranteeing at least one iteration.",
                 "distractors": [
@@ -161,7 +161,7 @@ class QuizEvaluator:
                 "explanation": "A `do-while` loop is a post-test loop, ensuring the loop body executes at least once before the condition is checked."
             },
             {
-                "triggers": ["struct", "structs", "union", "unions", "user-defined", "composite"],
+                "triggers": ["struct ", "structs", "unions in c", "user-defined struct"],
                 "question": "What is the primary architectural memory difference between a `struct` and a `union`?",
                 "correct": "A `struct` allocates separate memory for each member, while a `union` overlays all members in a single shared memory space equal to its largest member.",
                 "distractors": [
@@ -172,7 +172,7 @@ class QuizEvaluator:
                 "explanation": "All members of a union share the same memory location, meaning only one member can be meaningfully used at any given time."
             },
             {
-                "triggers": ["sorting", "searching", "algorithm", "binary search", "linear search", "algorithms"],
+                "triggers": ["binary search", "linear search", "sorting algorithm", "search algorithms"],
                 "question": "What is the mandatory prerequisite condition for performing an $O(\\log n)$ Binary Search on an array?",
                 "correct": "The array elements must be pre-sorted in contiguous ascending or descending order.",
                 "distractors": [
@@ -195,15 +195,38 @@ class QuizEvaluator:
         matched_questions.sort(key=lambda x: x[0], reverse=True)
         selected_q_items = [item[1] for item in matched_questions]
 
-        # If not enough matches, fallback to general items
-        if len(selected_q_items) < count:
-            for q_item in curriculum_q_bank:
-                if q_item not in selected_q_items:
-                    selected_q_items.append(q_item)
-                if len(selected_q_items) >= count:
-                    break
+        # Extract dynamic concept questions directly from context text
+        clean_lines = [
+            re.sub(r'^(?:\[Source:[^\]]*\]|#+|\d+[\.\)]\s*|\*|\-)\s*', '', line).strip()
+            for line in context.split('\n')
+            if len(line.strip()) > 15 and not line.strip().startswith('---')
+        ]
 
-        selected_q_items = selected_q_items[:count]
+        if not selected_q_items and clean_lines:
+            for c_idx, cl in enumerate(clean_lines):
+                parts = [p.strip() for p in re.split(r'[,:;]', cl) if len(p.strip()) > 3]
+                if parts:
+                    main_concept = parts[0]
+                    other_concepts = parts[1:] if len(parts) > 1 else [f"Advanced {main_concept}", f"Foundations of {main_concept}"]
+                    selected_q_items.append({
+                        "question": f"According to your uploaded syllabus on '{t}', which of the following is a primary curricular focus under '{main_concept}'?",
+                        "correct": f"Studying and mastering {', '.join(parts[:3]) if len(parts) > 1 else main_concept}.",
+                        "distractors": [
+                            f"This concept is explicitly marked as non-examinable in your coursework.",
+                            f"Only applies to unrelated third-party external domains.",
+                            f"Requires purely hypothetical approximations without theoretical grounding."
+                        ],
+                        "explanation": f"Grounded directly in your uploaded syllabus module: '{cl}'."
+                    })
+
+        # If we have matched domain items, cycle within the matched domain rather than mixing unrelated subjects
+        if selected_q_items:
+            final_items = []
+            while len(final_items) < count:
+                final_items.extend(selected_q_items)
+            selected_q_items = final_items[:count]
+        else:
+            selected_q_items = curriculum_q_bank[:count]
 
         questions = []
         positions = ["A", "B", "C", "D"]
