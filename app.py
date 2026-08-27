@@ -881,21 +881,21 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                 </div>
                 """, unsafe_allow_html=True)
 
-                st.markdown("#### 📋 Detailed Question Review & Correct Answers:")
-                for item in res.get("breakdown", []):
-                    if item["is_correct"]:
-                        st.success(
-                            f"**✅ Question {item['id']}: {item['question']}**\n\n"
-                            f"• **Your Answer:** `[{item['user_answer']}] {item['user_answer_text']}` *(Correct!)*\n\n"
-                            f"💡 **Explanation & Concept Rule:** {item['explanation']}"
-                        )
-                    else:
-                        st.error(
-                            f"**❌ Question {item['id']}: {item['question']}**\n\n"
-                            f"• **Your Choice (Incorrect):** `[{item['user_answer']}] {item['user_answer_text']}`\n\n"
-                            f"• **✅ Correct Answer:** `[{item['correct_answer']}] {item['correct_answer_text']}`\n\n"
-                            f"💡 **Why this is correct:** {item['explanation']}"
-                        )
+                with st.expander("📋 View Detailed Question Review & Correct Answers", expanded=False):
+                    for item in res.get("breakdown", []):
+                        if item["is_correct"]:
+                            st.success(
+                                f"**✅ Question {item['id']}: {item['question']}**\n\n"
+                                f"• **Your Answer:** `[{item['user_answer']}] {item['user_answer_text']}` *(Correct!)*\n\n"
+                                f"💡 **Explanation & Concept Rule:** {item['explanation']}"
+                            )
+                        else:
+                            st.error(
+                                f"**❌ Question {item['id']}: {item['question']}**\n\n"
+                                f"• **Your Choice (Incorrect):** `[{item['user_answer']}] {item['user_answer_text']}`\n\n"
+                                f"• **✅ Correct Answer:** `[{item['correct_answer']}] {item['correct_answer_text']}`\n\n"
+                                f"💡 **Why this is correct:** {item['explanation']}"
+                            )
 
     # ----------------------------------------------------------------------
     # TAB 4: VECTOR DB & KNOWLEDGE EXPLORER
