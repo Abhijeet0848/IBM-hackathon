@@ -603,6 +603,46 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
         if stats["total_chunks"] == 0:
             st.warning("⚠️ No documents uploaded yet. Upload your PDF or notes in the Study Schedule Planner to enable RAG answers.")
 
+        # Prominent Inline Question Bar (Cleanly placed in tab, not pinned to bottom)
+        with st.form("chat_inline_form", clear_on_submit=True):
+            col_inp, col_btn = st.columns([4.8, 1.2])
+            with col_inp:
+                prompt_text = st.text_input(
+                    "Ask Tutor:",
+                    placeholder="Type your syllabus question and press Enter...",
+                    label_visibility="collapsed",
+                    key="inline_tutor_prompt"
+                )
+            with col_btn:
+                ask_submit = st.form_submit_button("🚀 Ask Tutor", type="primary", use_container_width=True)
+
+        user_prompt = prompt_text.strip() if (ask_submit and prompt_text.strip()) else None
+
+        if user_prompt:
+            st.session_state.chat_history.append({"role": "user", "content": user_prompt})
+            with st.spinner("Analyzing syllabus and querying AI Tutor..."):
+                response_obj = rag_engine.answer_query(
+                    query=user_prompt,
+                    mode=selected_mode_key
+                )
+                answer_text = response_obj["answer"]
+                citations = response_obj["context_chunks"]
+
+                st.session_state.chat_history.append({
+                    "role": "assistant",
+                    "content": answer_text,
+                    "mode": selected_mode_key,
+                    "citations": citations
+                })
+
+                reward = GamificationEngine.award_xp(
+                    st.session_state.student_xp,
+                    "view_enriched_content" if selected_mode_key == "enriched" else "ask_question"
+                )
+                st.session_state.student_xp = reward["new_xp"]
+                st.toast(f"✨ +{reward['earned_xp']} XP earned!")
+                st.rerun()
+
         # Render Chat History (Direct Click-to-Edit on User Questions)
         for idx, msg in enumerate(st.session_state.chat_history):
             if msg["role"] == "user":
@@ -640,46 +680,6 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                                 src = c["metadata"].get("source", "Syllabus")
                                 st.markdown(f"**Chunk #{c_idx+1} (`{src}`):**")
                                 st.code(c["content"], language="markdown")
-
-        # Chat Input Box
-        user_prompt = st.chat_input("Ask a question about your uploaded syllabus...")
-
-        if user_prompt:
-            st.session_state.chat_history.append({"role": "user", "content": user_prompt})
-            with st.chat_message("user", avatar="🧑‍🎓"):
-                st.markdown(user_prompt)
-
-            with st.chat_message("assistant", avatar="💡" if selected_mode_key == "enriched" else ("🎓" if selected_mode_key == "strict" else "🧒")):
-                with st.spinner("Searching ChromaDB vector store & querying Gemini..."):
-                    response_obj = rag_engine.answer_query(
-                        query=user_prompt,
-                        mode=selected_mode_key
-                    )
-                    answer_text = response_obj["answer"]
-                    citations = response_obj["context_chunks"]
-
-                    st.markdown(answer_text)
-
-                    if citations:
-                        with st.expander(f"🔍 View {len(citations)} Verified Syllabus Citations"):
-                            for c_idx, c in enumerate(citations):
-                                src = c["metadata"].get("source", "Syllabus")
-                                st.markdown(f"**Chunk #{c_idx+1} (`{src}`):**")
-                                st.code(c["content"], language="markdown")
-
-                    st.session_state.chat_history.append({
-                        "role": "assistant",
-                        "content": answer_text,
-                        "mode": selected_mode_key,
-                        "citations": citations
-                    })
-
-                    reward = GamificationEngine.award_xp(
-                        st.session_state.student_xp,
-                        "view_enriched_content" if selected_mode_key == "enriched" else "ask_question"
-                    )
-                    st.session_state.student_xp = reward["new_xp"]
-                    st.toast(f"✨ +{reward['earned_xp']} XP earned!")
 
     # ----------------------------------------------------------------------
     # TAB 3: GAMIFIED KAHOOT-STYLE QUIZZES
