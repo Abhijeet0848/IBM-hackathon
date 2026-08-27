@@ -8,6 +8,7 @@ import re
 import time
 import importlib
 import streamlit as st
+import streamlit.components.v1 as components
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
@@ -496,7 +497,7 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
             st.markdown("<br>", unsafe_allow_html=True)
 
             # Interactive Pomodoro Focus Timer
-            st.markdown(render_pomodoro_timer(), unsafe_allow_html=True)
+            components.html(render_pomodoro_timer(), height=265)
 
             # Filter Options
             filt_c1, filt_c2 = st.columns([3, 1])
