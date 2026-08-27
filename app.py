@@ -167,98 +167,189 @@ tab_dashboard, tab_chat, tab_quiz, tab_explorer = st.tabs([
 # TAB 1: SYLLABUS INGESTION & PERSONALIZED STUDY PLAN
 # ----------------------------------------------------------------------
 with tab_dashboard:
-    st.markdown("### 🎯 Syllabus Parameter Form & Personalized Scheduler")
-    st.caption("Input your target timeline and available study bandwidth to generate an AI-sequenced study plan.")
+    st.markdown("### 🗓️ Study Schedule Planner")
+    st.caption("Generate an optimized, day-by-day learning roadmap customized to your exam date and study bandwidth.")
 
     if stats["total_chunks"] == 0:
         st.info("👈 **Get Started:** Upload your syllabus or course notes in the left sidebar to generate a custom schedule.")
 
-    with st.container():
-        col_p1, col_p2, col_p3 = st.columns([1.5, 1.5, 1])
-        with col_p1:
-            input_days = st.number_input("📅 Days Available Until Exam / Goal:", min_value=1, max_value=60, value=7, step=1)
-        with col_p2:
-            input_hours = st.slider("⏰ Free Study Hours per Day:", min_value=0.5, max_value=8.0, value=2.0, step=0.5)
-        with col_p3:
-            st.write("")
-            st.write("")
-            generate_plan_btn = st.button("✨ Generate AI Schedule", type="primary", use_container_width=True)
+    if not st.session_state.personalized_plan:
+        with st.container(border=True):
+            st.markdown("##### ⚙️ Plan Parameters")
+            st.caption("Define your target timeline, daily availability, and learning strategy.")
+            
+            col_p1, col_p2, col_p3 = st.columns(3)
+            with col_p1:
+                input_days = st.number_input("Days Until Target / Exam:", min_value=1, max_value=60, value=7, step=1, key="sched_days_input")
+            with col_p2:
+                input_hours = st.slider("Daily Study Hours:", min_value=0.5, max_value=8.0, value=2.0, step=0.5, key="sched_hours_input")
+            with col_p3:
+                strategy_options = [
+                    ("Balanced (Theory & Practice)", "balanced"),
+                    ("Exam Sprint (High-Yield Drills)", "exam_sprint"),
+                    ("Deep Dive (Theory & Derivations)", "deep_dive"),
+                    ("Spaced Repetition (Retention)", "spaced_repetition")
+                ]
+                selected_strategy = st.selectbox(
+                    "Learning Strategy:",
+                    strategy_options,
+                    format_func=lambda x: x[0],
+                    index=0,
+                    key="sched_strategy_select"
+                )[1]
 
-    if generate_plan_btn:
-        if stats["total_chunks"] == 0:
-            st.warning("Please upload a syllabus or notes in the sidebar first!")
-        else:
-            with st.spinner("Analyzing uploaded syllabus topics and generating custom day-by-day roadmap..."):
-                all_chunks = st.session_state.ingestion_pipeline.get_all_chunks(limit=35)
-                context_text = "\n\n".join([c["content"] for c in all_chunks])
-                
-                plan_res = study_planner.generate_personalized_plan(
-                    context_text=context_text,
-                    days=int(input_days),
-                    hours_per_day=float(input_hours)
-                )
-                st.session_state.personalized_plan = plan_res
-                reward = GamificationEngine.award_xp(st.session_state.student_xp, "complete_milestone")
-                st.session_state.student_xp = reward["new_xp"]
-                st.toast(f"🎉 +{reward['earned_xp']} XP for generating your personalized roadmap!")
-                st.rerun()
+            with st.expander("Advanced Configuration"):
+                col_o1, col_o2 = st.columns(2)
+                with col_o1:
+                    level_options = [("Beginner", "beginner"), ("Intermediate", "intermediate"), ("Advanced", "advanced")]
+                    selected_level = st.selectbox("Current Knowledge Level:", level_options, format_func=lambda x: x[0], index=1, key="sched_level_select")[1]
+                with col_o2:
+                    include_rest = st.checkbox("Include Periodic Review Days", value=False, key="sched_rest_days_cb")
 
-    # Display Active Personalized Plan
-    if st.session_state.personalized_plan:
+            st.markdown("<br>", unsafe_allow_html=True)
+            generate_plan_btn = st.button("Generate Study Plan", type="primary", use_container_width=True, key="btn_gen_ai_schedule")
+
+        if generate_plan_btn:
+            if stats["total_chunks"] == 0:
+                st.warning("Please upload a syllabus or notes in the sidebar first!")
+            else:
+                with st.spinner("Analyzing syllabus and sequencing daily milestones..."):
+                    all_chunks = st.session_state.ingestion_pipeline.get_all_chunks(limit=40)
+                    context_text = "\n\n".join([c["content"] for c in all_chunks])
+                    
+                    plan_res = study_planner.generate_personalized_plan(
+                        context_text=context_text,
+                        days=int(input_days),
+                        hours_per_day=float(input_hours),
+                        study_strategy=selected_strategy,
+                        student_level=selected_level if 'selected_level' in locals() else "intermediate",
+                        include_rest_days=include_rest if 'include_rest' in locals() else False
+                    )
+                    st.session_state.personalized_plan = plan_res
+                    reward = GamificationEngine.award_xp(st.session_state.student_xp, "complete_milestone")
+                    st.session_state.student_xp = reward["new_xp"]
+                    st.toast(f"🎉 +{reward['earned_xp']} XP for generating your roadmap!")
+                    st.rerun()
+
+    else:
+        # Display Active Personalized Plan (Clean & Sleek)
         plan = st.session_state.personalized_plan
         sched = plan.get("schedule", {})
-        modules_info = plan.get("modules_structure", {})
-
-        st.markdown(f"#### 📖 {sched.get('plan_title', 'Personalized Roadmap')}")
-        
-        if "modules" in modules_info:
-            st.markdown("###### 🗂️ Sequenced Course Modules:")
-            mod_cols = st.columns(len(modules_info["modules"]))
-            for idx, mod in enumerate(modules_info["modules"]):
-                with mod_cols[idx]:
-                    st.markdown(f"""
-                    <div class="milestone-card">
-                        <span class="badge badge-blue">Mod {mod.get('module_number', idx+1)}</span>
-                        <div style="font-weight: 700; margin-top: 6px; font-size: 0.95rem; color: #f8fafc;">{mod.get('module_name')}</div>
-                        <span class="badge badge-amber" style="margin-top: 6px;">{mod.get('difficulty', 'Intermediate')}</span>
-                        <span style="font-size: 0.8rem; color: #94a3b8; margin-left: 4px;">~{mod.get('estimated_hours', 4)}h</span>
-                    </div>
-                    """, unsafe_allow_html=True)
-
-        st.markdown("---")
-        st.markdown("###### 🗓️ Day-by-Day Milestone Checkpoints:")
-        
         days_list = sched.get("days", [])
+        analytics = study_planner.get_plan_analytics(plan)
+
+        with st.container(border=True):
+            m1, m2, m3, m4 = st.columns(4)
+            with m1:
+                st.metric("Progress", f"{analytics['completion_pct']}%", f"{analytics['completed_days']}/{analytics['total_days']} Days")
+            with m2:
+                st.metric("Hours Logged", f"{analytics['completed_hours']}h", f"of {analytics['total_hours']}h total")
+            with m3:
+                st.metric("Action Items", f"{analytics['total_tasks']}", "Checklist tasks")
+            with m4:
+                strat_name = sched.get("study_strategy", "balanced").replace("_", " ").title()
+                st.metric("Strategy", strat_name, "Active Mode")
+
+            st.progress(analytics["completion_pct"] / 100.0)
+
+        # Quick Actions Toolbar
+        st.markdown("<br>", unsafe_allow_html=True)
+        t_col1, t_col2, t_col3, t_col4 = st.columns([1.5, 1.5, 1.5, 1])
+        with t_col1:
+            ics_content = study_planner.export_to_ics(plan)
+            st.download_button("📅 Export to Calendar (.ics)", data=ics_content, file_name="study_plan.ics", mime="text/calendar", use_container_width=True)
+        with t_col2:
+            md_content = study_planner.export_to_markdown(plan)
+            st.download_button("📄 Export Markdown (.md)", data=md_content, file_name="study_roadmap.md", mime="text/markdown", use_container_width=True)
+        with t_col3:
+            with st.popover("⚙️ Adjust Schedule"):
+                st.markdown("**Adaptive Rebalancer**")
+                st.caption("Recalculate remaining incomplete days.")
+                reb_days = st.number_input("Revised Target Days:", min_value=1, max_value=30, value=max(1, analytics['total_days'] - analytics['completed_days']))
+                reb_hrs = st.slider("Revised Daily Hours:", min_value=0.5, max_value=8.0, value=float(sched.get('hours_per_day', 2.0)), step=0.5)
+                if st.button("Apply Rebalance", type="primary", use_container_width=True):
+                    st.session_state.personalized_plan = study_planner.rebalance_schedule(plan, new_target_days=int(reb_days), new_hours_per_day=float(reb_hrs))
+                    st.toast("✨ Schedule rebalanced!")
+                    st.rerun()
+        with t_col4:
+            if st.button("New Plan", use_container_width=True):
+                st.session_state.personalized_plan = None
+                st.rerun()
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # Filter Options
+        filt_c1, filt_c2 = st.columns([3, 1])
+        with filt_c1:
+            filter_mode = st.radio("Filter Sessions:", ["All Sessions", "Pending Only", "Completed"], horizontal=True, label_visibility="collapsed", key="sched_filter_mode")
+        with filt_c2:
+            st.markdown(f"<div style='text-align: right; color: #94a3b8; font-size: 0.85rem; padding-top: 6px;'>{len(days_list)} Days Planned</div>", unsafe_allow_html=True)
+
+        # Day-by-Day Clean Streamlit Containers
         for d in days_list:
             d_num = d.get("day_number")
             is_done = d.get("completed", False)
-            
-            with st.expander(f"📌 Day {d_num}: {d.get('focus_module')} ({d.get('estimated_time_minutes', 120)} mins) {'✅ Completed' if is_done else '⏳ In Progress'}"):
-                st.markdown(f"**Target Milestone:** `{d.get('checkpoint')}`")
-                st.markdown("###### 📝 Action Items & Smart References:")
-                
-                for t_idx, task in enumerate(d.get("tasks", [])):
-                    col_t1, col_t2 = st.columns([3.8, 1.2])
-                    with col_t1:
-                        st.markdown(f"**{t_idx + 1}.** {task}")
-                    with col_t2:
-                        res_data = ResourceFinder.get_curated_resources(task)
-                        with st.popover("📚 References"):
-                            st.markdown(f"**Topic:** *{res_data['topic'][:40]}*")
-                            st.markdown(f"- [▶️ **YouTube Video Lectures**]({res_data['youtube_url']})")
-                            st.markdown(f"- [📖 **Textbooks & Books**]({res_data['google_books_url']})")
-                            st.markdown(f"- [🎓 **MIT OpenCourseWare**]({res_data['mit_ocw_url']})")
-                            st.markdown(f"- [🔬 **Google Scholar Papers**]({res_data['scholar_url']})")
-                            st.markdown(f"- [🌐 **Wikipedia Overview**]({res_data['wikipedia_url']})")
+            focus_mod = d.get("focus_module", f"Day {d_num}")
+            mins = d.get("estimated_time_minutes", 120)
+            checkpoint = d.get("checkpoint", "Milestone Target")
 
-                st.markdown("<br>", unsafe_allow_html=True)
-                if not is_done:
-                    if st.button(f"Mark Day {d_num} Complete (+50 XP)", key=f"btn_chk_{d_num}"):
-                        d["completed"] = True
-                        reward = GamificationEngine.award_xp(st.session_state.student_xp, "complete_milestone")
-                        st.session_state.student_xp = reward["new_xp"]
-                        st.toast(f"🌟 +{reward['earned_xp']} XP earned!")
-                        st.rerun()
+            if filter_mode == "Pending Only" and is_done:
+                continue
+            if filter_mode == "Completed" and not is_done:
+                continue
+
+            with st.container(border=True):
+                h_col1, h_col2 = st.columns([3.5, 1.5])
+                with h_col1:
+                    status_icon = "✓" if is_done else "●"
+                    status_color = "#34d399" if is_done else "#818cf8"
+                    st.markdown(f"""
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="color: {status_color}; font-weight: bold; font-size: 1.1rem;">{status_icon}</span>
+                        <span style="font-weight: 700; font-size: 1.05rem; color: #ffffff;">Day {d_num}: {focus_mod}</span>
+                        <span style="background: rgba(148, 163, 184, 0.15); color: #cbd5e1; padding: 0.15rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">~{mins} mins</span>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with h_col2:
+                    st.markdown(f"""
+                    <div style="text-align: right;">
+                        <span style="background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.2rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">🎯 {checkpoint}</span>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                spaced = d.get("spaced_review_topic")
+                if spaced and spaced != "None" and "None" not in spaced:
+                    st.markdown(f"""
+                    <div style="background: rgba(99, 102, 241, 0.08); border-left: 3px solid #6366f1; padding: 0.35rem 0.65rem; border-radius: 4px; font-size: 0.82rem; color: #c7d2fe; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                        <strong>Spaced Review (10-15m):</strong> {spaced}
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                col_tasks, col_actions = st.columns([3.5, 1.2])
+                with col_tasks:
+                    for t in d.get("tasks", []):
+                        st.markdown(f"<div style='background: #0f172a; border: 1px solid rgba(255, 255, 255, 0.06); border-left: 3px solid #6366f1; border-radius: 6px; padding: 0.5rem 0.75rem; margin-bottom: 0.4rem; font-size: 0.88rem; color: #e2e8f0;'>{t}</div>", unsafe_allow_html=True)
+
+                with col_actions:
+                    with st.popover("📚 References", use_container_width=True):
+                        first_task = d.get("tasks", [focus_mod])[0]
+                        res_data = ResourceFinder.get_curated_resources(first_task)
+                        st.markdown(f"**Topic:** *{res_data['topic'][:35]}*")
+                        st.markdown(f"- [▶️ **YouTube Video Lectures**]({res_data['youtube_url']})")
+                        st.markdown(f"- [📖 **Textbooks & Books**]({res_data['google_books_url']})")
+                        st.markdown(f"- [🎓 **MIT OpenCourseWare**]({res_data['mit_ocw_url']})")
+                        st.markdown(f"- [🌐 **Wikipedia Overview**]({res_data['wikipedia_url']})")
+
+                    if not is_done:
+                        if st.button("Mark Completed", key=f"btn_chk_{d_num}", type="primary", use_container_width=True):
+                            d["completed"] = True
+                            reward = GamificationEngine.award_xp(st.session_state.student_xp, "complete_milestone")
+                            st.session_state.student_xp = reward["new_xp"]
+                            st.rerun()
+                    else:
+                        if st.button("Mark Incomplete", key=f"btn_unchk_{d_num}", use_container_width=True):
+                            d["completed"] = False
+                            st.rerun()
 
 # ----------------------------------------------------------------------
 # TAB 2: KNOWLEDGE RETRIEVAL & ENRICHED CONTENT
