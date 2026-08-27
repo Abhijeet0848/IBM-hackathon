@@ -953,10 +953,8 @@ details[data-testid="stExpander"] summary:hover {
 </style>
 """
 
-def render_top_nav(lvl_info, student_xp, streak, daily_quote, show_back=False):
-    """Renders the sleek, uncluttered top navigation bar without markdown indentation artifacts."""
-    quote_snippet = daily_quote['quote'][:48] + "..." if len(daily_quote['quote']) > 48 else daily_quote['quote']
-    
+def render_top_nav(lvl_info, student_xp, streak, daily_quote=None, show_back=False):
+    """Renders the sleek, uncluttered top navigation bar with XP and Streak metrics."""
     back_html = '<a href="/?page=homepage" target="_self" class="nav-back-link"><span>⬅️</span><span>Back to Homepage</span></a><span class="nav-divider">|</span>' if show_back else ''
 
     return (
@@ -969,9 +967,24 @@ def render_top_nav(lvl_info, student_xp, streak, daily_quote, show_back=False):
         '<div class="user-stats-section">'
         f'<span class="stat-pill stat-pill-xp">{lvl_info["icon"]} <strong>Level {lvl_info["current_level"]}</strong> ({student_xp} XP)</span>'
         f'<span class="stat-pill stat-pill-streak">🔥 <strong>{streak} Day Streak</strong></span>'
-        f'<span class="stat-pill stat-pill-quote" title="{daily_quote["quote"]} — {daily_quote["author"]}">💡 <em>"{quote_snippet}"</em></span>'
         '</div>'
         '</div>'
+    )
+
+def render_motivation_banner(quote_obj):
+    """Renders a prominent, sleek top motivation card with dynamic non-repeating learning wisdom."""
+    quote_text = quote_obj.get("quote", "Mastery is the daily accumulation of focused understanding.")
+    author_text = quote_obj.get("author", "Academic Focus")
+    return (
+        f'<div style="background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border: 1.5px solid #bbf7d0; border-radius: 12px; padding: 0.75rem 1.25rem; margin-bottom: 1.15rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(34, 197, 94, 0.05); gap: 12px; flex-wrap: wrap;">'
+        f'<div style="display: flex; align-items: center; gap: 10px; font-size: 0.94rem; color: #1e293b;">'
+        f'<span style="font-size: 1.3rem;">💡</span>'
+        f'<span><strong>Daily Study Mindset:</strong> <em>"{quote_text}"</em></span>'
+        f'</div>'
+        f'<div style="font-size: 0.76rem; font-weight: 700; color: #15803d; background: #dcfce7; padding: 0.25rem 0.65rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em;">'
+        f'{author_text}'
+        f'</div>'
+        f'</div>'
     )
 
 def render_hero():

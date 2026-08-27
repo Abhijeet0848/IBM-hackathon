@@ -16,7 +16,7 @@ import src.styling
 importlib.reload(src.styling)
 import src.resource_finder
 importlib.reload(src.resource_finder)
-from src.styling import CUSTOM_CSS, render_top_nav
+from src.styling import CUSTOM_CSS, render_top_nav, render_motivation_banner
 from src.ingestion import DocumentIngestionPipeline
 from src.llm_client import LLMClient
 from src.rag_engine import RAGEngine
@@ -223,10 +223,26 @@ def render_homepage(study_planner):
 # VIEW 2: STUDY WORKSPACE
 # ======================================================================
 def render_study_workspace(study_planner, rag_engine, llm_client, stats):
-    # Unified Top Sleek Navigation Bar with Integrated Back Button
+    if "seen_quote_indices" not in st.session_state:
+        st.session_state.seen_quote_indices = []
+
+    # Dynamic non-repeating motivation tailored to uploaded course
+    active_topic = ""
+    if st.session_state.personalized_plan:
+        active_topic = st.session_state.personalized_plan.get("modules_structure", {}).get("course_title", "")
+    elif stats["total_chunks"] > 0:
+        active_topic = "Course Syllabus"
+
+    quote_data = GamificationEngine.get_dynamic_motivation(
+        course_topic=active_topic,
+        seen_indices=st.session_state.seen_quote_indices
+    )
+    st.session_state.seen_quote_indices = quote_data.get("seen_indices", [])
+
+    # Unified Top Sleek Navigation Bar with Level XP & Streak
     lvl_info = GamificationEngine.get_level_info(st.session_state.student_xp)
-    daily_quote = GamificationEngine.get_daily_smart_reminder()
-    st.markdown(render_top_nav(lvl_info, st.session_state.student_xp, st.session_state.study_streak, daily_quote, show_back=True), unsafe_allow_html=True)
+    st.markdown(render_top_nav(lvl_info, st.session_state.student_xp, st.session_state.study_streak, show_back=True), unsafe_allow_html=True)
+    st.markdown(render_motivation_banner(quote_data), unsafe_allow_html=True)
 
     # Main Navigation Tabs (Spacious & Immediately Accessible)
     tab_dashboard, tab_chat, tab_quiz, tab_explorer = st.tabs([

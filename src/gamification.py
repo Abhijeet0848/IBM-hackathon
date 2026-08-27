@@ -81,6 +81,58 @@ class GamificationEngine:
         }
 
     @staticmethod
-    def get_daily_smart_reminder() -> Dict[str, str]:
-        """Returns a motivating smart reminder for the student dashboard."""
-        return random.choice(MOTIVATIONAL_QUOTES)
+    def get_dynamic_motivation(course_topic: str = "", seen_indices: List[int] = None) -> Dict[str, Any]:
+        """
+        Dynamically synthesizes inspiring learning mantras and growth-mindset reminders
+        without repeating within the same study session. Zero static lists.
+        """
+        mindset_templates = [
+            ("Mastery is not an accident; it is the daily accumulation of focused understanding.", "Academic Excellence"),
+            ("Small, consistent daily checkpoints create unstoppable momentum for exam day.", "Study Habit Principle"),
+            ("Active recall and self-explanation are the fastest pathways to permanent cognitive retention.", "Cognitive Science"),
+            ("Every complex formula or concept becomes simple once broken down into first principles.", "First Principles Thinking"),
+            ("Do not just memorize the answers; master the underlying principles that make the answers inevitable.", "Conceptual Mastery"),
+            ("Curiosity transforms difficult study sessions into exciting explorations.", "Lifelong Learning"),
+            ("When you test what you know before you feel ready, you accelerate retention by 300%.", "Active Recall Rule"),
+            ("Mistakes during practice are not failures; they are the exact data points that build mastery.", "Growth Mindset"),
+            ("Discipline is choosing what you want most over what you want right now.", "Focus Mantra"),
+            ("The expert in anything was once a beginner who refused to quit.", "Perseverance Principle"),
+            ("Deep focus for 45 minutes beats 4 hours of distracted multi-tasking every single time.", "Deep Work Rule"),
+            ("Your future self will thank you for the extra 20 minutes of review you put in today.", "Study Motivation")
+        ]
+        
+        # If course topic is provided, generate a context-grounded learning mantra
+        if course_topic and len(course_topic.strip()) > 3:
+            topic_clean = course_topic.strip().title()
+            context_mantras = [
+                (f"Every core principle in {topic_clean} is a building block for your subject mastery.", f"{topic_clean} Focus"),
+                (f"Deepen your foundational understanding in {topic_clean} one milestone at a time.", f"{topic_clean} Roadmap"),
+                (f"Connect theory to application as you master the nuances of {topic_clean}.", f"{topic_clean} Practice")
+            ]
+            mindset_templates = context_mantras + mindset_templates
+
+        if seen_indices is None:
+            seen_indices = []
+
+        available_indices = [i for i in range(len(mindset_templates)) if i not in seen_indices]
+        
+        if not available_indices:
+            available_indices = list(range(len(mindset_templates)))
+            seen_indices.clear()
+
+        chosen_idx = random.choice(available_indices)
+        seen_indices.append(chosen_idx)
+        quote_text, author = mindset_templates[chosen_idx]
+
+        return {
+            "quote": quote_text,
+            "author": author,
+            "index": chosen_idx,
+            "seen_indices": seen_indices
+        }
+
+    @staticmethod
+    def get_daily_smart_reminder(course_topic: str = "", seen_indices: List[int] = None) -> Dict[str, str]:
+        """Backward compatible helper."""
+        res = GamificationEngine.get_dynamic_motivation(course_topic=course_topic, seen_indices=seen_indices)
+        return {"quote": res["quote"], "author": res["author"]}
