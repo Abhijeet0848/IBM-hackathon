@@ -586,6 +586,35 @@ div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarUser"])
     border-color: #e2e8f0 !important;
 }
 
+/* Direct Click-to-Edit User Chat Bubble */
+div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarUser"]) div[data-baseweb="input"] {
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
+    cursor: text !important;
+    padding: 0 !important;
+}
+
+div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarUser"]) div[data-baseweb="input"]:hover {
+    border: 1px dashed #cbd5e1 !important;
+    background: #ffffff !important;
+    border-radius: 8px !important;
+}
+
+div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarUser"]) div[data-baseweb="input"]:focus-within {
+    border: 1px solid #6366f1 !important;
+    background: #ffffff !important;
+    border-radius: 8px !important;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15) !important;
+}
+
+div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarUser"]) input {
+    font-size: 0.98rem !important;
+    font-weight: 600 !important;
+    color: #0f172a !important;
+    cursor: text !important;
+}
+
 /* ==========================================================================
    KAHOOT QUIZ ARENA LUXURY STYLING
    ========================================================================== */

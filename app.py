@@ -566,55 +566,34 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
         if stats["total_chunks"] == 0:
             st.warning("⚠️ No documents uploaded yet. Upload your PDF or notes in the Study Schedule Planner to enable RAG answers.")
 
-        # Ensure editing state exists
-        if "editing_msg_idx" not in st.session_state:
-            st.session_state.editing_msg_idx = None
-
-        # Render Chat History with Inline Edit Option
+        # Render Chat History (Direct Click-to-Edit on User Questions)
         for idx, msg in enumerate(st.session_state.chat_history):
             if msg["role"] == "user":
                 with st.chat_message("user", avatar="🧑‍🎓"):
-                    if st.session_state.editing_msg_idx == idx:
-                        edit_text = st.text_input(
-                            "✏️ Edit your question (Press Enter to apply):",
-                            value=msg["content"],
-                            key=f"edit_input_{idx}"
-                        )
-                        c_ed1, c_ed2, _ = st.columns([2.0, 1.2, 3.5])
-                        with c_ed1:
-                            save_clicked = st.button("💾 Save & Regenerate", key=f"save_edit_{idx}", type="primary", use_container_width=True)
-                        with c_ed2:
-                            cancel_clicked = st.button("Cancel", key=f"cancel_edit_{idx}", use_container_width=True)
-
-                        if save_clicked or (edit_text and edit_text.strip() != msg["content"]):
-                            if edit_text.strip():
-                                st.session_state.chat_history = st.session_state.chat_history[:idx]
-                                st.session_state.chat_history.append({"role": "user", "content": edit_text.strip()})
-                                st.session_state.editing_msg_idx = None
-                                
-                                with st.spinner("Regenerating answer with updated question..."):
-                                    response_obj = rag_engine.answer_query(
-                                        query=edit_text.strip(),
-                                        mode=selected_mode_key
-                                    )
-                                    st.session_state.chat_history.append({
-                                        "role": "assistant",
-                                        "content": response_obj["answer"],
-                                        "mode": selected_mode_key,
-                                        "citations": response_obj["context_chunks"]
-                                    })
-                                st.rerun()
-                        elif cancel_clicked:
-                            st.session_state.editing_msg_idx = None
-                            st.rerun()
-                    else:
-                        c_msg_t, c_msg_b = st.columns([5.2, 0.8])
-                        with c_msg_t:
-                            st.markdown(msg["content"])
-                        with c_msg_b:
-                            if st.button("✏️ Edit", key=f"btn_edit_q_{idx}", use_container_width=True):
-                                st.session_state.editing_msg_idx = idx
-                                st.rerun()
+                    user_q_val = st.text_input(
+                        "Question",
+                        value=msg["content"],
+                        key=f"user_inline_q_{idx}",
+                        label_visibility="collapsed",
+                        help="Click text to edit your question, then press Enter to regenerate"
+                    )
+                    # If the student edited the question and pressed Enter
+                    if user_q_val and user_q_val.strip() != msg["content"]:
+                        st.session_state.chat_history = st.session_state.chat_history[:idx]
+                        st.session_state.chat_history.append({"role": "user", "content": user_q_val.strip()})
+                        
+                        with st.spinner("Regenerating answer with updated question..."):
+                            response_obj = rag_engine.answer_query(
+                                query=user_q_val.strip(),
+                                mode=selected_mode_key
+                            )
+                            st.session_state.chat_history.append({
+                                "role": "assistant",
+                                "content": response_obj["answer"],
+                                "mode": selected_mode_key,
+                                "citations": response_obj["context_chunks"]
+                            })
+                        st.rerun()
             else:
                 with st.chat_message("assistant", avatar="💡" if msg.get("mode") == "enriched" else ("🎓" if msg.get("mode") == "strict" else "🧒")):
                     st.markdown(msg["content"])
