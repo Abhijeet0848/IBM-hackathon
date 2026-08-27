@@ -177,10 +177,10 @@ button[kind="secondary"] {
     background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(20px);
     border: 1.5px solid rgba(226, 232, 240, 0.9);
-    border-radius: 24px;
-    padding: 2.75rem 2.25rem;
+    border-radius: 20px;
+    padding: clamp(1.25rem, 4vw, 2.75rem) clamp(1rem, 3vw, 2.25rem);
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.75rem;
     box-shadow: 0 20px 40px -15px rgba(30, 41, 59, 0.05), 0 4px 12px -2px rgba(30, 41, 59, 0.02);
 }
 
@@ -191,22 +191,22 @@ button[kind="secondary"] {
     background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
     color: #4f46e5;
     border: 1px solid #c7d2fe;
-    padding: 0.4rem 1.1rem;
+    padding: 0.35rem 0.95rem;
     border-radius: 999px;
-    font-size: 0.88rem;
+    font-size: clamp(0.76rem, 2vw, 0.88rem);
     font-weight: 700;
-    margin-bottom: 1.15rem;
+    margin-bottom: 0.95rem;
     box-shadow: 0 2px 6px rgba(99, 102, 241, 0.08);
 }
 
 .hero-h1 {
     font-family: 'Outfit', sans-serif !important;
-    font-size: 2.75rem;
+    font-size: clamp(1.75rem, 5.5vw, 2.75rem) !important;
     font-weight: 800;
     color: #0f172a;
     letter-spacing: -0.035em;
     line-height: 1.2;
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.75rem;
 }
 
 .hero-h1-gradient {
@@ -216,11 +216,11 @@ button[kind="secondary"] {
 }
 
 .hero-subtext {
-    font-size: 1.12rem;
+    font-size: clamp(0.92rem, 2.5vw, 1.12rem);
     color: #475569;
     max-width: 800px;
-    margin: 0 auto 1.65rem auto;
-    line-height: 1.68;
+    margin: 0 auto 1.45rem auto;
+    line-height: 1.65;
 }
 
 .feature-card {
@@ -1091,7 +1091,7 @@ def render_quiz_results_dashboard(res):
         f'<span style="font-weight: 800; font-size: 0.85rem; color: {tier_color}; text-transform: uppercase; letter-spacing: 0.04em;">{badge}</span>'
         f'</div>'
         f'</div>'
-        f'<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 1.15rem;">'
+        f'<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); gap: 10px; margin-bottom: 1.15rem;">'
         f'<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.9rem 0.75rem; text-align: center;">'
         f'<div style="font-size: 1.2rem; margin-bottom: 2px;">🎯</div>'
         f'<div style="font-family: \'Outfit\', sans-serif; font-size: 1.6rem; font-weight: 800; color: #3b82f6; line-height: 1.2;">{tot_q}</div>'
