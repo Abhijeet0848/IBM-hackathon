@@ -494,8 +494,34 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
 
                     col_tasks, col_actions = st.columns([3.5, 1.2])
                     with col_tasks:
-                        for t in d.get("tasks", []):
-                            st.markdown(f"<div style='background: #ffffff; border: 1px solid #ede8e3; border-left: 3px solid #6366f1; border-radius: 8px; padding: 0.55rem 0.85rem; margin-bottom: 0.45rem; font-size: 0.88rem; color: #1e293b; font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,0.02);'>{t}</div>", unsafe_allow_html=True)
+                        if "completed_tasks" not in d:
+                            d["completed_tasks"] = []
+                        
+                        tasks_arr = d.get("tasks", [])
+                        for t_idx, t in enumerate(tasks_arr):
+                            is_t_done = t_idx in d["completed_tasks"] or is_done
+                            t_checked = st.checkbox(
+                                t,
+                                value=is_t_done,
+                                key=f"chk_task_{d_num}_{t_idx}"
+                            )
+                            if t_checked != (t_idx in d["completed_tasks"]):
+                                if t_checked:
+                                    if t_idx not in d["completed_tasks"]:
+                                        d["completed_tasks"].append(t_idx)
+                                        reward = GamificationEngine.award_xp(st.session_state.student_xp, "ask_question")
+                                        st.session_state.student_xp = reward["new_xp"]
+                                        st.toast(f"✅ Subtopic completed! +{reward['earned_xp']} XP")
+                                else:
+                                    if t_idx in d["completed_tasks"]:
+                                        d["completed_tasks"].remove(t_idx)
+                                
+                                # If all tasks in day checked, mark day complete
+                                if len(d["completed_tasks"]) == len(tasks_arr) and len(tasks_arr) > 0:
+                                    d["completed"] = True
+                                elif not t_checked and d.get("completed"):
+                                    d["completed"] = False
+                                st.rerun()
 
                     with col_actions:
                         with st.popover("📚 References", use_container_width=True):
@@ -524,14 +550,16 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                                 st.markdown(sub_html, unsafe_allow_html=True)
 
                         if not is_done:
-                            if st.button("Mark Completed", key=f"btn_chk_{d_num}", type="primary", use_container_width=True):
+                            if st.button("Complete All", key=f"btn_chk_{d_num}", type="primary", use_container_width=True):
                                 d["completed"] = True
+                                d["completed_tasks"] = list(range(len(d.get("tasks", []))))
                                 reward = GamificationEngine.award_xp(st.session_state.student_xp, "complete_milestone")
                                 st.session_state.student_xp = reward["new_xp"]
                                 st.rerun()
                         else:
-                            if st.button("Mark Incomplete", key=f"btn_unchk_{d_num}", use_container_width=True):
+                            if st.button("Reset Day", key=f"btn_unchk_{d_num}", use_container_width=True):
                                 d["completed"] = False
+                                d["completed_tasks"] = []
                                 st.rerun()
 
     # ----------------------------------------------------------------------

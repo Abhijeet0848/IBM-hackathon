@@ -615,6 +615,35 @@ div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarUser"])
     cursor: text !important;
 }
 
+/* Interactive Daily Subtopic Checkboxes */
+div[data-testid="stCheckbox"]:has(input[id*="chk_task_"]) {
+    background: #ffffff !important;
+    border: 1px solid #ede8e3 !important;
+    border-left: 3.5px solid #6366f1 !important;
+    border-radius: 9px !important;
+    padding: 0.5rem 0.85rem !important;
+    margin-bottom: 0.45rem !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+    transition: all 0.2s ease !important;
+}
+
+div[data-testid="stCheckbox"]:has(input[id*="chk_task_"]):hover {
+    border-color: #cbd5e1 !important;
+    background: #f8fafc !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+div[data-testid="stCheckbox"]:has(input[id*="chk_task_"]:checked) {
+    background: #f0fdf4 !important;
+    border-color: #bbf7d0 !important;
+    border-left: 3.5px solid #10b981 !important;
+}
+
+div[data-testid="stCheckbox"]:has(input[id*="chk_task_"]:checked) label span p {
+    text-decoration: line-through !important;
+    color: #64748b !important;
+}
+
 /* ==========================================================================
    KAHOOT QUIZ ARENA LUXURY STYLING
    ========================================================================== */
