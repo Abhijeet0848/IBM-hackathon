@@ -1,87 +1,95 @@
 /**
- * Lazy PDF parser loader to keep initial page load instantaneous
+ * Client-Side Syllabus & Document Parser
+ * Uses dynamic import for PDF extraction with instant fallback
  */
+
 let pdfjsPromise = null;
 
 async function getPdfJs() {
   if (!pdfjsPromise) {
     pdfjsPromise = (async () => {
-      const pdfjsLib = await import('pdfjs-dist');
       try {
-        const workerModule = await import('pdfjs-dist/build/pdf.worker.min.mjs?url');
-        pdfjsLib.GlobalWorkerOptions.workerSrc = workerModule.default || workerModule;
-      } catch {
+        const pdfjsLib = await import('pdfjs-dist');
         pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version || '4.10.38'}/build/pdf.worker.min.mjs`;
+        return pdfjsLib;
+      } catch (err) {
+        console.warn("Could not load pdfjs-dist dynamically:", err);
+        return null;
       }
-      return pdfjsLib;
     })();
   }
   return pdfjsPromise;
 }
 
 /**
- * Extracts raw text from a PDF file lazily using pdfjs-dist with secondary stream fallback
+ * Extracts raw text from a PDF file using pdfjs-dist with secondary stream fallback
  */
 export async function extractTextFromPDF(file) {
+  // Try fast binary stream extraction first for speed
   try {
     const arrayBuffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    
+    // Attempt pdfjs extraction
     const pdfjsLib = await getPdfJs();
-
-    const loadingTask = pdfjsLib.getDocument({
-      data: new Uint8Array(arrayBuffer),
-      useSystemFonts: true,
-      disableFontFace: true,
-      isEvalSupported: false,
-    });
-
-    const pdfDocument = await loadingTask.promise;
-    const numPages = Math.min(pdfDocument.numPages, 30); // Cap at 30 pages for lightning speed
-    let fullText = '';
-
-    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+    if (pdfjsLib) {
       try {
-        const page = await pdfDocument.getPage(pageNum);
-        const textContent = await page.getTextContent();
-        
-        let lastY = null;
-        let pageStr = '';
-        
-        for (const item of textContent.items) {
-          if ('str' in item) {
-            if (lastY !== null && Math.abs(item.transform[5] - lastY) > 6) {
-              pageStr += '\n';
-            } else if (pageStr.length > 0 && !pageStr.endsWith(' ') && !pageStr.endsWith('\n')) {
-              pageStr += ' ';
+        const loadingTask = pdfjsLib.getDocument({
+          data: bytes,
+          useSystemFonts: true,
+          disableFontFace: true,
+          isEvalSupported: false,
+        });
+
+        const pdfDocument = await loadingTask.promise;
+        const numPages = Math.min(pdfDocument.numPages, 30);
+        let fullText = '';
+
+        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+          try {
+            const page = await pdfDocument.getPage(pageNum);
+            const textContent = await page.getTextContent();
+            
+            let lastY = null;
+            let pageStr = '';
+            
+            for (const item of textContent.items) {
+              if ('str' in item) {
+                if (lastY !== null && Math.abs(item.transform[5] - lastY) > 6) {
+                  pageStr += '\n';
+                } else if (pageStr.length > 0 && !pageStr.endsWith(' ') && !pageStr.endsWith('\n')) {
+                  pageStr += ' ';
+                }
+                pageStr += item.str;
+                lastY = item.transform[5];
+              }
             }
-            pageStr += item.str;
-            lastY = item.transform[5];
+
+            const cleanPageStr = pageStr.trim();
+            if (cleanPageStr) {
+              fullText += cleanPageStr + '\n\n';
+            }
+          } catch (pageErr) {
+            console.warn(`Error reading PDF page ${pageNum}:`, pageErr);
           }
         }
 
-        const cleanPageStr = pageStr.trim();
-        if (cleanPageStr) {
-          fullText += cleanPageStr + '\n\n';
+        if (fullText.trim().length > 20) {
+          return fullText.trim();
         }
-      } catch (pageErr) {
-        console.warn(`Error reading PDF page ${pageNum}:`, pageErr);
+      } catch (pdfErr) {
+        console.warn("Primary pdfjs extraction encountered error, attempting fallback:", pdfErr);
       }
     }
 
-    if (fullText.trim().length > 20) {
-      return fullText.trim();
-    }
-  } catch (pdfErr) {
-    console.warn("Primary pdfjs extraction encountered error, attempting fallback:", pdfErr);
-  }
-
-  // Fast Fallback: parse printable text segments if pdfjs had issues
-  try {
-    const text = await file.text();
-    const printable = text.replace(/[^\x20-\x7E\n\r\t]/g, ' ');
+    // Secondary fallback: Extract printable text segments from raw byte stream
+    const decoder = new TextDecoder('utf-8', { fatal: false });
+    const textChunk = decoder.decode(bytes);
+    const printable = textChunk.replace(/[^\x20-\x7E\n\r\t]/g, ' ');
     const lines = printable
       .split('\n')
       .map(l => l.trim())
-      .filter(l => l.length > 10 && !l.includes('obj') && !l.includes('endobj') && !l.includes('stream') && !l.includes('xref'));
+      .filter(l => l.length > 12 && !l.includes('obj') && !l.includes('endobj') && !l.includes('stream') && !l.includes('xref'));
     if (lines.length > 3) {
       return lines.join('\n');
     }
