@@ -48,13 +48,23 @@ class QuizEvaluator:
         Zero hardcoded/static questions. Extracts entities, parenthetical lists,
         colon-separated modules, and definitions directly from whatever text the student uploaded.
         """
-        # Clean title
-        if topic and topic.strip():
-            t = topic.strip()
+        # Clean topic title and strip prompt instruction commands
+        clean_t = re.sub(
+            r'^(?:generate|create|make|build)?\s*(?:at least\s+)?(?:\d+\s+)?(?:comprehensive\s+)?(?:multiple\s+choice\s+)?(?:questions|quiz)\s*(?:on|about|for|covering the syllabus|covering)?\s*',
+            '',
+            topic or '',
+            flags=re.IGNORECASE
+        ).strip()
+        clean_t = re.sub(r'(?:covering the syllabus|strictly based on the uploaded document context)$', '', clean_t, flags=re.IGNORECASE).strip()
+
+        if clean_t.lower() in ["syllabus", "the syllabus", "course", "notes", "uploaded syllabus", ""] or len(clean_t) > 40:
+            first_line = context.strip().split('\n')[0].strip() if context.strip() else "Course Syllabus"
+            first_line = re.sub(r'^(?:\[Source:[^\]]*\]|#+|\d+[\.\)]\s*|\*|\-)\s*', '', first_line).strip()
+            if ':' in first_line:
+                first_line = first_line.split(':')[0].strip()
+            t = first_line if (first_line and len(first_line) < 45) else "Course Syllabus"
         else:
-            first_line = context.strip().split('\n')[0].strip() if context.strip() else "Uploaded Syllabus"
-            first_line = re.sub(r'^(?:\[Source:[^\]]*\]|#+)\s*', '', first_line).strip()
-            t = first_line if (first_line and len(first_line) < 60) else "Uploaded Course Syllabus"
+            t = clean_t
 
         raw_lines = [
             re.sub(r'^(?:\[Source:[^\]]*\]|#+|\d+[\.\)]\s*|\*|\-)\s*', '', line).strip()
@@ -76,7 +86,7 @@ class QuizEvaluator:
                 items = [i.strip() for i in re.split(r'[,;]', items_str) if len(i.strip()) > 1]
                 if len(items) >= 2:
                     q_items.append({
-                        "question": f"In your course materials on {t}, which components are categorized under '{lead}'?",
+                        "question": f"Which key components or progressive stages are categorized under '{lead}'?",
                         "correct": f"{items_str}",
                         "distractors": [
                             "Preliminary, Intermediate, and Advanced milestones only",
@@ -87,7 +97,7 @@ class QuizEvaluator:
                     })
                     for it in items:
                         q_items.append({
-                            "question": f"According to the concept of '{lead}' in your syllabus, what role does '{it}' serve?",
+                            "question": f"According to your syllabus, what role does '{it}' serve in relation to '{lead}'?",
                             "correct": f"It is an essential classified dimension / stage of '{lead}'.",
                             "distractors": [
                                 f"It is explicitly removed from your current curriculum.",
