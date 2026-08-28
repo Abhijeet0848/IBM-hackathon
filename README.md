@@ -1,89 +1,123 @@
-# 🧠 AI Study Buddy: Personalized Learning Agent
-> **IBM Hackathon Project** — A 3-Layer Gamified Retrieval-Augmented Generation (RAG) & Small Language Model (SLLM) Architecture for Personalized Education.
+# 🧠 AI Study Buddy — Personalized Learning Agent
+
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ibm-hackathon-qy8csbf954w9pewxnyh3se.streamlit.app/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Track: Student AI](https://img.shields.io/badge/IBM%20Track-Student%20AI%20Track-6366f1.svg)](#-hackathon-track-alignment)
+
+> **IBM Hackathon 2026 Submission** — An intelligent, multi-persona AI study companion and Retrieval-Augmented Generation (RAG) agent that transforms raw syllabi and lecture notes into customized day-by-day study roadmaps, active recall quizzes, interactive 3D flashcards, focus timers, and adaptive weak-area remediation.
 
 ---
 
-## 📌 Overview
-Traditional digital learning systems present static, one-size-fits-all content without factoring in a student's real-world time constraints or cognitive preferences. 
-
-**AI Study Buddy** is an end-to-end intelligent learning agent that ingests raw course syllabi and lecture notes (PDF/TXT), sequences topics mathematically based on days and hours available, delivers enriched multi-persona tutoring, and reinforces memory retention through active-recall Kahoot-style quizzes and gamified XP rewards.
+## 🌐 **Live Web Application**
+👉 **[Launch AI Study Buddy Live](https://ibm-hackathon-qy8csbf954w9pewxnyh3se.streamlit.app/)**
 
 ---
 
-## 🏛️ System Architecture
+## 🎯 **Hackathon Track Alignment**
+
+### **Track 1: Student AI Track**
+* **Category:** Learning Outcomes, Employability, and Student Experience.
+* **Problem Solved:** Traditional education relies on one-size-fits-all curricula that fail to adapt to a student's daily bandwidth, cognitive style, or retention decay curve.
+* **Solution:** **AI Study Buddy** integrates cognitive learning science (*Active Recall*, *Spaced Repetition*, *Feynman Technique*, and *Leitner Flashcard Boxes*) with a zero-hallucination RAG architecture.
+
+---
+
+## 🏛️ **System Architecture**
 
 ```mermaid
 graph TD
     subgraph Layer1 [Layer 1: Syllabus Ingestion & Personalization]
-        A[Student Uploads PDF/TXT Notes] --> B[Fast Recursive Text Splitter]
-        C[Days & Hours Parameter Form] --> D[Syllabus Topic Sequencer]
+        A[Student Uploads PDF / Notes] --> B[Fast Recursive Text Splitter]
+        C[Timeline & Bandwidth Form] --> D[Adaptive Syllabus Sequencer]
         B --> D
-        D --> E[JSON Study Plan Store]
+        D --> E[Day-by-Day Study Plan + .ics Calendar]
     end
 
-    subgraph Layer2 [Layer 2: Knowledge Management & Retrieval]
+    subgraph Layer2 [Layer 2: Dense Vector Knowledge Base]
         B --> F[(ChromaDB Local Vector Store)]
         G[Student Query / Topic Request] --> H[Semantic Dense Similarity Retrieval]
         F --> H
         H --> I[RAG Orchestration Engine]
-        I --> J[LLM Core: Gemini / watsonx / Groq]
+        I --> J[LLM Core: Gemini 1.5 / watsonx.ai / Groq]
     end
 
-    subgraph Layer3 [Layer 3: Gamification & Delivery]
-        J --> K[Strict Syllabus Tutor - 0 Hallucination]
-        J --> L[ELI10 Explanations with Analogies]
-        J --> M[Enriched Content: Core + History + Future]
-        J --> N[Kahoot-Style Quiz Arena: 3-30 MCQs]
-        N --> O[Gamification Engine: XP, Levels 1-5, Streaks]
-        K --> P[Smart Reference Links: YouTube, Books, MIT OCW]
-        O --> Q[Student Learning Dashboard]
+    subgraph Layer3 [Layer 3: Multi-Persona Tutoring & Micro-Learning]
+        J --> K[Strict Syllabus Mode - 0 Hallucination]
+        J --> L[ELI10 Mode - Analogy Explanations]
+        J --> M[Enriched Deep Dives - Core + History + Future]
+        J --> N[Interactive 3D Flashcard Arena]
+        J --> O[Gamified Kahoot Quiz Arena]
+    end
+
+    subgraph Layer4 [Layer 4: Cognitive Execution & Diagnostics]
+        N --> P[Leitner Spaced Repetition Tracker]
+        O --> Q[Visual Knowledge Radar & Diagnostics]
+        Q --> R[⚡ 1-Click Adaptive Remediation Sprint]
+        E --> S[⏱️ Pomodoro Focus Arena + Ambient Lo-Fi]
+        P & Q --> T[Gamification Engine: XP, Levels 1-5, Streaks]
     end
 ```
 
 ---
 
-## ✨ Key Features
+## ✨ **Key Features & Capabilities**
 
-### 1. 📅 Layer 1: Personalization & SLLM Schedule Planner
-- **Constraint-Based Optimization:** Takes the student's available timeline (e.g. 7 days) and daily bandwidth (e.g. 2.0 hrs/day).
-- **Dynamic Topic Extraction:** Sequences real module titles, algorithms, formulas, and definitions from uploaded notes.
-- **Checkable Milestones:** Daily checkable milestones with **+50 XP** rewards per completed day.
-- **📚 Smart References Popover:** Instant one-click links to **YouTube Video Lectures**, **Google Books**, **MIT OpenCourseWare**, and **Google Scholar** for each study item.
+### 1. 📅 **Adaptive Syllabus Sequencer (Study Schedule Planner)**
+- **Constraint-Based Optimization:** Automatically calculates daily milestone workloads based on total target days (1 to 60 days) and daily hours (0.5h to 8.0h).
+- **4 Pedagogical Strategies:** *Balanced Mastery*, *Exam Cram Sprint*, *Deep Dive & Foundation*, and *Spaced Repetition Focused*.
+- **1-Click Calendar Sync (.ics):** Export your entire study roadmap as an RFC 5545 `.ics` file for **Google Calendar, Apple Calendar, and Microsoft Outlook**.
+- **Interactive Checklist:** Mark subtopics and days complete with instant **+50 XP** gamified rewards.
 
-### 2. 💬 Layer 2: Knowledge Retrieval & Multi-Persona Tutoring
-- **🎓 Strict Syllabus Tutor:** Answers strictly using syllabus facts with 0 hallucinations; refuses out-of-syllabus questions with *"This is not in your syllabus."*
-- **🎈 ELI10 Mode:** Demystifies complex technical jargon using vivid analogies (Lego blocks, pizzas, playgrounds).
-- **💡 Enriched Content Delivery:** 3-part structured breakdown:
-  1. *Core Syllabus Principles*
-  2. *Historical Origin Story & Notable Researchers*
-  3. *Future Industry Applications & Modern Research*
-- **🔍 Verified Citations:** Live citation drawer displaying the exact extracted source chunks.
+### 2. ⏱️ **Integrated Pomodoro Focus Arena**
+- **Interval Timers:** Toggle between **🍅 25m Focus Block**, **⚡ 50m Deep Work Sprint**, and **☕ 5m Short Break**.
+- **Visual Countdown Ring:** SVG progress dial updating smoothly every second without page reloads.
+- **🎧 Synthesized Ambient Audio:** Built-in Web Audio API sound generator (*🌧️ Gentle Rain*, *☕ Coffee Shop*, *🌊 Ocean Calm*) for distraction-free focus.
+- **Milestone Chimes:** Harmonic completion chime and celebration bonus points.
 
-### 3. 🎮 Layer 3: Gamified Kahoot-Style AI Quiz Arena
-- **Custom Question Count:** Generate anywhere from **3 to 30 multiple-choice questions** on any topic or full syllabus.
-- **100% Document-Grounded:** Extracts questions verbatim from your PDF text without cutting off words or sentences.
-- **Live Scoring & XP Multipliers:** Instant answer validation (`🔴 [A]`, `🔷 [B]`, `🟡 [C]`, `🟢 [D]`), accuracy percentage, tier badges (`🏆 Mastery`, `🥈 Proficient`, `🥉 Developing`), and detailed answer review explanations.
+### 3. 💬 **Multi-Persona Cognitive AI Tutor**
+- **🎓 Strict Syllabus Mode:** Zero hallucinations — strictly relies on indexed syllabus chunks and refuses out-of-scope queries with verified citations.
+- **🎈 ELI10 (Explain Like I'm 10):** Translates complex mathematical proofs, algorithms, and dense concepts into everyday analogies.
+- **💡 Enriched Delivery:** 3-part comprehensive breakdown:
+  1. *Core Mechanics & Key Equations*
+  2. *Historical Origin Story & Founding Researchers*
+  3. *Future Industry Applications & Research Frontiers*
+- **Click-to-Edit Questions:** Edit previous questions directly in the chat stream to branch or regenerate answers.
 
-### 4. 🔍 Layer 4: ChromaDB Vector Knowledge Explorer
-- Inspect and debug indexed chunks, vector cosine distances, character counts, and metadata in real-time.
+### 4. 🎮 **Gamified Kahoot-Style AI Quiz Arena**
+- **Flexible Question Counts:** Dynamically generates anywhere from **3 to 100 multiple-choice questions** evaluated strictly against your uploaded document.
+- **Instant Scorecards:** Real-time accuracy breakdown (`👑 Mastery`, `⚡ Proficient`, `⚠️ Needs Review`), correct/incorrect tallies, and in-depth conceptual explanations.
+- **XP Progression & Streaks:** Earn XP per correct question, level up from Level 1 (*Novice Scholar*) to Level 5 (*Grandmaster*), and maintain daily learning streaks.
+
+### 5. 🗂️ **Interactive AI Flashcards & Spaced Recall Arena**
+- **3D Card Flip Animation:** Click or tap to flip cards in 3D space (`rotateY(180deg)`) revealing verified definitions and formulas.
+- **Leitner Spaced Sorting:** Sort cards into **❌ Needs Practice** and **✅ Got It (Mastered)** piles with active progress bars.
+- **🔀 Shuffle & 💾 Export:** Shuffle deck order for randomized recall drills and export the entire deck as a `.md` notes file.
+
+### 6. 📊 **Visual Knowledge Radar & Weak-Area Diagnostics**
+- **Topic-by-Topic Retention Matrix:** Automatically maps student quiz accuracy across distinct syllabus subtopics.
+- **Adaptive Remediation Alert:** Isolates the student's lowest-scoring concept.
+- **⚡ 1-Click Sprint Generator:** Instantly builds a targeted 1-day remediation study plan focused exclusively on mastering the weak area.
+
+### 7. 📚 **Discipline-Adaptive Academic References**
+- Automatically detects the subject domain (*Current Affairs, Pedagogy, STEM, Computer Science, Humanities*) and synthesizes verified academic sources (Google Scholar, Wikipedia, YouTube lectures, OpenCourseWare, and textbooks).
 
 ---
 
-## 🛠️ Technology Stack
+## 🛠️ **Technology Stack**
 
-- **Frontend & UI:** [Streamlit](https://streamlit.io/) with Custom Glassmorphism Dark Theme (`CSS3`)
-- **Vector Database:** [ChromaDB](https://www.trychroma.com/) (Persistent Local Semantic Embeddings)
-- **Text Extraction & Chunking:** [pypdf](https://pypdf.readthedocs.io/), [LangChain Text Splitters](https://python.langchain.com/)
-- **LLM Connectors:**
-  - Google Gemini REST API (`gemini-flash-latest`, `gemini-1.5-flash`, `gemini-2.0-flash`)
-  - IBM watsonx.ai Foundation Models (`ibm/granite-13b-chat-v2`)
-  - Groq Cloud API (`llama-3.3-70b-versatile`)
-  - High-Fidelity Local Cognitive Fallback Engine
-- **Gamification:** Custom XP engine, Level progressions (Levels 1–5), study streak counter, and daily smart motivational reminders.
+| Layer | Technology |
+| :--- | :--- |
+| **Frontend & UI** | [Streamlit](https://streamlit.io/) with Custom Glassmorphic Luminous Design System (`CSS3`) |
+| **Vector Database** | [ChromaDB](https://www.trychroma.com/) (Zero-Network Semantic Vector Store) |
+| **Ingestion & Text Processing** | [pypdf](https://pypdf.readthedocs.io/), Custom `FastTextSplitter` |
+| **AI / LLM Orchestration** | Google Gemini API (`gemini-1.5-flash`), IBM watsonx.ai (`ibm/granite-13b-chat-v2`), Groq API |
+| **Audio Synthesis** | Native Browser Web Audio API (Synthesized Ambient Soundscapes) |
+| **Export Formats** | RFC 5545 iCalendar (`.ics`), Markdown (`.md`) |
 
 ---
 
-## 🚀 Quickstart Guide
+## 🚀 **Quickstart & Local Installation**
 
 ### 1. Clone the Repository
 ```bash
@@ -97,7 +131,7 @@ cd IBM-hackathon
 python -m venv venv
 .\venv\Scripts\activate
 
-# Mac / Linux
+# macOS / Linux
 python3 -m venv venv
 source venv/bin/activate
 ```
@@ -107,65 +141,53 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Configure Environment Variables
-Create a `.env` file in the root directory (or copy `.env.example`):
+### 4. Configure API Keys (Optional)
+Create a `.env` file in the root directory:
 ```env
-# Google Gemini API Key (Get free key from https://aistudio.google.com)
 GEMINI_API_KEY=your_gemini_api_key_here
-
-# Optional: Groq API Key
-GROQ_API_KEY=your_groq_api_key_here
-
-# Optional: IBM watsonx / Bob API Credentials
-WATSONX_APIKEY=your_ibm_api_key_here
-WATSONX_PROJECT_ID=your_ibm_project_id_here
-WATSONX_URL=https://us-south.ml.cloud.ibm.com
+# Optional IBM watsonx configuration
+WATSONX_APIKEY=your_ibm_api_key
+WATSONX_PROJECT_ID=your_ibm_project_id
 ```
+*(Note: The app includes a rule-based offline synthesizer that works even without an API key!)*
 
 ### 5. Launch the Application
 ```bash
 streamlit run app.py
 ```
-Open your browser at **`http://localhost:8501`**.
+Open your browser at `http://localhost:8501`.
 
 ---
 
-## 👥 5-Member Team Branching Strategy
+## 📂 **Project Directory Structure**
 
-| Member | Branch Name | Module Ownership | Core Files |
-|---|---|---|---|
-| **Member 1** | `feature/rag-ingestion` | PDF extraction, recursive chunking & ChromaDB vector store | `src/ingestion.py`, `src/rag_engine.py` |
-| **Member 2** | `feature/llm-connectors` | Multi-LLM connectors (Gemini / watsonx / Groq) & prompt engineering | `src/llm_client.py`, `src/prompts.py` |
-| **Member 3** | `feature/study-scheduler` | Parameter-based study planner & syllabus topic sequencing | `src/study_planner.py` |
-| **Member 4** | `feature/gamification-quiz` | Kahoot-style MCQ evaluation, XP tiers, streaks & scoring | `src/quiz_evaluator.py`, `src/gamification.py` |
-| **Member 5** | `feature/ui-smart-resources` | Glassmorphism UI tokens, YouTube/Books smart links & dashboard flow | `app.py`, `src/styling.py`, `src/resource_finder.py` |
-
----
-
-## 📁 Repository Structure
-```text
-├── app.py                     # Main Streamlit 4-Tab Web Application
-├── requirements.txt           # Python Dependencies Manifest
-├── .env.example               # Template Environment Configuration
-├── .gitignore                 # Git Ignore Rules (Protects .env and local db)
-├── README.md                  # Project Documentation
-└── src/
-    ├── __init__.py
-    ├── ingestion.py           # Document Ingestion, PDF parser & ChromaDB vector pipeline
-    ├── rag_engine.py          # RAG Query Orchestrator & Citation Manager
-    ├── llm_client.py          # Multi-Provider LLM Client (Gemini, watsonx, Groq)
-    ├── prompts.py             # System Prompts (Strict Tutor, ELI10, Enriched, Quiz)
-    ├── study_planner.py       # SLLM Syllabus Analyzer & Daily Milestone Sequencer
-    ├── quiz_evaluator.py      # Kahoot MCQ Parser, Live Grader & Score Breakdown
-    ├── resource_finder.py     # YouTube, Books, MIT OCW & Scholar Links Suggester
-    ├── gamification.py        # XP Engine (Levels 1-5), Streaks & Smart Reminders
-    └── styling.py             # Dark Glassmorphism CSS Design System & Hero Banner
+```
+IBM-hackathon/
+├── app.py                      # Main Streamlit Multi-Tab Application
+├── requirements.txt            # Project Dependencies
+├── README.md                   # Project Documentation
+├── src/
+│   ├── ingestion.py            # PDF/TXT File Parser & FastTextSplitter
+│   ├── study_planner.py        # Day-by-Day Sequencer & .ics Exporter
+│   ├── llm_client.py           # Multi-Provider LLM Gateway (Gemini/watsonx/Groq)
+│   ├── rag_engine.py           # RAG Knowledge Retriever & Multi-Persona Tutor
+│   ├── quiz_evaluator.py       # Kahoot Quiz Generator & Grading Engine
+│   ├── flashcard_engine.py     # 3D Interactive Flip Card Deck & Leitner Sorting
+│   ├── knowledge_radar.py      # Diagnostic Retention Matrix & Weak-Area Remediation
+│   ├── gamification.py         # XP System, Level Progression, Streaks & Mindset Mantras
+│   ├── resource_finder.py      # Discipline-Adaptive Academic Reference Engine
+│   └── styling.py              # Luminous Design System, CSS3 & HTML Component Templates
+└── chroma_db/                  # Persistent ChromaDB Vector Store
 ```
 
 ---
 
-## 🏆 Hackathon Impact & Value Proposition
-- **Zero-Delay Cold Start:** Instant local semantic dense indexing without external model download bottlenecks.
-- **Zero-Hallucination Academic Guarantee:** Strict Tutor ensures answers never drift outside the approved syllabus.
-- **Deep Conceptual & Historical Context:** Enriched delivery bridges classroom theory with real-world history and cutting-edge industry research.
-- **High Retention via Gamification:** Kahoot-style recall quizzes turn passive studying into an engaging, rewarded daily habit.
+## 🛡️ **Security & Privacy**
+- **Zero API Key Leakage:** API credentials are authenticated through server-side environment variables and Streamlit Secrets.
+- **In-Memory File Processing:** Uploaded files are parsed via `io.BytesIO` streams rather than written unsanitized to disk.
+- **Input Sanitization:** All user queries and document context strings are sanitized to prevent script injection.
+
+---
+
+## 📄 **License**
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
