@@ -900,12 +900,12 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
                             if st.button(f"⚡ Generate 1-Day Sprint Plan", key="btn_gen_remediation_plan", type="primary", use_container_width=True):
                                 all_chunks = st.session_state.ingestion_pipeline.get_all_chunks(limit=30)
                                 ctx = f"Focused Remediation Sprint on: {weak_topic}\n" + "\n".join([c["content"] for c in all_chunks[:6]])
-                                st.session_state.personalized_plan = study_planner.generate_study_schedule(
+                                st.session_state.personalized_plan = study_planner.generate_personalized_plan(
                                     context_text=ctx,
                                     days=1,
                                     hours_per_day=2.0,
-                                    strategy_key="exam_cram",
-                                    level_key="intermediate"
+                                    study_strategy="exam_cram",
+                                    student_level="intermediate"
                                 )
                                 st.toast(f"✨ 1-Day Remediation Plan for '{weak_topic}' Created! Open Tab 1 to start.")
                                 st.rerun()

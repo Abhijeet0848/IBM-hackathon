@@ -173,6 +173,27 @@ class StudyPlanner:
             start_date=start_date
         )
 
+    def generate_study_schedule(
+        self,
+        context_text: str,
+        days: int = 7,
+        hours_per_day: float = 2.0,
+        strategy_key: str = "balanced",
+        level_key: str = "intermediate",
+        include_rest_days: bool = False,
+        start_date: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Convenience alias for generate_personalized_plan."""
+        return self.generate_personalized_plan(
+            context_text=context_text,
+            days=days,
+            hours_per_day=hours_per_day,
+            study_strategy=strategy_key,
+            student_level=level_key,
+            include_rest_days=include_rest_days,
+            start_date=start_date
+        )
+
     def rebalance_schedule(
         self,
         current_plan: Dict[str, Any],

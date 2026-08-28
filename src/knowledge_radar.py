@@ -100,55 +100,55 @@ class KnowledgeRadarEngine:
 
         topics_cards_html = ""
         for top_name, info in topics.items():
-            topics_cards_html += f"""
-            <div style="background: {info['bg']}; border: 1.5px solid {info['border']}; border-radius: 12px; padding: 0.9rem 1rem; margin-bottom: 0.75rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <div style="font-weight: 700; font-size: 0.92rem; color: #0f172a;">
-                        {info['icon']} {top_name}
-                    </div>
-                    <div style="font-size: 0.78rem; font-weight: 800; color: {info['color']}; background: #ffffff; border: 1px solid {info['border']}; border-radius: 20px; padding: 0.15rem 0.55rem; text-transform: uppercase;">
-                        {info['tier']} ({info['accuracy_pct']}%)
-                    </div>
-                </div>
-                <div style="width: 100%; height: 6px; background: rgba(0,0,0,0.06); border-radius: 6px; overflow: hidden; margin-top: 4px;">
-                    <div style="width: {info['accuracy_pct']}%; height: 100%; background: {info['color']}; border-radius: 6px;"></div>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; font-weight: 600; margin-top: 4px;">
-                    <span>Score: {info['correct']}/{info['total']} correct</span>
-                    <span>{info['accuracy_pct']}% retention</span>
-                </div>
-            </div>
-            """
+            topics_cards_html += (
+                f'<div style="background: {info["bg"]}; border: 1.5px solid {info["border"]}; border-radius: 12px; padding: 0.9rem 1rem; margin-bottom: 0.75rem;">'
+                f'<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">'
+                f'<div style="font-weight: 700; font-size: 0.92rem; color: #0f172a;">'
+                f'{info["icon"]} {top_name}'
+                f'</div>'
+                f'<div style="font-size: 0.78rem; font-weight: 800; color: {info["color"]}; background: #ffffff; border: 1px solid {info["border"]}; border-radius: 20px; padding: 0.15rem 0.55rem; text-transform: uppercase;">'
+                f'{info["tier"]} ({info["accuracy_pct"]}%)'
+                f'</div>'
+                f'</div>'
+                f'<div style="width: 100%; height: 6px; background: rgba(0,0,0,0.06); border-radius: 6px; overflow: hidden; margin-top: 4px;">'
+                f'<div style="width: {info["accuracy_pct"]}%; height: 100%; background: {info["color"]}; border-radius: 6px;"></div>'
+                f'</div>'
+                f'<div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; font-weight: 600; margin-top: 4px;">'
+                f'<span>Score: {info["correct"]}/{info["total"]} correct</span>'
+                f'<span>{info["accuracy_pct"]}% retention</span>'
+                f'</div>'
+                f'</div>'
+            )
 
         remediation_html = ""
         if needs_rem and weakest:
-            remediation_html = f"""
-            <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #fde68a; border-radius: 12px; padding: 0.9rem 1.15rem; margin-top: 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 1.3rem;">🎯</span>
-                    <div>
-                        <div style="font-weight: 800; font-size: 0.88rem; color: #92400e;">Adaptive Remediation Alert: Focus on "{weakest}"</div>
-                        <div style="font-size: 0.78rem; color: #b45309;">Your quiz diagnostics identified this as your highest-priority review area.</div>
-                    </div>
-                </div>
-            </div>
-            """
+            remediation_html = (
+                f'<div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #fde68a; border-radius: 12px; padding: 0.9rem 1.15rem; margin-top: 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">'
+                f'<div style="display: flex; align-items: center; gap: 10px;">'
+                f'<span style="font-size: 1.3rem;">🎯</span>'
+                f'<div>'
+                f'<div style="font-weight: 800; font-size: 0.88rem; color: #92400e;">Adaptive Remediation Alert: Focus on "{weakest}"</div>'
+                f'<div style="font-size: 0.78rem; color: #b45309;">Your quiz diagnostics identified this as your highest-priority review area.</div>'
+                f'</div>'
+                f'</div>'
+                f'</div>'
+            )
 
-        return f"""
-        <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 18px; padding: 1.35rem 1.5rem; margin: 1.25rem 0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);">
-            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.85rem; margin-bottom: 1.15rem; flex-wrap: wrap; gap: 10px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 1.4rem;">📊</span>
-                    <div>
-                        <div style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 800; color: #0f172a;">Visual Knowledge Radar & Diagnostic Matrix</div>
-                        <div style="font-size: 0.8rem; color: #64748b;">Topic-by-topic retention mapping and targeted review recommendations</div>
-                    </div>
-                </div>
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 0.3rem 0.85rem; font-size: 0.8rem; font-weight: 700; color: #475569;">
-                    {len(topics)} Topics Analyzed
-                </div>
-            </div>
-            {topics_cards_html}
-            {remediation_html}
-        </div>
-        """
+        return (
+            f'<div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 18px; padding: 1.35rem 1.5rem; margin: 1.25rem 0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);">'
+            f'<div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.85rem; margin-bottom: 1.15rem; flex-wrap: wrap; gap: 10px;">'
+            f'<div style="display: flex; align-items: center; gap: 10px;">'
+            f'<span style="font-size: 1.4rem;">📊</span>'
+            f'<div>'
+            f'<div style="font-family: \'Outfit\', sans-serif; font-size: 1.15rem; font-weight: 800; color: #0f172a;">Visual Knowledge Radar & Diagnostic Matrix</div>'
+            f'<div style="font-size: 0.8rem; color: #64748b;">Topic-by-topic retention mapping and targeted review recommendations</div>'
+            f'</div>'
+            f'</div>'
+            f'<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 0.3rem 0.85rem; font-size: 0.8rem; font-weight: 700; color: #475569;">'
+            f'{len(topics)} Topics Analyzed'
+            f'</div>'
+            f'</div>'
+            f'{topics_cards_html}'
+            f'{remediation_html}'
+            f'</div>'
+        )
