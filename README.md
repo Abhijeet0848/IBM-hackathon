@@ -10,7 +10,7 @@
 ---
 
 ## 🌐 **Live Web Application**
-👉 **[Launch AI Study Buddy Live](https://ibm-hackathon-qy8csbf954w9pewxnyh3se.streamlit.app/)**
+👉 **[Launch AI Study Buddy Live](https://studyverse-ai.streamlit.app)**
 
 ---
 
