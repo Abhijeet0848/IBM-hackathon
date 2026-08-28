@@ -115,40 +115,94 @@ button[data-testid="stSidebarCollapsedControl"],
     background: #f5f3ff !important;
 }
 
-/* Typography Headings */
+/* Typography Headings (Ultra-Crisp Deep Slate) */
 h1, h2, h3, h4, h5, h6,
 .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4, .stMarkdown h5 {
     font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif !important;
-    color: #0f172a !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.025em !important;
+    color: #090d16 !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+    text-rendering: optimizeLegibility;
 }
 
 h1, .stMarkdown h1 {
-    font-size: 2.35rem !important;
+    font-size: clamp(1.85rem, 5vw, 2.45rem) !important;
+    line-height: 1.25 !important;
 }
 
 h2, .stMarkdown h2 {
-    font-size: 1.85rem !important;
+    font-size: clamp(1.5rem, 4vw, 1.95rem) !important;
+    line-height: 1.3 !important;
 }
 
 h3, .stMarkdown h3 {
-    font-size: 1.45rem !important;
+    font-size: clamp(1.25rem, 3vw, 1.55rem) !important;
+    line-height: 1.35 !important;
 }
 
 h4, .stMarkdown h4 {
-    font-size: 1.2rem !important;
+    font-size: 1.25rem !important;
+    line-height: 1.4 !important;
 }
 
 h5, .stMarkdown h5 {
-    font-size: 1.08rem !important;
+    font-size: 1.1rem !important;
+    line-height: 1.45 !important;
 }
 
-p, span, label, li,
+p, span, li,
 .stMarkdown p, .stMarkdown li, .stMarkdown span {
-    color: #334155 !important;
+    color: #0f172a !important;
     font-size: 0.98rem !important;
-    line-height: 1.65 !important;
+    font-weight: 500 !important;
+    line-height: 1.68 !important;
+}
+
+/* Captions and Subtext (High Contrast Dark Slate) */
+.stCaption, .stCaption p, .stCaption span, small {
+    color: #334155 !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    line-height: 1.5 !important;
+}
+
+/* Form Labels & Widget Labels */
+label, [data-testid="stWidgetLabel"] p, [data-testid="stWidgetLabel"] label {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+    font-size: 0.94rem !important;
+    letter-spacing: -0.01em !important;
+}
+
+/* Checkbox Labels */
+label[data-baseweb="checkbox"] span {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+}
+
+/* Radio Button Labels */
+label[data-baseweb="radio"] span,
+label[data-baseweb="radio"] div {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+}
+
+/* Streamlit Metric Typography */
+div[data-testid="stMetricValue"] {
+    font-family: 'Outfit', sans-serif !important;
+    color: #0f172a !important;
+    font-size: clamp(1.35rem, 3.5vw, 1.85rem) !important;
+    font-weight: 800 !important;
+}
+
+div[data-testid="stMetricLabel"] p {
+    color: #334155 !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
 }
 
 /* Streamlit Tabs Typography */
@@ -156,8 +210,15 @@ button[data-baseweb="tab"] div,
 button[data-baseweb="tab"] p {
     font-family: 'Outfit', sans-serif !important;
     font-size: 1.02rem !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     letter-spacing: -0.01em !important;
+    color: #1e293b !important;
+}
+
+button[data-baseweb="tab"][aria-selected="true"] div,
+button[data-baseweb="tab"][aria-selected="true"] p {
+    color: #4338ca !important;
+    font-weight: 800 !important;
 }
 
 /* Primary and Secondary Buttons */
@@ -166,7 +227,7 @@ button[kind="primary"],
 button[kind="secondary"] {
     font-family: 'Plus Jakarta Sans', sans-serif !important;
     font-size: 0.96rem !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     border-radius: 10px !important;
 }
 
