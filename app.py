@@ -968,7 +968,7 @@ def render_study_workspace(study_planner, rag_engine, llm_client, stats):
 
             if st.session_state.current_flashcards:
                 st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-                components.html(FlashcardEngine.render_interactive_flashcard_deck(st.session_state.current_flashcards), height=440)
+                components.html(FlashcardEngine.render_interactive_flashcard_deck(st.session_state.current_flashcards), height=495)
 
     # ----------------------------------------------------------------------
     # TAB 5: VECTOR DB & KNOWLEDGE EXPLORER
