@@ -22,37 +22,58 @@ class FlashcardEngine:
         if not context_text or len(context_text.strip()) < 10:
             return FlashcardEngine._get_fallback_flashcards("General Studies", count)
 
+        cards = []
+
         # 1. Attempt LLM Generation if available
         if llm_client and hasattr(llm_client, "generate") and llm_client.is_connected():
             prompt = (
                 f"You are an expert cognitive learning tutor. Analyze the following course syllabus / notes:\n\n"
-                f"{context_text[:4000]}\n\n"
+                f"{context_text[:8000]}\n\n"
                 f"Extract exactly {count} high-yield active recall flashcards covering key definitions, "
-                f"core formulas, fundamental principles, and conceptual differences.\n\n"
-                f"Output strictly valid JSON as an array of objects in this format:\n"
+                f"core formulas, fundamental principles, and conceptual differences from this document.\n\n"
+                f"Output strictly valid JSON as an array of objects matching this format:\n"
                 f"[\n"
-                f'  {{"id": 1, "front": "Concept or Question prompt", "back": "Clear, concise definition or breakdown", "category": "Topic Name", "difficulty": "Medium"}}\n'
+                f'  {{"id": 1, "front": "Specific Question or Definition Prompt from Notes", "back": "Accurate, concise definition or breakdown", "category": "Topic Name", "difficulty": "Medium"}}\n'
                 f"]"
             )
             try:
-                raw_resp = llm_client.generate(prompt=prompt, max_tokens=2200, temperature=0.3)
+                raw_resp = llm_client.generate(prompt=prompt, system_mode="plan_json", max_tokens=3000, temperature=0.3)
                 json_match = re.search(r'\[.*\]', raw_resp, re.DOTALL)
                 if json_match:
-                    cards = json.loads(json_match.group(0))
-                    if isinstance(cards, list) and len(cards) > 0:
-                        for idx, c in enumerate(cards):
-                            c["id"] = idx + 1
-                        return cards
+                    parsed = json.loads(json_match.group(0))
+                    if isinstance(parsed, list) and len(parsed) > 0:
+                        cards = parsed
             except Exception:
                 pass
 
-        # 2. Heuristic Context-Aware Fallback Generator
-        return FlashcardEngine._synthesize_from_context(context_text, count)
+        # 2. If LLM returned fewer than count, supplement with heuristic context cards
+        if len(cards) < count:
+            heuristic_cards = FlashcardEngine._synthesize_from_context(context_text, count - len(cards))
+            existing_fronts = {c.get("front", "").strip().lower() for c in cards}
+            for hc in heuristic_cards:
+                if hc.get("front", "").strip().lower() not in existing_fronts:
+                    cards.append(hc)
+                if len(cards) >= count:
+                    break
+
+        # 3. If still below requested count, pad with cognitive learning science cards
+        if len(cards) < count:
+            fallbacks = FlashcardEngine._get_fallback_flashcards("Study Mastery", count)
+            for fb in fallbacks:
+                if len(cards) >= count:
+                    break
+                cards.append(fb)
+
+        # Ensure unique sequential IDs
+        for idx, c in enumerate(cards[:count]):
+            c["id"] = idx + 1
+
+        return cards[:count]
 
     @staticmethod
     def _synthesize_from_context(text: str, count: int) -> List[Dict[str, Any]]:
         """Generates clean, syllabus-derived flashcards from text sentences and bullet points."""
-        lines = [ln.strip() for ln in text.splitlines() if len(ln.strip()) > 15]
+        lines = [ln.strip() for ln in text.splitlines() if len(ln.strip()) > 10]
         cards = []
         card_id = 1
 
@@ -63,7 +84,7 @@ class FlashcardEngine:
             if ":" in ln:
                 parts = ln.split(":", 1)
                 term, explanation = parts[0].strip(), parts[1].strip()
-                if 3 < len(term) < 60 and len(explanation) > 15:
+                if 2 < len(term) < 70 and len(explanation) > 10:
                     cards.append({
                         "id": card_id,
                         "front": f"Define and explain: **{term}**",
@@ -75,7 +96,7 @@ class FlashcardEngine:
             elif " - " in ln:
                 parts = ln.split(" - ", 1)
                 term, explanation = parts[0].strip(), parts[1].strip()
-                if 3 < len(term) < 60 and len(explanation) > 15:
+                if 2 < len(term) < 70 and len(explanation) > 10:
                     cards.append({
                         "id": card_id,
                         "front": f"What is the significance of: **{term}**?",
@@ -85,28 +106,25 @@ class FlashcardEngine:
                     })
                     card_id += 1
 
-        # If still need more cards, generate from clauses
+        # Extract sentences and key clauses if still need more
         if len(cards) < count:
-            sentences = [s.strip() for s in re.split(r'[\.\;\n]', text) if len(s.strip()) > 25]
+            sentences = [s.strip() for s in re.split(r'[\.\;\n]', text) if len(s.strip()) > 20]
             for s in sentences:
                 if len(cards) >= count:
                     break
                 words = s.split()
-                if len(words) >= 6:
+                if len(words) >= 5:
                     key_phrase = " ".join(words[:4])
                     cards.append({
                         "id": card_id,
-                        "front": f"Explain the core principle behind: *{key_phrase}...*",
+                        "front": f"Explain the key concept: *{key_phrase}...*",
                         "back": s,
                         "category": "Key Principle",
                         "difficulty": "Medium"
                     })
                     card_id += 1
 
-        if not cards:
-            return FlashcardEngine._get_fallback_flashcards("Course Studies", count)
-
-        return cards[:count]
+        return cards
 
     @staticmethod
     def _get_fallback_flashcards(topic: str, count: int) -> List[Dict[str, Any]]:
@@ -137,6 +155,118 @@ class FlashcardEngine:
                 "front": "What is the Leitner Flashcard System?",
                 "back": "A spaced repetition method using boxes where correctly answered cards are reviewed less frequently, while missed cards are reviewed daily.",
                 "category": "Study Strategy",
+                "difficulty": "Hard"
+            },
+            {
+                "id": 5,
+                "front": "What is Interleaving Practice?",
+                "back": "Mixing different related topics or problem types during a single study session to develop adaptive problem-solving skills.",
+                "category": "Cognitive Science",
+                "difficulty": "Medium"
+            },
+            {
+                "id": 6,
+                "front": "What is the Pomodoro Technique?",
+                "back": "A time management framework utilizing 25-minute focused work blocks followed by 5-minute cognitive rest periods to maintain mental stamina.",
+                "category": "Productivity",
+                "difficulty": "Easy"
+            },
+            {
+                "id": 7,
+                "front": "What is Cognitive Load Theory in learning?",
+                "back": "A psychological theory that working memory has limited capacity, requiring information to be chunked to avoid cognitive overload.",
+                "category": "Learning Theory",
+                "difficulty": "Hard"
+            },
+            {
+                "id": 8,
+                "front": "How does Retrieval Practice enhance long-term memory?",
+                "back": "Testing yourself on material produces the 'testing effect', which restructures neural memory pathways far more durably than re-studying.",
+                "category": "Memory Retention",
+                "difficulty": "Medium"
+            },
+            {
+                "id": 9,
+                "front": "What is Dual Coding Theory?",
+                "back": "The concept that combining verbal information with visual diagrams creates separate yet additive memory traces in the brain.",
+                "category": "Cognitive Science",
+                "difficulty": "Medium"
+            },
+            {
+                "id": 10,
+                "front": "What is the Method of Loci (Memory Palace)?",
+                "back": "A mnemonic technique associating concepts with familiar physical locations along an imagined journey for ordered recall.",
+                "category": "Mnemonics",
+                "difficulty": "Hard"
+            },
+            {
+                "id": 11,
+                "front": "What role does Sleep Consolidation play in study mastery?",
+                "back": "During slow-wave and REM sleep, the hippocampus replays and transfers short-term memories to the neocortex for permanent storage.",
+                "category": "Neuroscience",
+                "difficulty": "Medium"
+            },
+            {
+                "id": 12,
+                "front": "What is Metacognition?",
+                "back": "The ability to analyze, monitor, and regulate one's own understanding and learning strategies ('thinking about thinking').",
+                "category": "Self-Regulation",
+                "difficulty": "Easy"
+            },
+            {
+                "id": 13,
+                "front": "What is the Spacing Effect?",
+                "back": "The phenomenon where learning is greater when study sessions are spaced out over time rather than crammed in a single marathon.",
+                "category": "Spaced Learning",
+                "difficulty": "Easy"
+            },
+            {
+                "id": 14,
+                "front": "What is Elaborative Rehearsal?",
+                "back": "Connecting new syllabus topics to existing knowledge schemas by asking 'why does this make sense?' and 'how does this connect?'.",
+                "category": "Deep Learning",
+                "difficulty": "Medium"
+            },
+            {
+                "id": 15,
+                "front": "What is the Generation Effect?",
+                "back": "Information is remembered much better if it is actively generated by the student rather than simply read or heard.",
+                "category": "Active Recall",
+                "difficulty": "Easy"
+            },
+            {
+                "id": 16,
+                "front": "What is Chunking in information processing?",
+                "back": "Grouping individual bits of data into meaningful larger units to bypass the 4-7 item working memory limit.",
+                "category": "Cognitive Science",
+                "difficulty": "Easy"
+            },
+            {
+                "id": 17,
+                "front": "What is Desirable Difficulty in education?",
+                "back": "Learning tasks that require effort and active struggle yield stronger retention and deeper understanding than effortless review.",
+                "category": "Learning Theory",
+                "difficulty": "Hard"
+            },
+            {
+                "id": 18,
+                "front": "What is Priming in memory retrieval?",
+                "back": "Exposure to a stimulus influences the response to a later stimulus, activating associative neural pathways.",
+                "category": "Psychology",
+                "difficulty": "Medium"
+            },
+            {
+                "id": 19,
+                "front": "What is the Zeigarnik Effect?",
+                "back": "The tendency to better remember uncompleted or interrupted tasks compared to completed ones, useful for study breaks.",
+                "category": "Productivity",
+                "difficulty": "Medium"
+            },
+            {
+                "id": 20,
+                "front": "What is Deliberate Practice?",
+                "back": "Goal-oriented, systematic practice focused specifically on weaknesses with immediate feedback rather than mindless repetition.",
+                "category": "Mastery",
                 "difficulty": "Hard"
             }
         ]
